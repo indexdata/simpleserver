@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.33 2004-06-07 17:00:55 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.34 2004-09-03 13:27:19 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -358,7 +358,7 @@ void fatal(char *fmt, ...)
 {
     va_list ap;
 
-    fprintf(stderr, "FATAL (yazwrap): ");
+    fprintf(stderr, "FATAL (SimpleServer): ");
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
     va_end(ap);
@@ -441,8 +441,21 @@ static SV *rpn2perl(Z_RPNStructure *s)
     case Z_RPNStructure_simple: {
 	Z_Operand *o = s->u.simple;
 	Z_AttributesPlusTerm *at;
+	if (o->which == Z_Operand_resultSetId) {
+	    /* This code causes a SIGBUS on my machine, and I have no
+	       idea why.  It seems as clear as day to me */
+	    char *rsid = (char*) o->u.resultSetId;
+	    printf("Encoding resultSetId '%s'\n", rsid);
+	    sv = newObject("Net::Z3950::RPN::RSID", (SV*) (hv = newHV()));
+	    printf("Made sv=0x%lx, hv=0x%lx\n",
+		   (unsigned long) sv ,(unsigned long) hv);
+	    SV *sv2 = newSVpv(rsid, strlen(rsid));
+	    setMember(hv, "id", sv2);
+	    printf("Set hv{id} to 0x%lx\n", (unsigned long) sv2);
+	    return sv;
+	}
 	if (o->which != Z_Operand_APT)
-	    fatal("can't handle RPN simples other than APT");
+	    fatal("can't handle RPN simples other than APT and RSID");
 	at = o->u.attributesPlusTerm;
 	if (at->term->which != Z_Term_general)
 	    fatal("can't handle RPN terms other than general");
@@ -1317,6 +1330,9 @@ void bend_close(void *handle)
 
 
 MODULE = Net::Z3950::SimpleServer	PACKAGE = Net::Z3950::SimpleServer
+
+PROTOTYPES: DISABLE
+
 
 void
 set_init_handler(arg)
