@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.21 2004-06-04 09:57:00 sondberg Exp $
+## $Id: SimpleServer.pm,v 1.22 2004-09-03 13:24:55 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -39,7 +39,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
 @EXPORT = qw( );
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
@@ -95,6 +95,7 @@ package Net::Z3950::RPN::And;
 package Net::Z3950::RPN::Or;
 package Net::Z3950::RPN::AndNot;
 package Net::Z3950::RPN::Term;
+package Net::Z3950::RPN::RSID;
 package Net::Z3950::RPN::Attributes;
 package Net::Z3950::RPN::Attribute;
 
@@ -390,10 +391,15 @@ node of one of the above types.
 
 See below for details.
 
+=item C<Net::Z3950::RPN::RSID>
+
+A reference to a result-set ID indicating a previous search.  The ID
+of the result-set is in the C<id> element.
+
 =back
 
 (I guess I should make a superclass C<Net::Z3950::RPN::Node> and make
-all of these subclasses of it.  Not done that yet, but will do soon.)
+all of these subclasses of it.  Not done that yet, but will do one day.)
 
 =back
 
