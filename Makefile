@@ -154,19 +154,13 @@ EXPORT_LIST =
 PERL_ARCHIVE = 
 
 TO_INST_PM = OID.pm \
-	SQL.pm \
-	SQL_test.pl \
 	SimpleServer.pm \
 	ztest.pl
 
 PM_TO_BLIB = ztest.pl \
 	$(INST_LIBDIR)/ztest.pl \
-	SQL.pm \
-	$(INST_LIBDIR)/SQL.pm \
 	OID.pm \
 	$(INST_LIBDIR)/OID.pm \
-	SQL_test.pl \
-	$(INST_LIBDIR)/SQL_test.pl \
 	SimpleServer.pm \
 	$(INST_LIBDIR)/SimpleServer.pm
 
@@ -506,7 +500,7 @@ realclean purge ::  clean
 	rm -rf $(INST_AUTODIR) $(INST_ARCHAUTODIR)
 	rm -f $(INST_DYNAMIC) $(INST_BOOT)
 	rm -f $(INST_STATIC)
-	rm -f $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/SQL.pm $(INST_LIBDIR)/OID.pm $(INST_LIBDIR)/SQL_test.pl $(INST_LIBDIR)/SimpleServer.pm
+	rm -f $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/OID.pm $(INST_LIBDIR)/SimpleServer.pm
 	rm -rf Makefile Makefile.old
 
 

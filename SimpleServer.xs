@@ -32,6 +32,7 @@
 #include <yaz/log.h>
 #include <yaz/wrbuf.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
 #ifdef ASN_COMPILED
@@ -269,6 +270,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	hv_store(href, "HITS", 4, newSViv(0), 0);
 	hv_store(href, "DATABASES", 9, newRV( (SV*) aref), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
+	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 	query = zquery2pquery(rr->query);
 	if (query)
 	{
@@ -435,6 +437,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
 	hv_store(href, "SUR_FLAG", 8, newSViv(0), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
+	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 	if (rr->comp)
 	{
 		composition = rr->comp;
@@ -575,6 +578,7 @@ int bend_present(void *handle, bend_present_rr *rr)
 	/*oid_dotted = oid2dotted(rr->request_format_raw);
         hv_store(href, "REQ_FORM", 8, newSVpv((char *)oid_dotted->buf, oid_dotted->pos), 0);*/
 	hv_store(href, "HITS", 4, newSViv(0), 0);
+	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 	if (rr->comp)
 	{
 		composition = rr->comp;
@@ -708,6 +712,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "PEER_NAME", 9, newSVpv(q->peer_name, 0), 0);
 	hv_store(href, "HANDLE", 6, newSVsv(&sv_undef), 0);
+	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 
 	PUSHMARK(sp);	
 
