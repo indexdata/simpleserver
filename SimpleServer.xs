@@ -25,7 +25,10 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.10  2001-08-29 11:48:36  sondberg
+/*Revision 1.11  2001-08-30 13:15:11  sondberg
+/*Corrected a memory leak, one more to go.
+/*
+/*Revision 1.10  2001/08/29 11:48:36  sondberg
 /*Added routines
 /*
 /*	Net::Z3950::SimpleServer::ScanSuccess
@@ -797,7 +800,6 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	int i;
 	char **basenames;
 	SV **temp;
-	SV *list_ref = sv_newmortal();
 	SV *err_code = sv_newmortal();
 	SV *err_str = sv_newmortal();
 	SV *point = sv_newmortal();
@@ -806,6 +808,8 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	char *ptr;
 	char *ODR_errstr;
 	STRLEN len;
+	int term_len;
+	SV *term_tmp;
 	
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 
@@ -816,7 +820,8 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	list = newAV();
 	if (rr->term->term->which == Z_Term_general)
 	{
-		hv_store(href, "TERM", 4, newSVpv(rr->term->term->u.general->buf, 0), 0);
+		term_len = rr->term->term->u.general->len;
+		hv_store(href, "TERM", 4, newSVpv(rr->term->term->u.general->buf, term_len), 0);
 	} else {
 		rr->errcode = 229;	/* Unsupported term type */
 		return 0;
@@ -863,8 +868,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	number = newSVsv(*temp);
 
 	temp = hv_fetch(href, "ENTRIES", 7, 1);
-	list_ref = newSVsv(*temp);
-	entries = (AV *)SvRV(list_ref);
+	entries = (AV *)SvRV(newSVsv(*temp));
 
 	PUTBACK;
 	FREETMPS;
@@ -890,20 +894,23 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 		buffer->occurrences = SvIV(*temp);
 		buffer++;
 		hv_undef(scan_item);
+		/*sv_free((SV *)scan_item);*/
 	}
 	rr->entries = scan_list;
 	zhandle->handle = point;
 	handle = zhandle;
-	/*sv_free(list_ref);*/
 	sv_free(err_code);
 	sv_free(err_str);
 	sv_free(status);
 	sv_free(number);
-	/*sv_free(point);*/
 	hv_undef(href);
+	sv_free((SV *)href);
 	av_undef(aref);
+	sv_free((SV *)aref);
 	av_undef(list);
+	sv_free((SV *)list);
 	av_undef(entries);
+	sv_free((SV *)entries);
 
         return 0;
 }

@@ -5,7 +5,6 @@ use Net::Z3950::SimpleServer;
 use Net::Z3950::OID;
 use strict;
 
-
 sub dump_hash {
 	my $href = shift;
 	my $key;
@@ -51,8 +50,6 @@ sub my_scan_handler {
 				{	TERM		=>	'Number 10',
 					OCCURRENCE	=>	4 },
 			];
-
-
 	$args->{NUMBER} = 10;
 	$args->{ENTRIES} = $entries;
 	$args->{STATUS} = Net::Z3950::SimpleServer::ScanPartial;
@@ -129,7 +126,10 @@ $handler->launch_server("ztest.pl", @ARGV);
 
 
 ## $Log: ztest.pl,v $
-## Revision 1.9  2001-08-29 11:48:36  sondberg
+## Revision 1.10  2001-08-30 13:15:11  sondberg
+## Corrected a memory leak, one more to go.
+##
+## Revision 1.9  2001/08/29 11:48:36  sondberg
 ## Added routines
 ##
 ## 	Net::Z3950::SimpleServer::ScanSuccess
