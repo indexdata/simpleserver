@@ -25,7 +25,10 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.12  2001-08-30 14:02:10  sondberg
+/*Revision 1.13  2002-02-28 11:21:57  mike
+/*Add RPN structure to search-handler argument hash.
+/*
+/*Revision 1.12  2001/08/30 14:02:10  sondberg
 /*Small changes.
 /*
 /*Revision 1.11  2001/08/30 13:15:11  sondberg
@@ -279,6 +282,170 @@ WRBUF zquery2pquery(Z_Query *q)
 }
 
 
+/* Lifted verbatim from Net::Z3950 yazwrap/util.c */
+#include <stdarg.h>
+void fatal(char *fmt, ...)
+{
+    va_list ap;
+
+    fprintf(stderr, "FATAL (yazwrap): ");
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    fprintf(stderr, "\n");
+    abort();
+}
+
+
+/* Lifted verbatim from Net::Z3950 yazwrap/receive.c */
+/*
+ * Creates a new Perl object of type `class'; the newly-created scalar
+ * that is a reference to the blessed thingy `referent' is returned.
+ */
+static SV *newObject(char *class, SV *referent)
+{
+    HV *stash;
+    SV *sv;
+
+    sv = newRV_noinc((SV*) referent);
+    stash = gv_stashpv(class, 0);
+    if (stash == 0)
+	fatal("attempt to create object of undefined class '%s'", class);
+    /*assert(stash != 0);*/
+    sv_bless(sv, stash);
+    return sv;
+}
+
+
+/* Lifted verbatim from Net::Z3950 yazwrap/receive.c */
+static void setMember(HV *hv, char *name, SV *val)
+{
+    /* We don't increment `val's reference count -- I think this is
+     * right because it's created with a refcount of 1, and in fact
+     * the reference via this hash is the only reference to it in
+     * general.
+     */
+    if (!hv_store(hv, name, (U32) strlen(name), val, (U32) 0))
+	fatal("couldn't store member in hash");
+}
+
+
+/* Lifted verbatim from Net::Z3950 yazwrap/receive.c */
+static SV *translateOID(Odr_oid *x)
+{
+    /* Yaz represents an OID by an int array terminated by a negative
+     * value, typically -1; we represent it as a reference to a
+     * blessed scalar string of "."-separated elements.
+     */
+    char buf[1000];
+    int i;
+
+    *buf = '\0';
+    for (i = 0; x[i] >= 0; i++) {
+	sprintf(buf + strlen(buf), "%d", (int) x[i]);
+	if (x[i+1] >- 0)
+	    strcat(buf, ".");
+    }
+
+    /*
+     * ### We'd like to return a blessed scalar (string) here, but of
+     *	course you can't do that in Perl: only references can be
+     *	blessed, so we'd have to return a _reference_ to a string, and
+     *	bless _that_.  Better to do without the blessing, I think.
+     */
+    if (1) {
+	return newSVpv(buf, 0);
+    } else {
+	return newObject("Net::Z3950::APDU::OID", newSVpv(buf, 0));
+    }
+}
+
+
+static SV *rpn2perl(Z_RPNStructure *s)
+{
+    SV *sv;
+    HV *hv;
+    AV *av;
+
+    switch (s->which) {
+    case Z_RPNStructure_simple: {
+	Z_Operand *o = s->u.simple;
+	Z_AttributesPlusTerm *at;
+	if (o->which != Z_Operand_APT)
+	    fatal("can't handle RPN simples other than APT");
+	at = o->u.attributesPlusTerm;
+	if (at->term->which != Z_Term_general)
+	    fatal("can't handle RPN terms other than general");
+
+	sv = newObject("Net::Z3950::RPN::Term", (SV*) (hv = newHV()));
+	if (at->attributes) {
+	    int i;
+	    SV *attrs = newObject("Net::Z3950::RPN::Attributes",
+				  (SV*) (av = newAV()));
+	    for (i = 0; i < at->attributes->num_attributes; i++) {
+		Z_AttributeElement *elem = at->attributes->attributes[i];
+		HV *hv2;
+		SV *tmp = newObject("Net::Z3950::RPN::Attribute",
+				    (SV*) (hv2 = newHV()));
+		if (elem->attributeSet)
+		    setMember(hv2, "attributeSet",
+			      translateOID(elem->attributeSet));
+		setMember(hv2, "attributeType",
+			  newSViv(*elem->attributeType));
+		assert(elem->which == Z_AttributeValue_numeric);
+		setMember(hv2, "attributeValue",
+			  newSViv(*elem->value.numeric));
+		av_push(av, tmp);
+	    }
+	    setMember(hv, "attributes", attrs);
+	}
+	setMember(hv, "term", newSVpv((char*) at->term->u.general->buf,
+				      at->term->u.general->len));
+	return sv;
+    }
+    case Z_RPNStructure_complex: {
+	SV *tmp;
+	Z_Complex *c = s->u.complex;
+	char *type = 0;		/* vacuous assignment satisfies gcc -Wall */
+	switch (c->roperator->which) {
+	case Z_Operator_and:     type = "Net::Z3950::RPN::And"; break;
+	case Z_Operator_or:      type = "Net::Z3950::RPN::Or"; break;
+	case Z_Operator_and_not: type = "Net::Z3950::RPN::AndNot"; break;
+	case Z_Operator_prox:    fatal("proximity not yet supported");
+	default: fatal("unknown RPN operator %d", (int) c->roperator->which);
+	}
+	sv = newObject(type, (SV*) (av = newAV()));
+	if ((tmp = rpn2perl(c->s1)) == 0)
+	    return 0;
+	av_push(av, tmp);
+	if ((tmp = rpn2perl(c->s2)) == 0)
+	    return 0;
+	av_push(av, tmp);
+	return sv;
+    }
+    default: fatal("unknown RPN node type %d", (int) s->which);
+    }
+
+    return 0;
+}
+
+
+static SV *zquery2perl(Z_Query *q)
+{
+    SV *sv;
+    HV *hv;
+
+    if (q->which != Z_Query_type_1 && q->which != Z_Query_type_101) 
+	return 0;
+    sv = newObject("Net::Z3950::APDU::Query", (SV*) (hv = newHV()));
+    if (q->u.type_1->attributeSetId)
+	setMember(hv, "attributeSet",
+		  translateOID(q->u.type_1->attributeSetId));
+    setMember(hv, "query", rpn2perl(q->u.type_1->RPNStructure));
+    return sv;
+}
+
+
 int bend_sort(void *handle, bend_sort_rr *rr)
 {
 	HV *href;
@@ -391,6 +558,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	hv_store(href, "DATABASES", 9, newRV( (SV*) aref), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
+	hv_store(href, "RPN", 3, zquery2perl(rr->query), 0);
 	query = zquery2pquery(rr->query);
 	if (query)
 	{
@@ -450,6 +618,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 }
 
 
+/* ### this is worryingly similar to oid2str() */
 WRBUF oid2dotted(int *oid)
 {
 

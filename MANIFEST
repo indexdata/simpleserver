@@ -1,6 +1,7 @@
 Changes
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 SimpleServer.pm
 SimpleServer.xs
 test.pl

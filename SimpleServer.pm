@@ -26,7 +26,10 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.9  2001-08-29 11:48:36  sondberg
+## Revision 1.10  2002-02-28 11:21:57  mike
+## Add RPN structure to search-handler argument hash.
+##
+## Revision 1.9  2001/08/29 11:48:36  sondberg
 ## Added routines
 ##
 ## 	Net::Z3950::SimpleServer::ScanSuccess
@@ -61,7 +64,7 @@ require AutoLoader;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.02';
+$VERSION = '0.04';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
@@ -108,6 +111,20 @@ sub launch_server {
 
 	start_server(@args);
 }
+
+
+# Register packages that we will use in translated RPNs
+package Net::Z3950::APDU::Query;
+package Net::Z3950::APDU::OID;
+package Net::Z3950::RPN::And;
+package Net::Z3950::RPN::Or;
+package Net::Z3950::RPN::AndNot;
+package Net::Z3950::RPN::Term;
+package Net::Z3950::RPN::Attributes;
+package Net::Z3950::RPN::Attribute;
+
+# Must revert to original package for Autoloader's benefit
+package Net::Z3950::SimpleServer;
 
 
 # Autoload methods go after =cut, and are processed by the autosplit program.

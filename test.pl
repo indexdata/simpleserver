@@ -82,11 +82,11 @@ sub my_close_handler {
 if (!defined($pid = fork() )) {
 	die "Cannot fork: $!\n";
 } elsif ($pid) {                                        ## Parent launches server
-	my $handler = Net::Z3950::SimpleServer->new({
+	my $handler = Net::Z3950::SimpleServer->new(
 		INIT		=>	\&my_init_handler,
 		CLOSE		=>	\&my_close_handler,
 		SEARCH		=>      \&my_search_handler,
-		FETCH		=>	\&my_fetch_handler	});
+		FETCH		=>	\&my_fetch_handler);
 
 	$handler->launch_server("test.pl", "-1", @ARGV);
 } else {						## Child starts the client
