@@ -312,7 +312,7 @@ The parameters exchanged between the server and the fetch handler are
 	     HANDLE    =>  ref	    ## Reference to data structure
 	     SETNAME   =>  "id"     ## ID of the requested result set
 	     OFFSET    =>  nnn      ## Record offset number
-	     REQ_FORM  =>  "USMARC" ## Client requested record format
+	     REQ_FORM  =>  "n.m.k.l"## Client requested format OID
 	     COMP      =>  "xyz"    ## Formatting instructions
 
 				    ## Handler response:
@@ -323,7 +323,7 @@ The parameters exchanged between the server and the fetch handler are
 	     ERR_CODE  =>  0        ## Error code
 	     ERR_STR   =>  ""       ## Error string
 	     SUR_FLAG  =>  0        ## Surrogate diagnostic flag
-	     REP_FORM  =>  "USMARC" ## Provided record format
+	     REP_FORM  =>  "n.m.k.l"## Provided format OID
 	  };
 
 The REP_FORM value has by default the REQ_FORM value but can be set to
@@ -335,12 +335,9 @@ indicate whether the error condition pertains to the record currently
 being retrieved, or whether it pertains to the operation as a whole
 (eg. the client has specified a result set which does not exist.)
 
-Record formats are currently carried as strings (eg. USMARC, TEXT_XML,
-SUTRS), but this will probably change to proper OID strings in the
-future (not to worry, though, the module will supply constant values
-for the common OIDs). If you need to return USMARC records, you might
-want to have a look at the MARC module on CPAN, if you don't already
-have a way of generating these.
+If you need to return USMARC records, you might want to have a look at
+the MARC module on CPAN, if you don't already have a way of generating
+these.
 
 NOTE: The record offset is 1-indexed - 1 is the offset of the first
 record in the set.
