@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.25 2004-05-14 04:07:50 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.26 2004-05-29 07:04:26 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -118,6 +118,7 @@ int tst_clones(void)
 #endif
 
 int simpleserver_clone(void) {
+#ifdef USE_ITHREADS
      nmem_mutex_enter(simpleserver_mutex);
      if (1)
      {
@@ -135,6 +136,7 @@ int simpleserver_clone(void) {
          }
      }
      nmem_mutex_leave(simpleserver_mutex);
+#endif
      return 0;
 }
 
