@@ -1,6 +1,6 @@
 Revision history for Perl extension Net::Z3950::Server.
 
-0.06  (in progress)
+0.06  Thu Jan 02 11:15:01 2003
         - Added support for authentication
 	- Add documentation for the object tree passed as the RPN
 	  member of the search-handler's argument hash.
