@@ -91,3 +91,9 @@ my $handler = Net::Z3950::SimpleServer->new({
 
 $handler->launch_server("ztest.pl", @ARGV);
 
+
+## $Log: ztest.pl,v $
+## Revision 1.7  2001-03-13 14:20:21  sondberg
+## Added CVS logging
+##
+
