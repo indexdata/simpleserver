@@ -197,17 +197,85 @@ Net::Z3950::Record::GRS1 - Perl package used to encode GRS-1 records.
 
 =head1 SYNOPSIS
 
-  use Net::Z3950::Record::GRS1;
+  use Net::Z3950::GRS1;
 
   my $a_grs1_record = new Net::Z3950::Record::GRS1;
   my $another_grs1_record = new Net::Z3950::Record::GRS1;
 
   $a_grs1_record->AddElement($type, $value, $content);
-  $a_grs1_record->render();
+  $a_grs1_record->Render();
 
 =head1 DESCRIPTION
 
-Here goes the documentation. I guess, you'll have to wait for it!
+This Perl module helps you to create and manipulate GRS-1 records (generic record syntax).
+So far, you have only access to three methods:
+
+=head2 new
+
+Creates a new GRS-1 object,
+
+  my $grs1 = new Net::Z3950::GRS1;
+
+=head2 AddElement
+
+Lets you add entries to a GRS-1 object. The method should be called this way,
+
+  $grs1->AddElement($type, $value, $which, $content);
+
+where $type should be an integer, and $value is free text. The $which argument should
+contain one of the constants listed in Appendix A. Finally, $content contains the "thing"
+that should be stored in this entry. The structure of $content should match the chosen
+element data type. For
+
+  $which == Net::Z3950::GRS1::ElementData::String;
+
+$content should be some kind of scalar. If on the other hand,
+
+  $which == Net::Z3950::GRS1::ElementData::Subtree;
+
+$content should be a GRS1 object.
+
+=head3 Render
+
+This method digs through the GRS-1 data structure and renders the record. You call it
+this way,
+
+  $grs1->Render();
+
+If you want to access the rendered record through a variable, you can do it like this,
+
+  my $record_as_string;
+  $grs1->Render(POOL => \$record_as_string);
+
+If you want it stored in a file, Render should be called this way,
+
+  $grs1->Render(FILE => 'record.grs1');
+
+When no file name is specified, you can choose to stream the rendered record, for instance,
+
+  $grs1->Render(HANDLE => *STDOUT);		## or
+  $grs1->Render(HANDLE => *STDERR);		## or
+  $grs1->Render(HANDLE => *MY_HANDLE);
+
+=head1 APPENDIX A
+
+These element data types are specified in the Z39.50 protocol:
+
+  Net::Z3950::GRS1::ElementData::Octets
+  Net::Z3950::GRS1::ElementData::Numeric
+  Net::Z3950::GRS1::ElementData::Date
+  Net::Z3950::GRS1::ElementData::Ext
+  Net::Z3950::GRS1::ElementData::String			<---
+  Net::Z3950::GRS1::ElementData::TrueOrFalse
+  Net::Z3950::GRS1::ElementData::OID
+  Net::Z3950::GRS1::ElementData::IntUnit
+  Net::Z3950::GRS1::ElementData::ElementNotThere
+  Net::Z3950::GRS1::ElementData::ElementEmpty
+  Net::Z3950::GRS1::ElementData::NoDataRequested
+  Net::Z3950::GRS1::ElementData::Diagnostic
+  Net::Z3950::GRS1::ElementData::Subtree		<---
+
+Only the '<---' marked types are so far supported in this package.
 
 =head1 AUTHOR
 
@@ -222,7 +290,10 @@ Specification of the GRS-1 standard, for instance in the Z39.50 protocol specifi
 =cut
 
 #$Log: GRS1.pm,v $
-#Revision 1.1  2001-03-13 14:17:15  sondberg
+#Revision 1.2  2001-03-13 14:53:15  sondberg
+#Added a few lines of documentation into GRS1.pm.
+#
+#Revision 1.1  2001/03/13 14:17:15  sondberg
 #Added support for GRS-1.
 #
 
