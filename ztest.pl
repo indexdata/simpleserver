@@ -106,7 +106,6 @@ sub my_fetch_handler {
 	$hash->{Fetch} = "Fetch handler er besøgt";
 	##$href->{RECORD} = "<head>Overskrift</head> <text>Her kommer teksten</text>";
 	$href->{RECORD} = "<xml><head>Overskrift</head><body>Der var engang en mand</body></xml>";
-	$href->{LEN} = 69;
 	$href->{NUMBER} = 1;
 	$href->{BASENAME} = "MS-Gud";
 	$href->{LAST} = 1;

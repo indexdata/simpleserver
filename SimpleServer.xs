@@ -1,3 +1,30 @@
+/*
+ * Copyright (c) 2000, Index Data.
+ *
+ * Permission to use, copy, modify, distribute, and sell this software and
+ * its documentation, in whole or in part, for any purpose, is hereby granted,
+ * provided that:
+ *
+ * 1. This copyright and permission notice appear in all copies of the
+ * software and its documentation. Notices of copyright or attribution
+ * which appear at the beginning of any file must remain unchanged.
+ *
+ * 2. The name of Index Data or the individual authors may not be used to
+ * endorse or promote products derived from this software without specific
+ * prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS, IMPLIED, OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+ * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * IN NO EVENT SHALL INDEX DATA BE LIABLE FOR ANY SPECIAL, INCIDENTAL,
+ * INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND, OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER OR
+ * NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF
+ * LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+ * OF THIS SOFTWARE.
+ */
+
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -301,7 +328,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	HV *href;
 	SV **temp;
 	SV *basename;
-	SV *len;
 	SV *record;
 	SV *last;
 	SV *err_code;
@@ -334,7 +360,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	hv_store(href, "REQ_FORM", 8, newSVpv((char *)oid_dotted->buf, oid_dotted->pos), 0);
 	hv_store(href, "REP_FORM", 8, newSVpv((char *)oid_dotted->buf, oid_dotted->pos), 0);
 	hv_store(href, "BASENAME", 8, newSVpv("", 0), 0);
-	hv_store(href, "LEN", 3, newSViv(0), 0);
 	hv_store(href, "RECORD", 6, newSVpv("", 0), 0);
 	hv_store(href, "LAST", 4, newSViv(0), 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
@@ -344,7 +369,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	if (rr->comp)
 	{
 		composition = rr->comp;
-		if (composition->which == 1)
+		if (composition->which == Z_RecordComp_simple)
 		{
 			simple = composition->u.simple;
 			if (simple->which == 1)
@@ -374,9 +399,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 
 	temp = hv_fetch(href, "BASENAME", 8, 1);
 	basename = newSVsv(*temp);
-
-	temp = hv_fetch(href, "LEN", 3, 1);
-	len = newSVsv(*temp);
 
 	temp = hv_fetch(href, "RECORD", 6, 1);
 	record = newSVsv(*temp);
@@ -418,12 +440,11 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	}
 	rr->output_format_raw = ODR_oid_buf;	
 	
-	rr->len = SvIV(len);
-
 	ptr = SvPV(record, length);
 	ODR_record = (char *)odr_malloc(rr->stream, length + 1);
 	strcpy(ODR_record, ptr);
 	rr->record = ODR_record;
+	rr->len = length;
 
 	zhandle->handle = point;
 	handle = zhandle;
@@ -439,11 +460,9 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	}
 	rr->surrogate_flag = SvIV(sur_flag);
 
-	/*sv_free(point);*/
 	wrbuf_free(oid_dotted, 1);
 	sv_free((SV*) href);
 	sv_free(basename);
-	sv_free(len);
 	sv_free(record);
 	sv_free(last);
 	sv_free(err_string);

@@ -1,3 +1,30 @@
+##
+##  Copyright (c) 2000, Index Data.
+##
+##  Permission to use, copy, modify, distribute, and sell this software and
+##  its documentation, in whole or in part, for any purpose, is hereby granted,
+##  provided that:
+##
+##  1. This copyright and permission notice appear in all copies of the
+##  software and its documentation. Notices of copyright or attribution
+##  which appear at the beginning of any file must remain unchanged.
+##
+##  2. The name of Index Data or the individual authors may not be used to
+##  endorse or promote products derived from this software without specific
+##  prior written permission.
+##
+##  THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
+##  EXPRESS, IMPLIED, OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+##  WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+##  IN NO EVENT SHALL INDEX DATA BE LIABLE FOR ANY SPECIAL, INCIDENTAL,
+##  INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND, OR ANY DAMAGES
+##  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER OR
+##  NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF
+##  LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+##  OF THIS SOFTWARE.
+##
+##
+
 package Net::Z3950::SimpleServer;
 
 use strict;
@@ -68,11 +95,11 @@ __END__
 
 =head1 NAME
 
-Zfront - Simple Perl API for building Z39.50 servers. 
+Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers. 
 
 =head1 SYNOPSIS
 
-  use Zfront;
+  use Net::Z3950::SimpleServer;
 
   sub my_search_handler {
 	my $args = shift;
@@ -106,16 +133,19 @@ Zfront - Simple Perl API for building Z39.50 servers.
 
   ## Register custom event handlers:
 
-  Zfront::set_search_handler(\&my_search_handler);
-  Zfront::set_fetch_handler(\&my_fetch_handler);
-
+  my $handle = Net::Z3950::SimpleServer->new({
+						INIT   =>  \&my_init_handler,
+						CLOSE  =>  \&my_close_handler,
+						SEARCH =>  \&my_search_handler,
+						FETCH  =>  \&my_fetch_handler
+					     });
   ## Launch server:
 
-  Zfront::start_server("mytestserver", @ARGV);
+  $handle->launch_server("ztest.pl", @ARGV);
 
 =head1 DESCRIPTION
 
-The Zfront module is a tool for constructing Z39.50 "Information
+The SimpleServer module is a tool for constructing Z39.50 "Information
 Retrieval" servers in Perl. The module is easy to use, but it
 does help to have an understanding of the Z39.50 query
 structure and the construction of structured retrieval records.
@@ -156,17 +186,18 @@ the entries of these hashes are to be considered input and others
 output parameters.
 
 The Perl programmer specifies the event handles for the server by
-means of the subroutines
+means of the the SimpleServer object constructor
 
-  Zfront::set_init_handler(\&my_init_handler);
-  Zfront::set_search_handler(\&my_search_handler);
-  Zfront::set_fetch_handler(\&my_fetch_handler);
-  Zfront::set_close_handler(\&my_close_handler);
+  my $handle = Net::Z3950::SimpleServer->new({
+		INIT	=>	\&my_init_handler,
+		CLOSE	=>	\&my_close_handler,
+		SEARCH	=>	\&my_search_handler,
+		FETCH	=>	\&my_fetch_handler });
 
-After each handle is declared, the server is launched by means of
-the subroutine
+After the custom event handles are declared, the server is launched
+by means of the method
 
-  Zfront::start_server($script_name, @ARGV);
+  $handle->launch_server("MyServer.pl", @ARGV);
 
 Notice, the first argument should be the name of your server
 script (for logging purposes), while the rest of the arguments
@@ -283,11 +314,11 @@ The parameters exchanged between the server and the fetch handler are
 	     SETNAME   =>  "id"     ## ID of the requested result set
 	     OFFSET    =>  nnn      ## Record offset number
 	     REQ_FORM  =>  "USMARC" ## Client requested record format
+	     COMP      =>  "xyz"    ## Formatting instructions
 
 				    ## Handler response:
 
 	     RECORD    =>  ""       ## Record string
-	     LEN       =>  0        ## Length of record string
 	     BASENAME  =>  ""       ## Origin of returned record
 	     LAST      =>  0        ## Last record in set?
 	     ERR_CODE  =>  0        ## Error code

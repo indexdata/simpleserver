@@ -151,10 +151,10 @@ TO_INST_PM = OID.pm \
 	SimpleServer.pm \
 	ztest.pl
 
-PM_TO_BLIB = SimpleServer.pm \
-	$(INST_LIBDIR)/SimpleServer.pm \
-	ztest.pl \
+PM_TO_BLIB = ztest.pl \
 	$(INST_LIBDIR)/ztest.pl \
+	SimpleServer.pm \
+	$(INST_LIBDIR)/SimpleServer.pm \
 	OID.pm \
 	$(INST_LIBDIR)/OID.pm
 
@@ -491,7 +491,7 @@ realclean purge ::  clean
 	rm -rf $(INST_AUTODIR) $(INST_ARCHAUTODIR)
 	rm -f $(INST_DYNAMIC) $(INST_BOOT)
 	rm -f $(INST_STATIC)
-	rm -f $(INST_LIBDIR)/SimpleServer.pm $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/OID.pm
+	rm -f $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/SimpleServer.pm $(INST_LIBDIR)/OID.pm
 	rm -rf Makefile Makefile.old
 
 
