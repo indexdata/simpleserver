@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.31 2004-06-06 09:07:18 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.32 2004-06-07 16:48:38 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -103,7 +103,7 @@ CV * simpleserver_sv2cv(SV *handler) {
 }
 
 /* debugging routine to check for destruction of Perl interpreters */
-#if 1
+#ifdef USE_ITHREADS
 void tst_clones(void)
 {
     int i; 
