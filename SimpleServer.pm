@@ -26,7 +26,10 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.7  2001-08-24 14:00:20  sondberg
+## Revision 1.8  2001-08-29 10:29:51  sondberg
+## Added some documentation of scan.
+##
+## Revision 1.7  2001/08/24 14:00:20  sondberg
 ## Added support for scan.
 ##
 ## Revision 1.6  2001/03/13 14:17:15  sondberg
@@ -131,7 +134,7 @@ Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
 
 	my $set_id = $args->{SETNAME};
 
-	my $record = fetch_a_record($args->{OFFSET);
+	my $record = fetch_a_record($args->{OFFSET});
 
 	$args->{RECORD} = $record;
 	if (number_of_hits() == $args->{OFFSET}) {	## Last record in set?
@@ -144,15 +147,13 @@ Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
 
   ## Register custom event handlers:
 
-  my $handle = Net::Z3950::SimpleServer->new({
-						INIT   =>  \&my_init_handler,
+  my $z = new Net::Z3950::SimpleServer(		INIT   =>  \&my_init_handler,
 						CLOSE  =>  \&my_close_handler,
 						SEARCH =>  \&my_search_handler,
-						FETCH  =>  \&my_fetch_handler
-					     });
+						FETCH  =>  \&my_fetch_handler);
   ## Launch server:
 
-  $handle->launch_server("ztest.pl", @ARGV);
+  $z->launch_server("ztest.pl", @ARGV);
 
 =head1 DESCRIPTION
 
@@ -184,6 +185,7 @@ of events:
   - Search request
   - Present request
   - Fetching of records
+  - Scan request (browsing) 
   - Closing down connection
 
 Note that only the Search and Fetch handler functions are required.
@@ -200,17 +202,18 @@ output parameters.
 The Perl programmer specifies the event handles for the server by
 means of the the SimpleServer object constructor
 
-  my $handle = Net::Z3950::SimpleServer->new({
-		INIT	=>	\&my_init_handler,
-		CLOSE	=>	\&my_close_handler,
-		SEARCH	=>	\&my_search_handler,
-		PRESENT	=>	\&my_present_handler,
-		FETCH	=>	\&my_fetch_handler });
+  my $z = new Net::Z3950::SimpleServer(
+			INIT	=>	\&my_init_handler,
+			CLOSE	=>	\&my_close_handler,
+			SEARCH	=>	\&my_search_handler,
+			PRESENT	=>	\&my_present_handler,
+			SCAN	=>	\&my_scan_handler,
+			FETCH	=>	\&my_fetch_handler);
 
 After the custom event handles are declared, the server is launched
 by means of the method
 
-  $handle->launch_server("MyServer.pl", @ARGV);
+  $z->launch_server("MyServer.pl", @ARGV);
 
 Notice, the first argument should be the name of your server
 script (for logging purposes), while the rest of the arguments
@@ -395,6 +398,54 @@ these.
 
 NOTE: The record offset is 1-indexed - 1 is the offset of the first
 record in the set.
+
+=head2 Scan handler
+
+A full featured Z39.50 server should support scan (or in some literature
+browse). The client specifies a starting term of the scan, and the server
+should return an ordered list of specified length consisting of terms
+actually occurring in the data base. Each of these terms should be close
+to or equal to the term originally specified. The quality of scan compared
+to simple search is a guarantee of hits. It is simply like browsing through
+an index of a book, you always find something! The parameters exchanged are
+
+  $args = {
+						## Client request
+
+		HANDLE		=> $ref		## Reference to data structure
+		TERM		=> 'start',	## The start term
+		NUMBER		=> xx,		## Number of requested terms
+		POS		=> yy,		## Position of starting point
+						## within returned list
+		STEP		=> 0,		## Step size
+
+						## Server response
+
+		ERR_CODE	=> 0,		## Error code
+		ERR_STR		=> '',		## Diagnostic message
+		NUMBER		=> zz,		## Number of returned terms
+		STATUS		=> ScanSuccess,	## ScanSuccess/ScanFailure
+		ENTRIES		=> $entries	## Referenced list of terms
+	};
+
+where the term list is returned by reference in the scalar $entries, which
+should point at a data structure of this kind,
+
+  my $entries = [
+			{	TERM		=> 'energy',
+				OCCURRENCE	=> 5		},
+
+			{	TERM		=> 'energy density',
+				OCCURRENCE	=> 6,		},
+
+			{	TERM		=> 'energy flow',
+				OCCURRENCE	=> 3		},
+
+				...
+
+				...
+	];
+			
 
 =head2 Close handler
 
