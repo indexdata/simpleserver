@@ -158,12 +158,15 @@ TO_INST_PM = GRS1.pm \
 	OID.pm \
 	SimpleServer.pm \
 	grs_test.pl \
+	hash2grs.pl \
 	ztest.pl
 
 PM_TO_BLIB = GRS1.pm \
 	$(INST_LIBDIR)/GRS1.pm \
 	ztest.pl \
 	$(INST_LIBDIR)/ztest.pl \
+	hash2grs.pl \
+	$(INST_LIBDIR)/hash2grs.pl \
 	OID.pm \
 	$(INST_LIBDIR)/OID.pm \
 	grs_test.pl \
@@ -510,7 +513,7 @@ realclean purge ::  clean
 	rm -rf $(INST_AUTODIR) $(INST_ARCHAUTODIR)
 	rm -f $(INST_DYNAMIC) $(INST_BOOT)
 	rm -f $(INST_STATIC)
-	rm -f $(INST_LIBDIR)/GRS1.pm $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/OID.pm $(INST_LIBDIR)/grs_test.pl $(INST_LIBDIR)/SimpleServer.pm
+	rm -f $(INST_LIBDIR)/GRS1.pm $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/hash2grs.pl $(INST_LIBDIR)/OID.pm $(INST_LIBDIR)/grs_test.pl $(INST_LIBDIR)/SimpleServer.pm
 	rm -rf Makefile Makefile.old
 
 

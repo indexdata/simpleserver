@@ -16,9 +16,9 @@ sub new {
 	bless $self, $class;
 	if (defined($href) && ref($href) eq 'HASH') {
 		if (!defined($map)) {
-			croak "Usage: new Net::Z3950::GRS1($href, $map);";
+			croak 'Usage: new Net::Z3950::GRS1($href, $map);';
 		}	
-		$self->Hash2grs($href);
+		$self->Hash2grs($href, $map);
 	}
 
 	return $self;
@@ -30,25 +30,37 @@ sub Hash2grs {
 	my $key;
 	my $content;
 	my $aref;
+	my $issue;
 
 	$mapping = defined($mapping) ? $mapping : $self->{MAP};
+	$self->{MAP} = $mapping;
 	foreach $key (keys %$href) {
 		$content = $href->{$key};
+		next unless defined($content);
 		if (!defined($aref = $mapping->{$key})) {
 			print STDERR "Hash2grs: Unmapped key: '$key'\n";
 			next;
 		}
 		if (ref($content) eq 'HASH') {					## Subtree?
-			my $subtree = new Net::Z3950::GRS1($content);
+			my $subtree = new Net::Z3950::GRS1($content, $mapping);
 			$self->AddElement($aref->[0], $aref->[1], &Net::Z3950::GRS1::ElementData::Subtree, $subtree);
-		} elsif (ref($content) eq '') {					## Regular string?
+		} elsif (!ref($content)) {					## Regular string?
 			$self->AddElement($aref->[0], $aref->[1], &Net::Z3950::GRS1::ElementData::String, $content);
+		} elsif (ref($content) eq 'ARRAY') {
+			my $issues = new Net::Z3950::GRS1;
+			foreach $issue (@$content) {
+				my $entry = new Net::Z3950::GRS1($issue, $mapping);
+				$issues->AddElement(5, 1, &Net::Z3950::GRS1::ElementData::Subtree, $entry);
+			}
+			$self->AddElement($aref->[0], $aref->[1], &Net::Z3950::GRS1::ElementData::Subtree, $issues);
 		} else {
 			print STDERR "Hash2grs: Unsupported content type\n";
 			next;
 		}
 	}
 }
+
+
 sub GetElementList {
 	my $self = shift;
 
@@ -344,7 +356,10 @@ Specification of the GRS-1 standard, for instance in the Z39.50 protocol specifi
 =cut
 
 #$Log: GRS1.pm,v $
-#Revision 1.4  2001-05-17 14:07:06  sondberg
+#Revision 1.5  2001-05-21 11:07:02  sondberg
+#Extended maximum numbers of GRS-1 elements. Should be done dynamically.
+#
+#Revision 1.4  2001/05/17 14:07:06  sondberg
 #Added some documentation.
 #
 #Revision 1.3  2001/05/17 13:43:04  sondberg

@@ -25,7 +25,10 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.7  2001-03-13 14:17:15  sondberg
+/*Revision 1.8  2001-05-21 11:07:02  sondberg
+/*Extended maximum numbers of GRS-1 elements. Should be done dynamically.
+/*
+/*Revision 1.7  2001/03/13 14:17:15  sondberg
 /*Added support for GRS-1.
 /**/
 
@@ -40,7 +43,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
-#define GRS_MAX_FIELDS 50
+#define GRS_MAX_FIELDS 500 
 #ifdef ASN_COMPILED
 #include <yaz/ill.h>
 #endif
@@ -121,6 +124,11 @@ Z_GenericRecord *read_grs1(char *str, ODR o)
 			r->elements = (Z_TaggedElement **)
 			odr_malloc(o, sizeof(Z_TaggedElement*) * GRS_MAX_FIELDS);
 			r->num_elements = 0;
+		}
+		if (r->num_elements > GRS_MAX_FIELDS)
+		{
+			yaz_log(LOG_WARN, "Max number of GRS-1 elements exceeded [GRS_MAX_FIELDS=%d]", GRS_MAX_FIELDS);
+			exit(0);
 		}
 		r->elements[r->num_elements] = t = (Z_TaggedElement *) odr_malloc(o, sizeof(Z_TaggedElement));
 		t->tagType = (int *)odr_malloc(o, sizeof(int));
