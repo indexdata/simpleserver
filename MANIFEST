@@ -6,3 +6,4 @@ SimpleServer.xs
 test.pl
 ztest.pl
 OID.pm
+INSTALL
