@@ -26,7 +26,10 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.14  2002-03-06 11:30:02  mike
+## Revision 1.15  2002-09-16 14:00:16  sondberg
+## Updated Changes and added a few lines of documentation.
+##
+## Revision 1.14  2002/03/06 11:30:02  mike
 ## Add RPN structure documentation to SimpleServer.pm's POD.
 ## Add README to MANIFEST.
 ##
@@ -78,7 +81,7 @@ require AutoLoader;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
@@ -276,6 +279,10 @@ The argument hash passed to the init handler has the form
 	     IMP_NAME  =>  "",      ## Z39.50 Implementation name
 	     IMP_VER   =>  "",      ## Z39.50 Implementation version
 	     ERR_CODE  =>  0,       ## Error code, cnf. Z39.50 manual
+	     USER      =>  "xxx"    ## If Z39.50 authentication is used,
+	     			    ## this member contains user name
+	     PASS      =>  "yyy"    ## Under same conditions, this member
+	     			    ## contains the password in clear text
 	     HANDLE    =>  undef    ## Handler of Perl data structure
 	  };
 
