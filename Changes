@@ -1,6 +1,8 @@
 Revision history for Perl extension Net::Z3950::Server.
 
 0.06  (in progress)
+	- Add documentation for the object tree passed as the RPN
+	  member of the search-handler's argument hash.
 	- We actually removed the vacuous Changelog and TODO files
 	  back in 0.05.  They should never have been here :-)
 
