@@ -25,8 +25,8 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.17  2003-01-03 09:00:24  sondberg
-/**** empty log message ***
+/*Revision 1.18  2003-01-03 09:05:41  sondberg
+/*Applied Dave's GRS-1 patch - actually this was already done in revision 1.17.
 /*
 /*Revision 1.16  2002/11/26 17:09:18  mike
 /*basic support for idPass authentication
