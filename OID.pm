@@ -50,3 +50,7 @@ sub xml		{ $prefix . '109.10' }
 sub appxml	{ $prefix . '109.11' }
 
 
+## $Log: OID.pm,v $
+## Revision 1.2  2001-03-13 14:54:13  sondberg
+## Started CVS logging
+##
