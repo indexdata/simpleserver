@@ -1,5 +1,5 @@
 ##
-##  Copyright (c) 2000, Index Data.
+##  Copyright (c) 2000-2004, Index Data.
 ##
 ##  Permission to use, copy, modify, distribute, and sell this software and
 ##  its documentation, in whole or in part, for any purpose, is hereby granted,
@@ -26,7 +26,10 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.18  2003-09-09 20:12:38  mike
+## Revision 1.19  2004-05-13 19:04:32  adam
+## Bump year
+##
+## Revision 1.18  2003/09/09 20:12:38  mike
 ## Return diagnostics on Init failure
 ##
 ## Revision 1.17  2003/09/09 11:40:10  mike

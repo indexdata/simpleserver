@@ -1,9 +1,8 @@
 /*
-
- * $Id: SimpleServer.xs,v 1.23 2004-05-13 18:55:40 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.24 2004-05-13 19:04:28 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
- * Copyright (c) 2000, Index Data.
+ * Copyright (c) 2000-2004, Index Data.
  *
  * Permission to use, copy, modify, distribute, and sell this software and
  * its documentation, in whole or in part, for any purpose, is hereby granted,
@@ -27,8 +26,6 @@
  * LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
  * OF THIS SOFTWARE.
  */
-
-
 
 #include "EXTERN.h"
 #include "perl.h"
