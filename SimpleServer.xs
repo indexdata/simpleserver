@@ -37,7 +37,9 @@
 #ifdef ASN_COMPILED
 #include <yaz/ill.h>
 #endif
-
+#ifndef sv_undef		/* To fix the problem with Perl 5.6.0 */
+#define sv_undef PL_sv_undef
+#endif
 
 typedef struct {
 	SV *handle;
