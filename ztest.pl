@@ -20,6 +20,7 @@ sub my_init_handler {
 	my $session = {};
 
 	$args->{IMP_NAME} = "DemoServer";
+	$args->{IMP_ID} = "81";
 	$args->{IMP_VER} = "3.14159";
 	$args->{ERR_CODE} = 0;
 	$args->{HANDLE} = $session;
@@ -121,16 +122,19 @@ sub my_fetch_handler {
 
 
 my $handler = new Net::Z3950::SimpleServer( 
-		INIT	=>	\&my_init_handler,
-		SEARCH	=>	\&my_search_handler,
-		SCAN	=>	\&my_scan_handler,
-		FETCH	=>	\&my_fetch_handler );
+		INIT	=>	"main::my_init_handler",
+		SEARCH	=>	"main::my_search_handler",
+		SCAN	=>	"main::my_scan_handler",
+		FETCH	=>	"main::my_fetch_handler" );
 
 $handler->launch_server("ztest.pl", @ARGV);
 
 
 ## $Log: ztest.pl,v $
-## Revision 1.11  2002-09-16 13:55:53  sondberg
+## Revision 1.12  2004-05-11 12:15:16  sondberg
+## Simpleserver is now thread proof.
+##
+## Revision 1.11  2002/09/16 13:55:53  sondberg
 ## Added support for authentication into SimpleServer.
 ##
 ## Revision 1.10  2001/08/30 13:15:11  sondberg

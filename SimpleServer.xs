@@ -1,4 +1,8 @@
 /*
+
+ * $Id: SimpleServer.xs,v 1.21 2004-05-11 12:15:16 sondberg Exp $ 
+ * ----------------------------------------------------------------------
+ * 
  * Copyright (c) 2000, Index Data.
  *
  * Permission to use, copy, modify, distribute, and sell this software and
@@ -24,56 +28,11 @@
  * OF THIS SOFTWARE.
  */
 
-/*$Log: SimpleServer.xs,v $
-/*Revision 1.20  2003-09-09 20:12:38  mike
-/*Return diagnostics on Init failure
-/*
-/*Revision 1.19  2003/09/09 11:40:10  mike
-/*(Finally!) support implementation-ID
-/*
-/*Revision 1.18  2003/01/03 09:05:41  sondberg
-/*Applied Dave's GRS-1 patch - actually this was already done in revision 1.17.
-/*
-/*Revision 1.16  2002/11/26 17:09:18  mike
-/*basic support for idPass authentication
-/*
-/*Revision 1.15  2002/09/16 13:55:53  sondberg
-/*Added support for authentication into SimpleServer.
-/*
-/*Revision 1.14  2002/03/05 00:34:13  mike
-/*Support for implementation_id (commented out until it's
-/*in mainstream Yaz)
-/*
-/*Revision 1.13  2002/02/28 11:21:57  mike
-/*Add RPN structure to search-handler argument hash.
-/*
-/*Revision 1.12  2001/08/30 14:02:10  sondberg
-/*Small changes.
-/*
-/*Revision 1.11  2001/08/30 13:15:11  sondberg
-/*Corrected a memory leak, one more to go.
-/*
-/*Revision 1.10  2001/08/29 11:48:36  sondberg
-/*Added routines
-/*
-/*	Net::Z3950::SimpleServer::ScanSuccess
-/*	Net::Z3950::SimpleServer::ScanPartial
-/*
-/*and a bit of documentation.
-/*
-/*Revision 1.9  2001/08/24 14:00:20  sondberg
-/*Added support for scan.
-/*
-/*Revision 1.8  2001/05/21 11:07:02  sondberg
-/*Extended maximum numbers of GRS-1 elements. Should be done dynamically.
-/*
-/*Revision 1.7  2001/03/13 14:17:15  sondberg
-/*Added support for GRS-1.
-/**/
 
 
 #include "EXTERN.h"
 #include "perl.h"
+#include "embed.h"
 #include "XSUB.h"
 #include <yaz/backend.h>
 #include <yaz/log.h>
@@ -113,9 +72,49 @@ SV *present_ref = NULL;
 SV *esrequest_ref = NULL;
 SV *delete_ref = NULL;
 SV *scan_ref = NULL;
+PerlInterpreter *root_perl_context;
 int MAX_OID = 15;
 
 #define GRS_BUF_SIZE 512
+
+CV * simpleserver_sv2cv(SV *handler) {
+    STRLEN len;
+    char *buf;
+   
+    if (SvPOK(handler)) {
+	CV *ret;
+	buf = SvPV( handler, len);
+	if ( !( ret = perl_get_cv(buf, FALSE ) ) ) {
+	    fprintf( stderr, "simpleserver_sv2cv: No such handler '%s'\n\n", buf );
+	    exit(1);
+	}
+	
+	return ret;
+    } else {
+	return (CV *) handler;
+    }
+}
+
+
+int simpleserver_clone(void) {
+     PerlInterpreter *current = PERL_GET_CONTEXT;
+
+     if (!current) {
+         PerlInterpreter *perl_interp = perl_clone(root_perl_context, CLONEf_COPY_STACKS);
+         PERL_SET_CONTEXT( perl_interp );
+     }
+     return 0;
+}
+
+
+void simpleserver_free(void) {
+    PerlInterpreter *current_interp = PERL_GET_CONTEXT;
+
+    perl_destruct(current_interp);
+    perl_free(current_interp);
+    PERL_SYS_TERM();
+}
+
 
 Z_GenericRecord *read_grs1(char *str, ODR o)
 {
@@ -557,6 +556,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	SV *point;
 	SV *ODR_point;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
+	CV* handler_cv = 0;
 
 	dSP;
 	ENTER;
@@ -593,7 +593,8 @@ int bend_search(void *handle, bend_search_rr *rr)
 	
 	PUTBACK;
 
-	n = perl_call_sv(search_ref, G_SCALAR | G_DISCARD);
+	handler_cv = simpleserver_sv2cv( search_ref );
+	perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
 
 	SPAGAIN;
 
@@ -722,6 +723,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	oident *oid;
 	WRBUF oid_dotted;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
+	CV* handler_cv = 0;
 
 	Z_RecordComposition *composition;
 	Z_ElementSetNames *simple;
@@ -773,7 +775,8 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 
 	PUTBACK;
 	
-	perl_call_sv(fetch_ref, G_SCALAR | G_DISCARD);
+	handler_cv = simpleserver_sv2cv( fetch_ref );
+	perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
 
 	SPAGAIN;
 
@@ -877,6 +880,7 @@ int bend_present(void *handle, bend_present_rr *rr)
 	char *ODR_errstr;
 	char *ptr;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
+	CV* handler_cv = 0;
 
 /*	WRBUF oid_dotted; */
 
@@ -924,7 +928,8 @@ int bend_present(void *handle, bend_present_rr *rr)
 	
 	PUTBACK;
 	
-	perl_call_sv(present_ref, G_SCALAR | G_DISCARD);
+	handler_cv = simpleserver_sv2cv( present_ref );
+	perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
 	
 	SPAGAIN;
 
@@ -1002,8 +1007,8 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	int term_len;
 	SV *term_tmp;
 	SV *entries_ref;
-	
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
+	CV* handler_cv = 0;
 
 	dSP;
 	ENTER;
@@ -1040,7 +1045,8 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 
 	PUTBACK;
 
-	perl_call_sv(scan_ref, G_SCALAR | G_DISCARD);
+	handler_cv = simpleserver_sv2cv( scan_ref );
+	perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
 
 	SPAGAIN;
 
@@ -1111,6 +1117,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 
 bend_initresult *bend_init(bend_initrequest *q)
 {
+        int dummy = simpleserver_clone();
 	bend_initresult *r = (bend_initresult *) odr_malloc (q->stream, sizeof(*r));
 	HV *href;
 	SV **temp;
@@ -1128,6 +1135,9 @@ bend_initresult *bend_init(bend_initrequest *q)
 	char *ptr;
 	char *user = NULL;
 	char *passwd = NULL;
+	CV* handler_cv = 0;
+
+	PERL_SET_CONTEXT(PERL_GET_THX);
 
 	dSP;
 	ENTER;
@@ -1188,7 +1198,8 @@ bend_initresult *bend_init(bend_initrequest *q)
 
 	if (init_ref != NULL)
 	{
-		perl_call_sv(init_ref, G_SCALAR | G_DISCARD);
+	     handler_cv = simpleserver_sv2cv( init_ref );
+	     perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
 	}
 
 	SPAGAIN;
@@ -1242,6 +1253,7 @@ void bend_close(void *handle)
 	HV *href;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	SV **temp;
+	CV* handler_cv = 0;
 
 	dSP;
 	ENTER;
@@ -1261,7 +1273,8 @@ void bend_close(void *handle)
 
 	PUTBACK;
 	
-	perl_call_sv(close_ref, G_SCALAR | G_DISCARD);
+	handler_cv = simpleserver_sv2cv( close_ref );
+	perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
 	
 	SPAGAIN;
 
@@ -1270,6 +1283,7 @@ void bend_close(void *handle)
 	LEAVE;
 
 	xfree(handle);
+	simpleserver_free();
 	
 	return;
 }
@@ -1357,6 +1371,7 @@ start_server(...)
 			strcpy(*argv_buf++, ptr); 
 		}
 		*argv_buf = NULL;
+		root_perl_context = PERL_GET_CONTEXT;
 		
 		RETVAL = statserv_main(items, argv, bend_init, bend_close);
 	OUTPUT:
