@@ -5,6 +5,17 @@ use Net::Z3950::SimpleServer;
 use Net::Z3950::OID;
 use strict;
 
+
+sub dump_hash {
+	my $href = shift;
+	my $key;
+
+	foreach $key (keys %$href) {
+		printf("%10s	=>	%s\n", $key, $href->{$key});
+	}
+}
+
+
 sub my_init_handler {
 	my $args = shift;
 	my $session = {};
@@ -61,7 +72,6 @@ sub my_fetch_handler {
 	my $href = $data->[$offset - 1];
 
 	$args->{REP_FORM} = Net::Z3950::OID::xml;
-
 	foreach $field (keys %$href) {
 		$record .= "<" . $field . ">" . $href->{$field} . "</" . $field . ">";
 	}

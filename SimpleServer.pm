@@ -64,6 +64,7 @@ sub new {
 	$self->{SEARCH} = $args->{SEARCH} || croak "SimpleServer.pm: ERROR: Unspecified search handler";
 	$self->{FETCH} = $args->{FETCH} || croak "SimpleServer.pm: ERROR: Unspecified fetch handler";
 	$self->{CLOSE} = $args->{CLOSE};
+	$self->{PRESENT} = $args->{PRESENT};
 
 	bless $self, $class;
 	return $self;
@@ -81,6 +82,9 @@ sub launch_server {
 	set_fetch_handler($self->{FETCH});
 	if (defined($self->{CLOSE})) {
 		set_close_handler($self->{CLOSE});
+	}
+	if (defined($self->{PRESENT})) {
+		set_present_handler($self->{PRESENT});
 	}
 
 	start_server(@args);
@@ -170,6 +174,7 @@ of events:
 
   - Initialize request
   - Search request
+  - Present request
   - Fetching of records
   - Closing down connection
 
@@ -191,6 +196,7 @@ means of the the SimpleServer object constructor
 		INIT	=>	\&my_init_handler,
 		CLOSE	=>	\&my_close_handler,
 		SEARCH	=>	\&my_search_handler,
+		PRESENT	=>	\&my_present_handler,
 		FETCH	=>	\&my_fetch_handler });
 
 After the custom event handles are declared, the server is launched
@@ -217,9 +223,9 @@ The argument hash passed to the init handler has the form
   $args = {
 				    ## Response parameters:
 
-	     IMP_NAME  =>  ""       ## Z39.50 Implementation name
-	     IMP_VER   =>  ""       ## Z39.50 Implementation version
-	     ERR_CODE  =>  0        ## Error code, cnf. Z39.50 manual
+	     IMP_NAME  =>  "",      ## Z39.50 Implementation name
+	     IMP_VER   =>  "",      ## Z39.50 Implementation version
+	     ERR_CODE  =>  0,       ## Error code, cnf. Z39.50 manual
 	     HANDLE    =>  undef    ## Handler of Perl data structure
 	  };
 
@@ -248,17 +254,17 @@ mous hash. The structure is the following:
   $args = {
 	  			    ## Request parameters:
 
-	     HANDLE    =>  ref      ## Your session reference.
-	     SETNAME   =>  "id"     ## ID of the result set
-	     REPL_SET  =>  0        ## Replace set if already existing?
-	     DATABASES =>  ["xxx"]  ## Reference to a list of data-
+	     HANDLE    =>  ref,     ## Your session reference.
+	     SETNAME   =>  "id",    ## ID of the result set
+	     REPL_SET  =>  0,       ## Replace set if already existing?
+	     DATABASES =>  ["xxx"], ## Reference to a list of data-
 				    ## bases to search
-	     QUERY     =>  "query"  ## The query expression
+	     QUERY     =>  "query", ## The query expression
 
 				    ## Response parameters:
 
-	     ERR_CODE  =>  0        ## Error code (0=Succesful search)
-	     ERR_STR   =>  ""       ## Error string
+	     ERR_CODE  =>  0,       ## Error code (0=Succesful search)
+	     ERR_STR   =>  "",      ## Error string
 	     HITS      =>  0        ## Number of matches
 	  };
 
@@ -297,6 +303,46 @@ need to support anymore functionality than you want to. For instance,
 it is perfectly legal to not accept boolean operators, but you SHOULD
 try to return good error codes if you run into something you can't or
 won't support.
+
+=head2 Present handler
+
+The presence of a present handler in a SimpleServer front-end is optional.
+Each time a client wishes to retrieve records, the present service is
+called. The present service allows the origin to request a certain number
+of records retrieved from a given result set.
+When the present handler is called, the front-end server should prepare a
+result set for fetching. In practice, this means to get access to the
+data from the backend database and store the data in a temporary fashion
+for fast and efficient fetching. The present handler does *not* fetch
+anything. This task is taken care of by the fetch handler, which will be
+called the correct number of times by the YAZ library. More about this
+below.
+If no present handler is implemented in the front-end, the YAZ toolkit
+will take care of a minimum of preparations itself. This default present
+handler is sufficient in many situations, where only a small amount of
+records are expected to be retrieved. If on the other hand, large result
+sets are likely to occur, the implementation of a reasonable present
+handler can gain performance significantly.
+
+The informations exchanged between client and present handle are:
+
+  $args = {
+				    ## Client/server request:
+
+	     HANDLE    =>  ref,     ## Reference to datastructure
+	     SETNAME   =>  "id",    ## Result set ID
+	     START     =>  xxx,     ## Start position
+	     COMP      =>  "",	    ## Desired record composition
+	     NUMBER    =>  yyy,	    ## Number of requested records
+
+
+				    ## Respons parameters:
+
+	     HITS      =>  zzz,	    ## Number of returned records
+	     ERR_CODE  =>  0,	    ## Error code
+	     ERR_STR   =>  ""	    ## Error message
+          };
+
 
 =head2 Fetch handler
 

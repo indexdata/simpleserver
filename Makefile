@@ -12,7 +12,7 @@
 
 #	DEFINE => q[]
 #	INC => q[]
-#	LIBS => [q[-L/usr/local/lib -lyaz -lpthread -L/lib -lwrap -lnsl]]
+#	LIBS => [q[-L/usr/local/lib -lyaz]]
 #	NAME => q[Net::Z3950::SimpleServer]
 #	VERSION_FROM => q[SimpleServer.pm]
 
@@ -148,10 +148,16 @@ EXPORT_LIST =
 PERL_ARCHIVE = 
 
 TO_INST_PM = OID.pm \
+	SQL.pm \
+	SQL_test.pl \
 	SimpleServer.pm \
 	ztest.pl
 
-PM_TO_BLIB = ztest.pl \
+PM_TO_BLIB = SQL_test.pl \
+	$(INST_LIBDIR)/SQL_test.pl \
+	SQL.pm \
+	$(INST_LIBDIR)/SQL.pm \
+	ztest.pl \
 	$(INST_LIBDIR)/ztest.pl \
 	SimpleServer.pm \
 	$(INST_LIBDIR)/SimpleServer.pm \
@@ -263,10 +269,10 @@ SPLIT =
 # Net::Z3950::SimpleServer might depend on some other libraries:
 # See ExtUtils::Liblist for details
 #
-EXTRALIBS = -L/usr/local/lib -lyaz -lpthread -L/lib -lwrap -lnsl
-LDLOADLIBS = -L/usr/local/lib -lyaz -lpthread -L/lib -lwrap -lnsl
+EXTRALIBS = -L/usr/local/lib -lyaz
+LDLOADLIBS = -L/usr/local/lib -lyaz
 BSLOADLIBS = 
-LD_RUN_PATH = /usr/local/lib:/lib:/usr/lib
+LD_RUN_PATH = /usr/local/lib
 
 
 # --- MakeMaker const_cccmd section:
@@ -491,7 +497,7 @@ realclean purge ::  clean
 	rm -rf $(INST_AUTODIR) $(INST_ARCHAUTODIR)
 	rm -f $(INST_DYNAMIC) $(INST_BOOT)
 	rm -f $(INST_STATIC)
-	rm -f $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/SimpleServer.pm $(INST_LIBDIR)/OID.pm
+	rm -f $(INST_LIBDIR)/SQL_test.pl $(INST_LIBDIR)/SQL.pm $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/SimpleServer.pm $(INST_LIBDIR)/OID.pm
 	rm -rf Makefile Makefile.old
 
 

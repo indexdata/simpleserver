@@ -158,8 +158,75 @@ WRBUF zquery2pquery(Z_Query *q)
 
 int bend_sort(void *handle, bend_sort_rr *rr)
 {
-	perl_call_sv(sort_ref, G_VOID | G_DISCARD | G_NOARGS);
-	return;
+	HV *href;
+	AV *aref;
+	SV **temp;
+	SV *err_code;
+	SV *err_str;
+	SV *status;
+	STRLEN len;
+	char *ptr;
+	char *ODR_err_str;
+	char **input_setnames;
+	Zfront_handle *zhandle = (Zfront_handle *)handle;
+	int i;
+	
+	dSP;
+	ENTER;
+	SAVETMPS;
+	
+	aref = newAV();
+	input_setnames = rr->input_setnames;
+	for (i = 0; i < rr->num_input_setnames; i++)
+	{
+		av_push(aref, newSVpv(*input_setnames++, 0));
+	}
+	href = newHV();
+	hv_store(href, "INPUT", 5, newRV( (SV*) aref), 0);
+	hv_store(href, "OUTPUT", 6, newSVpv(rr->output_setname, 0), 0);
+	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
+	hv_store(href, "STATUS", 6, newSViv(0), 0);
+
+	PUSHMARK(sp);
+
+	XPUSHs(sv_2mortal(newRV( (SV*) href)));
+
+	PUTBACK;
+
+	perl_call_sv(sort_ref, G_SCALAR | G_DISCARD);
+
+	SPAGAIN;
+
+	temp = hv_fetch(href, "ERR_CODE", 8, 1);
+	err_code = newSVsv(*temp);
+
+	temp = hv_fetch(href, "ERR_STR", 7, 1);
+	err_str = newSVsv(*temp);
+
+	temp = hv_fetch(href, "STATUS", 6, 1);
+	status = newSVsv(*temp);
+
+
+	
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+
+	hv_undef(href),
+	av_undef(aref);
+	rr->errcode = SvIV(err_code);
+	rr->sort_status = SvIV(status);
+	ptr = SvPV(err_str, len);
+	ODR_err_str = (char *)odr_malloc(rr->stream, len + 1);
+	strcpy(ODR_err_str, ptr);
+	rr->errstring = ODR_err_str;
+
+	sv_free(err_code);
+	sv_free(err_str);
+	sv_free(status);
+	
+	return 0;
 }
 
 
@@ -477,34 +544,42 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 int bend_present(void *handle, bend_present_rr *rr)
 {
 
-	int n;
 	HV *href;
 	SV **temp;
 	SV *err_code;
 	SV *err_string;
+	SV *hits;
+	SV *point;
 	STRLEN len;
 	Z_RecordComposition *composition;
 	Z_ElementSetNames *simple;
 	char *ODR_errstr;
 	char *ptr;
+	Zfront_handle *zhandle = (Zfront_handle *)handle;
+
+/*	WRBUF oid_dotted; */
 
 	dSP;
 	ENTER;
 	SAVETMPS;
 
 	href = newHV();
+        hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
 	hv_store(href, "START", 5, newSViv(rr->start), 0);
 	hv_store(href, "SETNAME", 7, newSVpv(rr->setname, 0), 0);
 	hv_store(href, "NUMBER", 6, newSViv(rr->number), 0);
+	/*oid_dotted = oid2dotted(rr->request_format_raw);
+        hv_store(href, "REQ_FORM", 8, newSVpv((char *)oid_dotted->buf, oid_dotted->pos), 0);*/
+	hv_store(href, "HITS", 4, newSViv(0), 0);
 	if (rr->comp)
 	{
 		composition = rr->comp;
-		if (composition->which == 1)
+		if (composition->which == Z_RecordComp_simple)
 		{
 			simple = composition->u.simple;
-			if (simple->which == 1)
+			if (simple->which == Z_ElementSetNames_generic)
 			{
 				hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
 			} 
@@ -527,7 +602,7 @@ int bend_present(void *handle, bend_present_rr *rr)
 	
 	PUTBACK;
 	
-	n = perl_call_sv(present_ref, G_SCALAR | G_DISCARD);
+	perl_call_sv(present_ref, G_SCALAR | G_DISCARD);
 	
 	SPAGAIN;
 
@@ -537,20 +612,30 @@ int bend_present(void *handle, bend_present_rr *rr)
 	temp = hv_fetch(href, "ERR_STR", 7, 1);
 	err_string = newSVsv(*temp);
 
+	temp = hv_fetch(href, "HITS", 4, 1);
+	hits = newSVsv(*temp);
+
+	temp = hv_fetch(href, "HANDLE", 6, 1);
+	point = newSVsv(*temp);
+
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
 	
 	hv_undef(href);
 	rr->errcode = SvIV(err_code);
+	rr->hits = SvIV(hits);
 
 	ptr = SvPV(err_string, len);
 	ODR_errstr = (char *)odr_malloc(rr->stream, len + 1);
 	strcpy(ODR_errstr, ptr);
 	rr->errstring = ODR_errstr;
-
+/*	wrbuf_free(oid_dotted, 1);*/
+	zhandle->handle = point;
+	handle = zhandle;
 	sv_free(err_code);
 	sv_free(err_string);
+	sv_free(hits);
 	sv_free( (SV*) href);
 
 	return 0;
@@ -604,7 +689,10 @@ bend_initresult *bend_init(bend_initrequest *q)
 	{
 		q->bend_search = bend_search;
 	}
-	/*q->bend_present = present;*/
+	if (present_ref)
+	{
+		q->bend_present = bend_present;
+	}
 	/*q->bend_esrequest = bend_esrequest;*/
 	/*q->bend_delete = bend_delete;*/
 	if (fetch_ref)
@@ -616,6 +704,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	hv_store(href, "IMP_NAME", 8, newSVpv("", 0), 0);
 	hv_store(href, "IMP_VER", 7, newSVpv("", 0), 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
+	hv_store(href, "PEER_NAME", 9, newSVpv(q->peer_name, 0), 0);
 	hv_store(href, "HANDLE", 6, newSVsv(&sv_undef), 0);
 
 	PUSHMARK(sp);	
