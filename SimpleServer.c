@@ -34,7 +34,15 @@
  */
 
 /*$Log: SimpleServer.c,v $
-/*Revision 1.11  2001-08-24 14:00:20  sondberg
+/*Revision 1.12  2001-08-29 11:48:35  sondberg
+/*Added routines
+/*
+/*	Net::Z3950::SimpleServer::ScanSuccess
+/*	Net::Z3950::SimpleServer::ScanPartial
+/*
+/*and a bit of documentation.
+/*
+/*Revision 1.9  2001/08/24 14:00:20  sondberg
 /*Added support for scan.
 /*
 /*Revision 1.8  2001/05/21 11:07:02  sondberg
@@ -1040,7 +1048,7 @@ void bend_close(void *handle)
 }
 
 
-#line 1041 "SimpleServer.c"
+#line 1044 "SimpleServer.c"
 XS(XS_Net__Z3950__SimpleServer_set_init_handler)
 {
     dXSARGS;
@@ -1048,9 +1056,9 @@ XS(XS_Net__Z3950__SimpleServer_set_init_handler)
 	croak("Usage: Net::Z3950::SimpleServer::set_init_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 1037 "SimpleServer.xs"
+#line 1040 "SimpleServer.xs"
 		init_ref = newSVsv(arg);
-#line 1051 "SimpleServer.c"
+#line 1054 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1062,9 +1070,9 @@ XS(XS_Net__Z3950__SimpleServer_set_close_handler)
 	croak("Usage: Net::Z3950::SimpleServer::set_close_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 1044 "SimpleServer.xs"
+#line 1047 "SimpleServer.xs"
 		close_ref = newSVsv(arg);
-#line 1065 "SimpleServer.c"
+#line 1068 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1076,9 +1084,9 @@ XS(XS_Net__Z3950__SimpleServer_set_sort_handler)
 	croak("Usage: Net::Z3950::SimpleServer::set_sort_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 1051 "SimpleServer.xs"
+#line 1054 "SimpleServer.xs"
 		sort_ref = newSVsv(arg);
-#line 1079 "SimpleServer.c"
+#line 1082 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1090,9 +1098,9 @@ XS(XS_Net__Z3950__SimpleServer_set_search_handler)
 	croak("Usage: Net::Z3950::SimpleServer::set_search_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 1057 "SimpleServer.xs"
+#line 1060 "SimpleServer.xs"
 		search_ref = newSVsv(arg);
-#line 1093 "SimpleServer.c"
+#line 1096 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1104,9 +1112,9 @@ XS(XS_Net__Z3950__SimpleServer_set_fetch_handler)
 	croak("Usage: Net::Z3950::SimpleServer::set_fetch_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 1064 "SimpleServer.xs"
+#line 1067 "SimpleServer.xs"
 		fetch_ref = newSVsv(arg);
-#line 1107 "SimpleServer.c"
+#line 1110 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1118,9 +1126,9 @@ XS(XS_Net__Z3950__SimpleServer_set_present_handler)
 	croak("Usage: Net::Z3950::SimpleServer::set_present_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 1071 "SimpleServer.xs"
+#line 1074 "SimpleServer.xs"
 		present_ref = newSVsv(arg);
-#line 1121 "SimpleServer.c"
+#line 1124 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1132,9 +1140,9 @@ XS(XS_Net__Z3950__SimpleServer_set_esrequest_handler)
 	croak("Usage: Net::Z3950::SimpleServer::set_esrequest_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 1078 "SimpleServer.xs"
+#line 1081 "SimpleServer.xs"
 		esrequest_ref = newSVsv(arg);
-#line 1135 "SimpleServer.c"
+#line 1138 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1146,9 +1154,9 @@ XS(XS_Net__Z3950__SimpleServer_set_delete_handler)
 	croak("Usage: Net::Z3950::SimpleServer::set_delete_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 1085 "SimpleServer.xs"
+#line 1088 "SimpleServer.xs"
 		delete_ref = newSVsv(arg);
-#line 1149 "SimpleServer.c"
+#line 1152 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1160,9 +1168,9 @@ XS(XS_Net__Z3950__SimpleServer_set_scan_handler)
 	croak("Usage: Net::Z3950::SimpleServer::set_scan_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 1092 "SimpleServer.xs"
+#line 1095 "SimpleServer.xs"
 		scan_ref = newSVsv(arg);
-#line 1163 "SimpleServer.c"
+#line 1166 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1171,15 +1179,15 @@ XS(XS_Net__Z3950__SimpleServer_start_server)
 {
     dXSARGS;
     {
-#line 1098 "SimpleServer.xs"
+#line 1101 "SimpleServer.xs"
 		char **argv;
 		char **argv_buf;
 		char *ptr;
 		int i;
 		STRLEN len;
-#line 1178 "SimpleServer.c"
+#line 1181 "SimpleServer.c"
 	int	RETVAL;
-#line 1104 "SimpleServer.xs"
+#line 1107 "SimpleServer.xs"
 		argv_buf = (char **)xmalloc((items + 1) * sizeof(char *));
 		argv = argv_buf;
 		for (i = 0; i < items; i++)
@@ -1191,7 +1199,39 @@ XS(XS_Net__Z3950__SimpleServer_start_server)
 		*argv_buf = NULL;
 
 		RETVAL = statserv_main(items, argv, bend_init, bend_close);
-#line 1192 "SimpleServer.c"
+#line 1195 "SimpleServer.c"
+	ST(0) = sv_newmortal();
+	sv_setiv(ST(0), (IV)RETVAL);
+    }
+    XSRETURN(1);
+}
+
+XS(XS_Net__Z3950__SimpleServer_ScanSuccess)
+{
+    dXSARGS;
+    if (items != 0)
+	croak("Usage: Net::Z3950::SimpleServer::ScanSuccess()");
+    {
+	int	RETVAL;
+#line 1125 "SimpleServer.xs"
+		RETVAL = BEND_SCAN_SUCCESS;
+#line 1211 "SimpleServer.c"
+	ST(0) = sv_newmortal();
+	sv_setiv(ST(0), (IV)RETVAL);
+    }
+    XSRETURN(1);
+}
+
+XS(XS_Net__Z3950__SimpleServer_ScanPartial)
+{
+    dXSARGS;
+    if (items != 0)
+	croak("Usage: Net::Z3950::SimpleServer::ScanPartial()");
+    {
+	int	RETVAL;
+#line 1132 "SimpleServer.xs"
+		RETVAL = BEND_SCAN_PARTIAL;
+#line 1227 "SimpleServer.c"
 	ST(0) = sv_newmortal();
 	sv_setiv(ST(0), (IV)RETVAL);
     }
@@ -1218,6 +1258,8 @@ XS(boot_Net__Z3950__SimpleServer)
         newXS("Net::Z3950::SimpleServer::set_delete_handler", XS_Net__Z3950__SimpleServer_set_delete_handler, file);
         newXS("Net::Z3950::SimpleServer::set_scan_handler", XS_Net__Z3950__SimpleServer_set_scan_handler, file);
         newXS("Net::Z3950::SimpleServer::start_server", XS_Net__Z3950__SimpleServer_start_server, file);
+        newXS("Net::Z3950::SimpleServer::ScanSuccess", XS_Net__Z3950__SimpleServer_ScanSuccess, file);
+        newXS("Net::Z3950::SimpleServer::ScanPartial", XS_Net__Z3950__SimpleServer_ScanPartial, file);
     XSRETURN_YES;
 }
 

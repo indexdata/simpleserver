@@ -25,7 +25,15 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.9  2001-08-24 14:00:20  sondberg
+/*Revision 1.10  2001-08-29 11:48:36  sondberg
+/*Added routines
+/*
+/*	Net::Z3950::SimpleServer::ScanSuccess
+/*	Net::Z3950::SimpleServer::ScanPartial
+/*
+/*and a bit of documentation.
+/*
+/*Revision 1.9  2001/08/24 14:00:20  sondberg
 /*Added support for scan.
 /*
 /*Revision 1.8  2001/05/21 11:07:02  sondberg
@@ -1116,4 +1124,21 @@ start_server(...)
 		
 		RETVAL = statserv_main(items, argv, bend_init, bend_close);
 	OUTPUT:
-		RETVAL 
+		RETVAL
+
+
+int
+ScanSuccess()
+	CODE:
+		RETVAL = BEND_SCAN_SUCCESS;
+	OUTPUT:
+		RETVAL
+
+int
+ScanPartial()
+	CODE:
+		RETVAL = BEND_SCAN_PARTIAL;
+	OUTPUT:
+		RETVAL
+
+ 

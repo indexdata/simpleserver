@@ -55,6 +55,7 @@ sub my_scan_handler {
 
 	$args->{NUMBER} = 10;
 	$args->{ENTRIES} = $entries;
+	$args->{STATUS} = Net::Z3950::SimpleServer::ScanPartial;
 	print "Welcome to scan....\n";
 	print "You scanned for term '$term'\n";
 }
@@ -128,7 +129,15 @@ $handler->launch_server("ztest.pl", @ARGV);
 
 
 ## $Log: ztest.pl,v $
-## Revision 1.8  2001-08-24 14:00:20  sondberg
+## Revision 1.9  2001-08-29 11:48:36  sondberg
+## Added routines
+##
+## 	Net::Z3950::SimpleServer::ScanSuccess
+## 	Net::Z3950::SimpleServer::ScanPartial
+##
+## and a bit of documentation.
+##
+## Revision 1.8  2001/08/24 14:00:20  sondberg
 ## Added support for scan.
 ##
 ## Revision 1.7  2001/03/13 14:20:21  sondberg

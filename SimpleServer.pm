@@ -26,7 +26,15 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.8  2001-08-29 10:29:51  sondberg
+## Revision 1.9  2001-08-29 11:48:36  sondberg
+## Added routines
+##
+## 	Net::Z3950::SimpleServer::ScanSuccess
+## 	Net::Z3950::SimpleServer::ScanPartial
+##
+## and a bit of documentation.
+##
+## Revision 1.8  2001/08/29 10:29:51  sondberg
 ## Added some documentation of scan.
 ##
 ## Revision 1.7  2001/08/24 14:00:20  sondberg
@@ -424,7 +432,7 @@ an index of a book, you always find something! The parameters exchanged are
 		ERR_CODE	=> 0,		## Error code
 		ERR_STR		=> '',		## Diagnostic message
 		NUMBER		=> zz,		## Number of returned terms
-		STATUS		=> ScanSuccess,	## ScanSuccess/ScanFailure
+		STATUS		=> $status,	## ScanSuccess/ScanFailure
 		ENTRIES		=> $entries	## Referenced list of terms
 	};
 
@@ -445,7 +453,14 @@ should point at a data structure of this kind,
 
 				...
 	];
-			
+
+The $status flag should be assigned one of two values:
+
+  Net::Z3950::SimpleServer::ScanSuccess  On success (default)
+  Net::Z3950::SimpleServer::ScanPartial  Less terms returned than requested
+
+The STEP member contains the requested number of entries in the term-list
+between two adjacent entries in the response.
 
 =head2 Close handler
 
