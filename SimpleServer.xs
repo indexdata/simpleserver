@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.27 2004-06-04 20:16:04 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.28 2004-06-05 07:55:05 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -65,7 +65,10 @@ typedef struct {
 	SV *delete_ref;
 	SV *scan_ref;
 	NMEM nmem;
+	int stop_flag;  /* is used to stop server prematurely .. */
 } Zfront_handle;
+
+#define ENABLE_STOP_SERVER 0
 
 SV *init_ref = NULL;
 SV *close_ref = NULL;
@@ -614,6 +617,12 @@ int bend_search(void *handle, bend_search_rr *rr)
 	{
 		av_push(aref, newSVpv(*basenames++, 0));
 	}
+#if ENABLE_STOP_SERVER
+	if (rr->num_bases == 1 && !strcmp(rr->basenames[0], "XXstop"))
+	{
+		zhandle->stop_flag = 1;
+	}
+#endif
 	href = newHV();		
 	hv_store(href, "SETNAME", 7, newSVpv(rr->setname, 0), 0);
 	hv_store(href, "REPL_SET", 8, newSViv(rr->replace_set), 0);
@@ -1188,6 +1197,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	SAVETMPS;
 
 	zhandle->nmem = nmem;
+	zhandle->stop_flag = 0;
 	/*q->bend_sort = bend_sort;*/
 	if (search_ref)
 	{
@@ -1295,7 +1305,7 @@ void bend_close(void *handle)
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	SV **temp;
 	CV* handler_cv = 0;
-
+	int stop_flag = 0;
 
 	if (close_ref)
 	{
@@ -1320,9 +1330,12 @@ void bend_close(void *handle)
 		FREETMPS;
 		LEAVE;
 	}
+	stop_flag = zhandle->stop_flag;
 	nmem_destroy(zhandle->nmem);
 	simpleserver_free();
-	
+
+	if (stop_flag)
+		exit(0);
 	return;
 }
 

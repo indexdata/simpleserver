@@ -1,8 +1,8 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.3 2004-05-28 20:27:16 sondberg Exp $
+## $Id: Makefile.PL,v 1.4 2004-06-05 07:55:05 adam Exp $
 
-my $libs = `yaz-config --libs threads` || die "ERROR: Unable to call script: yaz-config";
+my $libs = `yaz-config --libs` || die "ERROR: Unable to call script: yaz-config";
 
 WriteMakefile(
     'NAME'	=> 'Net::Z3950::SimpleServer',
