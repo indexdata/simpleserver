@@ -44,6 +44,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
+#define GRS_MAX_FIELDS 50
 #ifdef ASN_COMPILED
 #include <yaz/ill.h>
 #endif
@@ -75,6 +76,95 @@ SV *esrequest_ref = NULL;
 SV *delete_ref = NULL;
 SV *scan_ref = NULL;
 int MAX_OID = 15;
+
+
+Z_GenericRecord *read_grs1(char *str, ODR o)
+{
+	int type, ivalue;
+	char line[512], *buf, *ptr, *original;
+	char value[512];
+ 	Z_GenericRecord *r = 0;
+
+	original = str;
+	for (;;)
+	{
+		Z_TaggedElement *t;
+		Z_ElementData *c;
+	
+		ptr = strchr(str, '\n');
+		if (!ptr) {
+			return r;
+		}
+		strncpy(line, str, ptr - str);
+		line[ptr - str] = 0;
+		buf = line;
+		str = ptr + 1;
+		while (*buf && isspace(*buf))
+			buf++;
+		if (*buf == '}') {
+			memmove(original, str, strlen(str));
+			return r;
+		}
+		if (sscanf(buf, "(%d,%[^)])", &type, value) != 2)
+		{
+			yaz_log(LOG_WARN, "Bad data in '%s'", buf);
+			return 0;
+		}
+		if (!type && *value == '0')
+			return r;
+		if (!(buf = strchr(buf, ')')))
+			return 0;
+		buf++;
+		while (*buf && isspace(*buf))
+			buf++;
+		if (!*buf)
+			return 0;
+		if (!r)
+		{
+			r = (Z_GenericRecord *)odr_malloc(o, sizeof(*r));
+			r->elements = (Z_TaggedElement **)
+			odr_malloc(o, sizeof(Z_TaggedElement*) * GRS_MAX_FIELDS);
+			r->num_elements = 0;
+		}
+		r->elements[r->num_elements] = t = (Z_TaggedElement *) odr_malloc(o, sizeof(Z_TaggedElement));
+		t->tagType = (int *)odr_malloc(o, sizeof(int));
+		*t->tagType = type;
+		t->tagValue = (Z_StringOrNumeric *)
+			odr_malloc(o, sizeof(Z_StringOrNumeric));
+		if ((ivalue = atoi(value)))
+		{
+			t->tagValue->which = Z_StringOrNumeric_numeric;
+			t->tagValue->u.numeric = (int *)odr_malloc(o, sizeof(int));
+			*t->tagValue->u.numeric = ivalue;
+		}
+		else
+		{
+			t->tagValue->which = Z_StringOrNumeric_string;
+			t->tagValue->u.string = (char *)odr_malloc(o, strlen(value)+1);
+			strcpy(t->tagValue->u.string, value);
+		}
+		t->tagOccurrence = 0;
+		t->metaData = 0;
+		t->appliedVariant = 0;
+		t->content = c = (Z_ElementData *)odr_malloc(o, sizeof(Z_ElementData));
+		if (*buf == '{')
+		{
+			c->which = Z_ElementData_subtree;
+			c->u.subtree = read_grs1(str, o);
+		}
+		else
+		{
+			c->which = Z_ElementData_string;
+/*			buf[strlen(buf)-1] = '\0';*/
+			buf[strlen(buf)] = '\0';
+			c->u.string = odr_strdup(o, buf);
+		}
+		r->num_elements++;
+	}
+}
+
+
+
 
 static void oid2str(Odr_oid *o, WRBUF buf)
 {
@@ -420,13 +510,13 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	char *ODR_basename;
 	char *ODR_errstr;
 	int *ODR_oid_buf;
+	oident *oid;
 	WRBUF oid_dotted;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 
 	Z_RecordComposition *composition;
 	Z_ElementSetNames *simple;
 	STRLEN length;
-	int oid;
 
 	dSP;
 	ENTER;
@@ -522,11 +612,19 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	rr->output_format_raw = ODR_oid_buf;	
 	
 	ptr = SvPV(record, length);
-	ODR_record = (char *)odr_malloc(rr->stream, length + 1);
-	strcpy(ODR_record, ptr);
-	rr->record = ODR_record;
-	rr->len = length;
-
+	oid = oid_getentbyoid(ODR_oid_buf);
+	if (oid->value == VAL_GRS1)		/* Treat GRS-1 records separately */
+	{
+		rr->record = (char *) read_grs1(ptr, rr->stream);
+		rr->len = -1;
+	}
+	else
+	{
+		ODR_record = (char *)odr_malloc(rr->stream, length + 1);
+		strcpy(ODR_record, ptr);
+		rr->record = ODR_record;
+		rr->len = length;
+	}
 	zhandle->handle = point;
 	handle = zhandle;
 	rr->last_in_set = SvIV(last);
@@ -805,7 +903,7 @@ void bend_close(void *handle)
 }
 
 
-#line 809 "SimpleServer.c"
+#line 907 "SimpleServer.c"
 XS(XS_Net__Z3950__SimpleServer_set_init_handler)
 {
     dXSARGS;
@@ -813,9 +911,9 @@ XS(XS_Net__Z3950__SimpleServer_set_init_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_init_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 805 "SimpleServer.xs"
+#line 903 "SimpleServer.xs"
 		init_ref = newSVsv(arg);
-#line 819 "SimpleServer.c"
+#line 917 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -827,9 +925,9 @@ XS(XS_Net__Z3950__SimpleServer_set_close_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_close_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 812 "SimpleServer.xs"
+#line 910 "SimpleServer.xs"
 		close_ref = newSVsv(arg);
-#line 833 "SimpleServer.c"
+#line 931 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -841,9 +939,9 @@ XS(XS_Net__Z3950__SimpleServer_set_sort_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_sort_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 819 "SimpleServer.xs"
+#line 917 "SimpleServer.xs"
 		sort_ref = newSVsv(arg);
-#line 847 "SimpleServer.c"
+#line 945 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -855,9 +953,9 @@ XS(XS_Net__Z3950__SimpleServer_set_search_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_search_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 825 "SimpleServer.xs"
+#line 923 "SimpleServer.xs"
 		search_ref = newSVsv(arg);
-#line 861 "SimpleServer.c"
+#line 959 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -869,9 +967,9 @@ XS(XS_Net__Z3950__SimpleServer_set_fetch_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_fetch_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 832 "SimpleServer.xs"
+#line 930 "SimpleServer.xs"
 		fetch_ref = newSVsv(arg);
-#line 875 "SimpleServer.c"
+#line 973 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -883,9 +981,9 @@ XS(XS_Net__Z3950__SimpleServer_set_present_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_present_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 839 "SimpleServer.xs"
+#line 937 "SimpleServer.xs"
 		present_ref = newSVsv(arg);
-#line 889 "SimpleServer.c"
+#line 987 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -897,9 +995,9 @@ XS(XS_Net__Z3950__SimpleServer_set_esrequest_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_esrequest_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 846 "SimpleServer.xs"
+#line 944 "SimpleServer.xs"
 		esrequest_ref = newSVsv(arg);
-#line 903 "SimpleServer.c"
+#line 1001 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -911,9 +1009,9 @@ XS(XS_Net__Z3950__SimpleServer_set_delete_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_delete_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 853 "SimpleServer.xs"
+#line 951 "SimpleServer.xs"
 		delete_ref = newSVsv(arg);
-#line 917 "SimpleServer.c"
+#line 1015 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -925,9 +1023,9 @@ XS(XS_Net__Z3950__SimpleServer_set_scan_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_scan_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 860 "SimpleServer.xs"
+#line 958 "SimpleServer.xs"
 		scan_ref = newSVsv(arg);
-#line 931 "SimpleServer.c"
+#line 1029 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -936,16 +1034,16 @@ XS(XS_Net__Z3950__SimpleServer_start_server)
 {
     dXSARGS;
     {
-#line 866 "SimpleServer.xs"
+#line 964 "SimpleServer.xs"
 		char **argv;
 		char **argv_buf;
 		char *ptr;
 		int i;
 		STRLEN len;
-#line 946 "SimpleServer.c"
+#line 1044 "SimpleServer.c"
 	int	RETVAL;
 	dXSTARG;
-#line 872 "SimpleServer.xs"
+#line 970 "SimpleServer.xs"
 		argv_buf = (char **)xmalloc((items + 1) * sizeof(char *));
 		argv = argv_buf;
 		for (i = 0; i < items; i++)
@@ -957,7 +1055,7 @@ XS(XS_Net__Z3950__SimpleServer_start_server)
 		*argv_buf = NULL;
 
 		RETVAL = statserv_main(items, argv, bend_init, bend_close);
-#line 961 "SimpleServer.c"
+#line 1059 "SimpleServer.c"
 	XSprePUSH; PUSHi((IV)RETVAL);
     }
     XSRETURN(1);

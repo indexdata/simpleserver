@@ -111,7 +111,8 @@ H_FILES =
 HTMLLIBPODS    = 
 HTMLSCRIPTPODS = 
 MAN1PODS = 
-MAN3PODS = SimpleServer.pm
+MAN3PODS = GRS1.pm \
+	SimpleServer.pm
 HTMLEXT = html
 INST_MAN1DIR = blib/man1
 INSTALLMAN1DIR = $(PREFIX)/man/man1
@@ -153,14 +154,20 @@ EXPORT_LIST =
 
 PERL_ARCHIVE = 
 
-TO_INST_PM = OID.pm \
+TO_INST_PM = GRS1.pm \
+	OID.pm \
 	SimpleServer.pm \
+	grs_test.pl \
 	ztest.pl
 
-PM_TO_BLIB = ztest.pl \
+PM_TO_BLIB = GRS1.pm \
+	$(INST_LIBDIR)/GRS1.pm \
+	ztest.pl \
 	$(INST_LIBDIR)/ztest.pl \
 	OID.pm \
 	$(INST_LIBDIR)/OID.pm \
+	grs_test.pl \
+	$(INST_LIBDIR)/grs_test.pl \
 	SimpleServer.pm \
 	$(INST_LIBDIR)/SimpleServer.pm
 
@@ -468,8 +475,11 @@ POD2MAN = $(PERL) -we '%m=@ARGV;for (keys %m){' \
 -e 'system(qq[$$^X ].q["-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" $(POD2MAN_EXE) ].qq[$$_>$$m{$$_}])==0 or warn "Couldn\047t install $$m{$$_}\n";' \
 -e 'chmod(oct($(PERM_RW))), $$m{$$_} or warn "chmod $(PERM_RW) $$m{$$_}: $$!\n";}'
 
-manifypods : pure_all SimpleServer.pm
+manifypods : pure_all GRS1.pm \
+	SimpleServer.pm
 	@$(POD2MAN) \
+	GRS1.pm \
+	$(INST_MAN3DIR)/Net::Z3950::GRS1.$(MAN3EXT) \
 	SimpleServer.pm \
 	$(INST_MAN3DIR)/Net::Z3950::SimpleServer.$(MAN3EXT)
 
@@ -500,7 +510,7 @@ realclean purge ::  clean
 	rm -rf $(INST_AUTODIR) $(INST_ARCHAUTODIR)
 	rm -f $(INST_DYNAMIC) $(INST_BOOT)
 	rm -f $(INST_STATIC)
-	rm -f $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/OID.pm $(INST_LIBDIR)/SimpleServer.pm
+	rm -f $(INST_LIBDIR)/GRS1.pm $(INST_LIBDIR)/ztest.pl $(INST_LIBDIR)/OID.pm $(INST_LIBDIR)/grs_test.pl $(INST_LIBDIR)/SimpleServer.pm
 	rm -rf Makefile Makefile.old
 
 

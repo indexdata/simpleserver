@@ -24,6 +24,11 @@
  * OF THIS SOFTWARE.
  */
 
+/*$Log: SimpleServer.xs,v $
+/*Revision 1.7  2001-03-13 14:17:15  sondberg
+/*Added support for GRS-1.
+/**/
+
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -35,6 +40,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
+#define GRS_MAX_FIELDS 50
 #ifdef ASN_COMPILED
 #include <yaz/ill.h>
 #endif
@@ -66,6 +72,95 @@ SV *esrequest_ref = NULL;
 SV *delete_ref = NULL;
 SV *scan_ref = NULL;
 int MAX_OID = 15;
+
+
+Z_GenericRecord *read_grs1(char *str, ODR o)
+{
+	int type, ivalue;
+	char line[512], *buf, *ptr, *original;
+	char value[512];
+ 	Z_GenericRecord *r = 0;
+
+	original = str;
+	for (;;)
+	{
+		Z_TaggedElement *t;
+		Z_ElementData *c;
+	
+		ptr = strchr(str, '\n');
+		if (!ptr) {
+			return r;
+		}
+		strncpy(line, str, ptr - str);
+		line[ptr - str] = 0;
+		buf = line;
+		str = ptr + 1;
+		while (*buf && isspace(*buf))
+			buf++;
+		if (*buf == '}') {
+			memmove(original, str, strlen(str));
+			return r;
+		}
+		if (sscanf(buf, "(%d,%[^)])", &type, value) != 2)
+		{
+			yaz_log(LOG_WARN, "Bad data in '%s'", buf);
+			return 0;
+		}
+		if (!type && *value == '0')
+			return r;
+		if (!(buf = strchr(buf, ')')))
+			return 0;
+		buf++;
+		while (*buf && isspace(*buf))
+			buf++;
+		if (!*buf)
+			return 0;
+		if (!r)
+		{
+			r = (Z_GenericRecord *)odr_malloc(o, sizeof(*r));
+			r->elements = (Z_TaggedElement **)
+			odr_malloc(o, sizeof(Z_TaggedElement*) * GRS_MAX_FIELDS);
+			r->num_elements = 0;
+		}
+		r->elements[r->num_elements] = t = (Z_TaggedElement *) odr_malloc(o, sizeof(Z_TaggedElement));
+		t->tagType = (int *)odr_malloc(o, sizeof(int));
+		*t->tagType = type;
+		t->tagValue = (Z_StringOrNumeric *)
+			odr_malloc(o, sizeof(Z_StringOrNumeric));
+		if ((ivalue = atoi(value)))
+		{
+			t->tagValue->which = Z_StringOrNumeric_numeric;
+			t->tagValue->u.numeric = (int *)odr_malloc(o, sizeof(int));
+			*t->tagValue->u.numeric = ivalue;
+		}
+		else
+		{
+			t->tagValue->which = Z_StringOrNumeric_string;
+			t->tagValue->u.string = (char *)odr_malloc(o, strlen(value)+1);
+			strcpy(t->tagValue->u.string, value);
+		}
+		t->tagOccurrence = 0;
+		t->metaData = 0;
+		t->appliedVariant = 0;
+		t->content = c = (Z_ElementData *)odr_malloc(o, sizeof(Z_ElementData));
+		if (*buf == '{')
+		{
+			c->which = Z_ElementData_subtree;
+			c->u.subtree = read_grs1(str, o);
+		}
+		else
+		{
+			c->which = Z_ElementData_string;
+/*			buf[strlen(buf)-1] = '\0';*/
+			buf[strlen(buf)] = '\0';
+			c->u.string = odr_strdup(o, buf);
+		}
+		r->num_elements++;
+	}
+}
+
+
+
 
 static void oid2str(Odr_oid *o, WRBUF buf)
 {
@@ -411,13 +506,13 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	char *ODR_basename;
 	char *ODR_errstr;
 	int *ODR_oid_buf;
+	oident *oid;
 	WRBUF oid_dotted;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 
 	Z_RecordComposition *composition;
 	Z_ElementSetNames *simple;
 	STRLEN length;
-	int oid;
 
 	dSP;
 	ENTER;
@@ -513,11 +608,19 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	rr->output_format_raw = ODR_oid_buf;	
 	
 	ptr = SvPV(record, length);
-	ODR_record = (char *)odr_malloc(rr->stream, length + 1);
-	strcpy(ODR_record, ptr);
-	rr->record = ODR_record;
-	rr->len = length;
-
+	oid = oid_getentbyoid(ODR_oid_buf);
+	if (oid->value == VAL_GRS1)		/* Treat GRS-1 records separately */
+	{
+		rr->record = (char *) read_grs1(ptr, rr->stream);
+		rr->len = -1;
+	}
+	else
+	{
+		ODR_record = (char *)odr_malloc(rr->stream, length + 1);
+		strcpy(ODR_record, ptr);
+		rr->record = ODR_record;
+		rr->len = length;
+	}
 	zhandle->handle = point;
 	handle = zhandle;
 	rr->last_in_set = SvIV(last);

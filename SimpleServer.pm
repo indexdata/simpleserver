@@ -25,6 +25,11 @@
 ##
 ##
 
+## $Log: SimpleServer.pm,v $
+## Revision 1.6  2001-03-13 14:17:15  sondberg
+## Added support for GRS-1.
+##
+
 package Net::Z3950::SimpleServer;
 
 use strict;
