@@ -1,6 +1,6 @@
 /*
 
- * $Id: SimpleServer.xs,v 1.21 2004-05-11 12:15:16 sondberg Exp $ 
+ * $Id: SimpleServer.xs,v 1.22 2004-05-11 12:56:37 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000, Index Data.
@@ -38,7 +38,10 @@
 #include <yaz/log.h>
 #include <yaz/wrbuf.h>
 #include <stdio.h>
+#ifdef WIN32
+#else
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <ctype.h>
 #define GRS_MAX_FIELDS 500 
@@ -1136,8 +1139,6 @@ bend_initresult *bend_init(bend_initrequest *q)
 	char *user = NULL;
 	char *passwd = NULL;
 	CV* handler_cv = 0;
-
-	PERL_SET_CONTEXT(PERL_GET_THX);
 
 	dSP;
 	ENTER;
