@@ -267,7 +267,7 @@ $content should be some kind of scalar. If on the other hand,
 
 $content should be a GRS1 object.
 
-=head3 Render
+=head2 Render
 
 This method digs through the GRS-1 data structure and renders the record. You call it
 this way,
@@ -288,6 +288,28 @@ When no file name is specified, you can choose to stream the rendered record, fo
   $grs1->Render(HANDLE => *STDOUT);		## or
   $grs1->Render(HANDLE => *STDERR);		## or
   $grs1->Render(HANDLE => *MY_HANDLE);
+
+=head2 Hash2grs
+
+This method converts a hash into a GRS-1 object. Scalar entries within the hash are converted
+into GRS-1 string elements. A hash entry can itself be a reference to another hash. In this case,
+the new referenced hash will be converted into a GRS-1 subtree. The method is called this way,
+
+  $grs1->Hash2grs($href, $mapping);
+
+where $href is the hash to be converted and $mapping is referenced hash specifying the mapping
+between keys in $href and (type, value) pairs in the $grs1 object. The $mapping hash could
+for instance look like this,
+
+  my $mapping =	{
+			title	=>	[2, 1],
+			author	=>	[1, 1],
+			issn	=>	[3, 1]
+		};
+
+If the $grs1 object contains data prior to the invocation of Hash2grs, the new data represented
+by the hash is simply added.
+
 
 =head1 APPENDIX A
 
@@ -322,7 +344,10 @@ Specification of the GRS-1 standard, for instance in the Z39.50 protocol specifi
 =cut
 
 #$Log: GRS1.pm,v $
-#Revision 1.3  2001-05-17 13:43:04  sondberg
+#Revision 1.4  2001-05-17 14:07:06  sondberg
+#Added some documentation.
+#
+#Revision 1.3  2001/05/17 13:43:04  sondberg
 #Added method Hash2grs into GRS1 module.
 #
 #Revision 1.2  2001/03/13 14:53:15  sondberg
