@@ -35,7 +35,7 @@ sub my_search_handler {
 	my $set_id = $args->{SETNAME};
 	my @database_list = @{ $args->{DATABASES} };
 	my $query = $args->{QUERY};
-	my $hits = 3;
+	my $hits = 2;
 
 	print "------------------------------------------------------------\n";
 	print "Processing query : $query\n";
@@ -58,7 +58,7 @@ sub my_fetch_handler {
 	my $record = "<xml>";
 	my $field;
 	my $hits = $session->{__HITS};
-	my $href = $data->[$offset];
+	my $href = $data->[$offset - 1];
 
 	$args->{REP_FORM} = Net::Z3950::OID::xml;
 
