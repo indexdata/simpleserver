@@ -1,6 +1,7 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-0.08  (IN PROGRESS)
+0.08  Fri May 28 22:09:08 2004
+	- SimpleServer is now perl 5.8 thread proof 
 	- Support for IMP_ID parameter in Init responses.  This was
 	  actually written a long time ago, but left commented out as
 	  the underlying YAZ back-end server didn't support

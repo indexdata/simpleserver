@@ -25,56 +25,7 @@
 ##
 ##
 
-## $Log: SimpleServer.pm,v $
-## Revision 1.19  2004-05-13 19:04:32  adam
-## Bump year
-##
-## Revision 1.18  2003/09/09 20:12:38  mike
-## Return diagnostics on Init failure
-##
-## Revision 1.17  2003/09/09 11:40:10  mike
-## (Finally!) support implementation-ID
-##
-## Revision 1.16  2003/01/03 09:01:51  sondberg
-## Version 0.07.
-##
-## Revision 1.15  2002/09/16 14:00:16  sondberg
-## Updated Changes and added a few lines of documentation.
-##
-## Revision 1.14  2002/03/06 11:30:02  mike
-## Add RPN structure documentation to SimpleServer.pm's POD.
-## Add README to MANIFEST.
-##
-## Revision 1.13  2002/03/06 11:02:04  mike
-## Added simple README file, derived from POD comments in SimpleServer.pm
-## Fixed my (Mike Taylor's) email address
-##
-## Revision 1.12  2002/03/05 20:52:22  sondberg
-## Version 0.05 so that we can release the thing at CPAN.
-##
-## Revision 1.11  2002/03/05 20:49:56  sondberg
-## Added a couple of lines of documentation.
-##
-## Revision 1.10  2002/02/28 11:21:57  mike
-## Add RPN structure to search-handler argument hash.
-##
-## Revision 1.9  2001/08/29 11:48:36  sondberg
-## Added routines
-##
-## 	Net::Z3950::SimpleServer::ScanSuccess
-## 	Net::Z3950::SimpleServer::ScanPartial
-##
-## and a bit of documentation.
-##
-## Revision 1.8  2001/08/29 10:29:51  sondberg
-## Added some documentation of scan.
-##
-## Revision 1.7  2001/08/24 14:00:20  sondberg
-## Added support for scan.
-##
-## Revision 1.6  2001/03/13 14:17:15  sondberg
-## Added support for GRS-1.
-##
+## $Id: SimpleServer.pm,v 1.20 2004-05-28 20:14:28 sondberg Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -87,12 +38,7 @@ require DynaLoader;
 require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-@EXPORT = qw(
-	
-);
+@EXPORT = qw( );
 $VERSION = '0.08';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;

@@ -12,3 +12,4 @@ grs_test.pl
 samples/render-search.pl
 test.pl
 ztest.pl
+META.yml                                 Module meta-data (added by MakeMaker)
