@@ -26,6 +26,40 @@ sub my_init_handler {
 	$args->{HANDLE} = $session;
 }
 
+sub my_scan_handler {
+	my $args = shift;
+	my $term = $args->{TERM};
+	my $entries = [
+				{	TERM		=>	'Number 1',
+					OCCURRENCE	=>	10 },
+				{	TERM		=>	'Number 2',
+					OCCURRENCE	=>	8 },
+				{	TERM		=>	'Number 3',
+					OCCURRENCE	=>	8 },
+				{	TERM		=>	'Number 4',
+					OCCURRENCE	=>	8 },
+				{	TERM		=>	'Number 5',
+					OCCURRENCE	=>	8 },
+				{	TERM		=>	'Number 6',
+					OCCURRENCE	=>	8 },
+				{	TERM		=>	'Number 7',
+					OCCURRENCE	=>	8 },
+				{	TERM		=>	'Number 8',
+					OCCURRENCE	=>	8 },
+				{	TERM		=>	'Number 9',
+					OCCURRENCE	=>	8 },
+				{	TERM		=>	'Number 10',
+					OCCURRENCE	=>	4 },
+			];
+
+
+	$args->{NUMBER} = 10;
+	$args->{ENTRIES} = $entries;
+	print "Welcome to scan....\n";
+	print "You scanned for term '$term'\n";
+}
+
+
 sub my_search_handler { 
 	my $args = shift;
 	my $data = [{
@@ -84,16 +118,20 @@ sub my_fetch_handler {
 }
 
 
-my $handler = Net::Z3950::SimpleServer->new({ 
+my $handler = new Net::Z3950::SimpleServer( 
 		INIT	=>	\&my_init_handler,
 		SEARCH	=>	\&my_search_handler,
-		FETCH	=>	\&my_fetch_handler });
+		SCAN	=>	\&my_scan_handler,
+		FETCH	=>	\&my_fetch_handler );
 
 $handler->launch_server("ztest.pl", @ARGV);
 
 
 ## $Log: ztest.pl,v $
-## Revision 1.7  2001-03-13 14:20:21  sondberg
+## Revision 1.8  2001-08-24 14:00:20  sondberg
+## Added support for scan.
+##
+## Revision 1.7  2001/03/13 14:20:21  sondberg
 ## Added CVS logging
 ##
 

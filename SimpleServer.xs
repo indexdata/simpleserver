@@ -25,7 +25,10 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.8  2001-05-21 11:07:02  sondberg
+/*Revision 1.9  2001-08-24 14:00:20  sondberg
+/*Added support for scan.
+/*
+/*Revision 1.8  2001/05/21 11:07:02  sondberg
 /*Extended maximum numbers of GRS-1 elements. Should be done dynamically.
 /*
 /*Revision 1.7  2001/03/13 14:17:15  sondberg
@@ -775,8 +778,126 @@ int bend_delete(void *handle, bend_delete_rr *rr)
 
 int bend_scan(void *handle, bend_scan_rr *rr)
 {
-	perl_call_sv(scan_ref, G_VOID | G_DISCARD | G_NOARGS);
-	return 0;
+        HV *href;
+	AV *aref;
+	AV *list;
+	AV *entries;
+	HV *scan_item;
+	struct scan_entry *scan_list;
+	struct scan_entry *buffer;
+	int *step_size = rr->step_size;
+	int i;
+	char **basenames;
+	SV **temp;
+	SV *list_ref = sv_newmortal();
+	SV *err_code = sv_newmortal();
+	SV *err_str = sv_newmortal();
+	SV *point = sv_newmortal();
+	SV *status = sv_newmortal();
+	SV *number = sv_newmortal();
+	char *ptr;
+	char *ODR_errstr;
+	STRLEN len;
+	
+	Zfront_handle *zhandle = (Zfront_handle *)handle;
+
+	dSP;
+	ENTER;
+	SAVETMPS;
+	href = newHV();
+	list = newAV();
+	if (rr->term->term->which == Z_Term_general)
+	{
+		hv_store(href, "TERM", 4, newSVpv(rr->term->term->u.general->buf, 0), 0);
+	} else {
+		rr->errcode = 229;	/* Unsupported term type */
+		return 0;
+	}
+	hv_store(href, "STEP", 4, newSViv(*step_size), 0);
+	hv_store(href, "NUMBER", 6, newSViv(rr->num_entries), 0);
+	hv_store(href, "POS", 3, newSViv(rr->term_position), 0);
+	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
+	hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
+	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
+	hv_store(href, "STATUS", 6, newSViv(BEND_SCAN_SUCCESS), 0);
+	hv_store(href, "ENTRIES", 7, newRV((SV *) list), 0);
+        aref = newAV();
+        basenames = rr->basenames;
+        for (i = 0; i < rr->num_bases; i++)
+        {
+                av_push(aref, newSVpv(*basenames++, 0));
+        }
+	hv_store(href, "DATABASES", 9, newRV( (SV*) aref), 0);
+
+	PUSHMARK(sp);
+
+	XPUSHs(sv_2mortal(newRV( (SV*) href)));
+
+	PUTBACK;
+
+	perl_call_sv(scan_ref, G_SCALAR | G_DISCARD);
+
+	SPAGAIN;
+
+	temp = hv_fetch(href, "ERR_CODE", 8, 1);
+	err_code = newSVsv(*temp);
+
+	temp = hv_fetch(href, "ERR_STR", 7, 1);
+	err_str = newSVsv(*temp);
+
+	temp = hv_fetch(href, "HANDLE", 6, 1);
+	point = newSVsv(*temp);
+
+	temp = hv_fetch(href, "STATUS", 6, 1);
+	status = newSVsv(*temp);
+	
+	temp = hv_fetch(href, "NUMBER", 6, 1);
+	number = newSVsv(*temp);
+
+	temp = hv_fetch(href, "ENTRIES", 7, 1);
+	list_ref = newSVsv(*temp);
+	entries = (AV *)SvRV(list_ref);
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+
+	ptr = SvPV(err_str, len);
+	ODR_errstr = (char *)odr_malloc(rr->stream, len + 1);
+	strcpy(ODR_errstr, ptr);
+	rr->errstring = ODR_errstr;
+	rr->errcode = SvIV(err_code);
+	rr->num_entries = SvIV(number);
+	rr->status = SvIV(status);
+        scan_list = (struct scan_entry *) odr_malloc (rr->stream, rr->num_entries * sizeof(*scan_list));
+	buffer = scan_list;
+	for (i = 0; i < rr->num_entries; i++)
+	{
+		scan_item = (HV *)SvRV(sv_2mortal(av_shift(entries)));
+		temp = hv_fetch(scan_item, "TERM", 4, 1);
+		ptr = SvPV(*temp, len);
+		buffer->term = (char *) odr_malloc (rr->stream, len + 1); 
+		strcpy(buffer->term, ptr);
+		temp = hv_fetch(scan_item, "OCCURRENCE", 10, 1); 
+		buffer->occurrences = SvIV(*temp);
+		buffer++;
+		hv_undef(scan_item);
+	}
+	rr->entries = scan_list;
+	zhandle->handle = point;
+	handle = zhandle;
+	/*sv_free(list_ref);*/
+	sv_free(err_code);
+	sv_free(err_str);
+	sv_free(status);
+	sv_free(number);
+	/*sv_free(point);*/
+	hv_undef(href);
+	av_undef(aref);
+	av_undef(list);
+	av_undef(entries);
+
+        return 0;
 }
 
 
@@ -816,7 +937,10 @@ bend_initresult *bend_init(bend_initrequest *q)
 	{
 		q->bend_fetch = bend_fetch;
 	}
-	/*q->bend_scan = bend_scan;*/
+	if (scan_ref)
+	{
+		q->bend_scan = bend_scan;
+	}
        	href = newHV();	
 	hv_store(href, "IMP_NAME", 8, newSVpv("", 0), 0);
 	hv_store(href, "IMP_VER", 7, newSVpv("", 0), 0);

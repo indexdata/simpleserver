@@ -26,7 +26,10 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.6  2001-03-13 14:17:15  sondberg
+## Revision 1.7  2001-08-24 14:00:20  sondberg
+## Added support for scan.
+##
+## Revision 1.6  2001/03/13 14:17:15  sondberg
 ## Added support for GRS-1.
 ##
 
@@ -57,19 +60,16 @@ my $count = 0;
 
 sub new {
 	my $class = shift;
-	my $args = shift || croak "SimpleServer::new: Usage new(argument hash)";
-	my $self = {};
+	my %args = @_;
+	my $self = \%args;
 
 	if ($count) {
 		carp "SimpleServer.pm: WARNING: Multithreaded server unsupported";
 	}
 	$count = 1;
 
-	$self->{INIT} = $args->{INIT};
-	$self->{SEARCH} = $args->{SEARCH} || croak "SimpleServer.pm: ERROR: Unspecified search handler";
-	$self->{FETCH} = $args->{FETCH} || croak "SimpleServer.pm: ERROR: Unspecified fetch handler";
-	$self->{CLOSE} = $args->{CLOSE};
-	$self->{PRESENT} = $args->{PRESENT};
+	croak "SimpleServer.pm: ERROR: Unspecified search handler" unless defined($self->{SEARCH});
+	croak "SimpleServer.pm: ERROR: Unspecified fetch handler" unless defined($self->{FETCH});
 
 	bless $self, $class;
 	return $self;
@@ -90,6 +90,9 @@ sub launch_server {
 	}
 	if (defined($self->{PRESENT})) {
 		set_present_handler($self->{PRESENT});
+	}
+	if (defined($self->{SCAN})) {
+		set_scan_handler($self->{SCAN});
 	}
 
 	start_server(@args);
