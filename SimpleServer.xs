@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.26 2004-05-29 07:04:26 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.27 2004-06-04 20:16:04 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -64,6 +64,7 @@ typedef struct {
 	SV *esrequest_ref;
 	SV *delete_ref;
 	SV *scan_ref;
+	NMEM nmem;
 } Zfront_handle;
 
 SV *init_ref = NULL;
@@ -667,9 +668,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	ODR_errstr = (char *)odr_malloc(rr->stream, len + 1);
 	strcpy(ODR_errstr, ptr);
 	rr->errstring = ODR_errstr;
-/*	ODR_point = (SV *)odr_malloc(rr->stream, sizeof(*point));
-	memcpy(ODR_point, point, sizeof(*point));
-	zhandle->handle = ODR_point;*/
+
 	zhandle->handle = point;
 	handle = zhandle;
 	sv_free(hits);
@@ -1171,7 +1170,9 @@ bend_initresult *bend_init(bend_initrequest *q)
 	SV *ver;
 	SV *err_str;
 	SV *status;
-	Zfront_handle *zhandle =  (Zfront_handle *) xmalloc (sizeof(*zhandle));
+	NMEM nmem = nmem_create();
+	Zfront_handle *zhandle =  (Zfront_handle *) nmem_malloc (nmem,
+			sizeof(*zhandle));
 	STRLEN len;
 	int n;
 	SV *handle;
@@ -1186,6 +1187,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	ENTER;
 	SAVETMPS;
 
+	zhandle->nmem = nmem;
 	/*q->bend_sort = bend_sort;*/
 	if (search_ref)
 	{
@@ -1277,15 +1279,11 @@ bend_initresult *bend_init(bend_initrequest *q)
 	sv_free(err_str);
 	r->handle = zhandle;
 	ptr = SvPV(id, len);
-	q->implementation_id = (char *)xmalloc(len + 1);
-	strcpy(q->implementation_id, ptr);
+	q->implementation_id = nmem_strdup(nmem, ptr);
 	ptr = SvPV(name, len);
-	q->implementation_name = (char *)xmalloc(len + 1);
-	strcpy(q->implementation_name, ptr);
-/*	q->implementation_name = SvPV(name, len);*/
+	q->implementation_name = nmem_strdup(nmem, ptr);
 	ptr = SvPV(ver, len);
-	q->implementation_version = (char *)xmalloc(len + 1);
-	strcpy(q->implementation_version, ptr);
+	q->implementation_version = nmem_strdup(nmem, ptr);
 	
 	return r;
 }
@@ -1322,7 +1320,7 @@ void bend_close(void *handle)
 		FREETMPS;
 		LEAVE;
 	}
-	xfree(handle);
+	nmem_destroy(zhandle->nmem);
 	simpleserver_free();
 	
 	return;
