@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::Z3950::Server.
 
-0.04  (in progress)
+0.05  Tue Feb 05 21:54:30
+        - Add brief documentation of the new handling
+	  of RPN.
+
+0.04  Tue Feb 05 21:49:56 
 	- Add Changelog (### Why?  We already have this file!)
 	- Add TODO file (although it's empty!)
 	- Change interface to constructor, and fix test.pl script to
