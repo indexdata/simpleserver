@@ -1,0 +1,6 @@
+Net::Z3950::SimpleServer - TODO list
+------------------------------------
+
+- Include a yaz-config --libs feature in Makefile.PM
+- Documentation
+
