@@ -33,6 +33,15 @@
  * OF THIS SOFTWARE.
  */
 
+/*$Log: SimpleServer.c,v $
+/*Revision 1.8  2001-03-13 14:19:28  sondberg
+/*Added a modified version of ztest.pl called grs_test.pl, which shows how to
+/*implement support of GRS-1 record syntax.
+/*
+/*Revision 1.7  2001/03/13 14:17:15  sondberg
+/*Added support for GRS-1.
+/**/
+
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -903,7 +912,7 @@ void bend_close(void *handle)
 }
 
 
-#line 907 "SimpleServer.c"
+#line 912 "SimpleServer.c"
 XS(XS_Net__Z3950__SimpleServer_set_init_handler)
 {
     dXSARGS;
@@ -911,9 +920,9 @@ XS(XS_Net__Z3950__SimpleServer_set_init_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_init_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 903 "SimpleServer.xs"
+#line 908 "SimpleServer.xs"
 		init_ref = newSVsv(arg);
-#line 917 "SimpleServer.c"
+#line 922 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -925,9 +934,9 @@ XS(XS_Net__Z3950__SimpleServer_set_close_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_close_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 910 "SimpleServer.xs"
+#line 915 "SimpleServer.xs"
 		close_ref = newSVsv(arg);
-#line 931 "SimpleServer.c"
+#line 936 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -939,9 +948,9 @@ XS(XS_Net__Z3950__SimpleServer_set_sort_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_sort_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 917 "SimpleServer.xs"
+#line 922 "SimpleServer.xs"
 		sort_ref = newSVsv(arg);
-#line 945 "SimpleServer.c"
+#line 950 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -953,9 +962,9 @@ XS(XS_Net__Z3950__SimpleServer_set_search_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_search_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 923 "SimpleServer.xs"
+#line 928 "SimpleServer.xs"
 		search_ref = newSVsv(arg);
-#line 959 "SimpleServer.c"
+#line 964 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -967,9 +976,9 @@ XS(XS_Net__Z3950__SimpleServer_set_fetch_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_fetch_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 930 "SimpleServer.xs"
+#line 935 "SimpleServer.xs"
 		fetch_ref = newSVsv(arg);
-#line 973 "SimpleServer.c"
+#line 978 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -981,9 +990,9 @@ XS(XS_Net__Z3950__SimpleServer_set_present_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_present_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 937 "SimpleServer.xs"
+#line 942 "SimpleServer.xs"
 		present_ref = newSVsv(arg);
-#line 987 "SimpleServer.c"
+#line 992 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -995,9 +1004,9 @@ XS(XS_Net__Z3950__SimpleServer_set_esrequest_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_esrequest_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 944 "SimpleServer.xs"
+#line 949 "SimpleServer.xs"
 		esrequest_ref = newSVsv(arg);
-#line 1001 "SimpleServer.c"
+#line 1006 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1009,9 +1018,9 @@ XS(XS_Net__Z3950__SimpleServer_set_delete_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_delete_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 951 "SimpleServer.xs"
+#line 956 "SimpleServer.xs"
 		delete_ref = newSVsv(arg);
-#line 1015 "SimpleServer.c"
+#line 1020 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1023,9 +1032,9 @@ XS(XS_Net__Z3950__SimpleServer_set_scan_handler)
 	Perl_croak(aTHX_ "Usage: Net::Z3950::SimpleServer::set_scan_handler(arg)");
     {
 	SV *	arg = ST(0);
-#line 958 "SimpleServer.xs"
+#line 963 "SimpleServer.xs"
 		scan_ref = newSVsv(arg);
-#line 1029 "SimpleServer.c"
+#line 1034 "SimpleServer.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1034,16 +1043,16 @@ XS(XS_Net__Z3950__SimpleServer_start_server)
 {
     dXSARGS;
     {
-#line 964 "SimpleServer.xs"
+#line 969 "SimpleServer.xs"
 		char **argv;
 		char **argv_buf;
 		char *ptr;
 		int i;
 		STRLEN len;
-#line 1044 "SimpleServer.c"
+#line 1049 "SimpleServer.c"
 	int	RETVAL;
 	dXSTARG;
-#line 970 "SimpleServer.xs"
+#line 975 "SimpleServer.xs"
 		argv_buf = (char **)xmalloc((items + 1) * sizeof(char *));
 		argv = argv_buf;
 		for (i = 0; i < items; i++)
@@ -1055,7 +1064,7 @@ XS(XS_Net__Z3950__SimpleServer_start_server)
 		*argv_buf = NULL;
 
 		RETVAL = statserv_main(items, argv, bend_init, bend_close);
-#line 1059 "SimpleServer.c"
+#line 1064 "SimpleServer.c"
 	XSprePUSH; PUSHi((IV)RETVAL);
     }
     XSRETURN(1);
