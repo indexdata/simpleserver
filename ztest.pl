@@ -35,7 +35,7 @@ sub my_search_handler {
 	my $set_id = $args->{SETNAME};
 	my @database_list = @{ $args->{DATABASES} };
 	my $query = $args->{QUERY};
-	my $hits = 2;
+	my $hits = 3;
 
 	print "------------------------------------------------------------\n";
 	print "Processing query : $query\n";
