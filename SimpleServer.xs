@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.28 2004-06-05 07:55:05 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.29 2004-06-05 22:18:09 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -102,18 +102,19 @@ CV * simpleserver_sv2cv(SV *handler) {
     }
 }
 
-/* debuggin routine to check for destruction of Perl interpreters */
-#if 0
+/* debugging routine to check for destruction of Perl interpreters */
+#if 1
 int tst_clones(void)
 {
     int i; 
     PerlInterpreter *parent = PERL_GET_CONTEXT;
     for (i = 0; i<500; i++)
     {
-        PerlInterpreter *perl_interp = perl_clone(parent, 0);
-        PERL_SET_CONTEXT( perl_interp );
+        PerlInterpreter *perl_interp;
+
 	PL_perl_destruct_level = 2;
-        PERL_SET_CONTEXT( parent );
+        perl_interp = perl_clone(parent, 0);
+	PL_perl_destruct_level = 2;
         perl_destruct(perl_interp);
         perl_free(perl_interp);
     }
@@ -156,7 +157,7 @@ void simpleserver_free(void) {
 	 */
 	if (current_interp != root_perl_context) {
        	    PL_perl_destruct_level = 2;
-            PERL_SET_CONTEXT(root_perl_context);
+            PERL_SET_CONTEXT(current_interp);
             perl_destruct(current_interp);
             perl_free(current_interp);
 	}
@@ -564,8 +565,6 @@ int bend_sort(void *handle, bend_sort_rr *rr)
 	status = newSVsv(*temp);
 
 
-	
-
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
@@ -592,9 +591,6 @@ int bend_search(void *handle, bend_search_rr *rr)
 	HV *href;
 	AV *aref;
 	SV **temp;
-	SV *hits;
-	SV *err_code;
-	SV *err_str;
 	char *ODR_errstr;
 	STRLEN len;
 	int i;
@@ -654,39 +650,30 @@ int bend_search(void *handle, bend_search_rr *rr)
 	SPAGAIN;
 
 	temp = hv_fetch(href, "HITS", 4, 1);
-	hits = newSVsv(*temp);
+	rr->hits = SvIV(*temp);
 
 	temp = hv_fetch(href, "ERR_CODE", 8, 1);
-	err_code = newSVsv(*temp);
+	rr->errcode = SvIV(*temp);
 
 	temp = hv_fetch(href, "ERR_STR", 7, 1);
-	err_str = newSVsv(*temp);
-
-	temp = hv_fetch(href, "HANDLE", 6, 1);
-	point = newSVsv(*temp);
-
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-	
-	hv_undef(href);
-	av_undef(aref);
-	rr->hits = SvIV(hits);
-	rr->errcode = SvIV(err_code);
-	ptr = SvPV(err_str, len);
+	ptr = SvPV(*temp, len);
 	ODR_errstr = (char *)odr_malloc(rr->stream, len + 1);
 	strcpy(ODR_errstr, ptr);
 	rr->errstring = ODR_errstr;
 
+	temp = hv_fetch(href, "HANDLE", 6, 1);
+	point = newSVsv(*temp);
+
+	hv_undef(href);
+	av_undef(aref);
+
 	zhandle->handle = point;
-	handle = zhandle;
-	sv_free(hits);
-	sv_free(err_code);
-	sv_free(err_str);
 	sv_free( (SV*) aref);
 	sv_free( (SV*) href);
-	/*sv_free(point);*/
 	wrbuf_free(query, 1);
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
 	return 0;
 }
 
@@ -857,9 +844,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	temp = hv_fetch(href, "HANDLE", 6, 1);
 	point = newSVsv(*temp);
 
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
 
 	hv_undef(href);
 	
@@ -913,6 +897,10 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	sv_free(err_code),
 	sv_free(sur_flag);
 	sv_free(rep_form);
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
 	
 	return 0;
 }
@@ -920,7 +908,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 
 int bend_present(void *handle, bend_present_rr *rr)
 {
-
 	HV *href;
 	SV **temp;
 	SV *err_code;
@@ -1167,32 +1154,25 @@ int bend_scan(void *handle, bend_scan_rr *rr)
         return 0;
 }
 
-
 bend_initresult *bend_init(bend_initrequest *q)
 {
-        int dummy = simpleserver_clone();
-	bend_initresult *r = (bend_initresult *) odr_malloc (q->stream, sizeof(*r));
-	HV *href;
-	SV **temp;
-	SV *id;
-	SV *name;
-	SV *ver;
-	SV *err_str;
-	SV *status;
-	NMEM nmem = nmem_create();
-	Zfront_handle *zhandle =  (Zfront_handle *) nmem_malloc (nmem,
-			sizeof(*zhandle));
-	STRLEN len;
-	int n;
-	SV *handle;
-	/*char *name_ptr;
-	char *ver_ptr;*/
+	int dummy = simpleserver_clone();
+	bend_initresult *r = (bend_initresult *)
+		odr_malloc (q->stream, sizeof(*r));
 	char *ptr;
 	char *user = NULL;
 	char *passwd = NULL;
 	CV* handler_cv = 0;
-
 	dSP;
+	STRLEN len;
+	NMEM nmem = nmem_create();
+	Zfront_handle *zhandle =  (Zfront_handle *) nmem_malloc (nmem,
+			sizeof(*zhandle));
+	SV *handle;
+	HV *href;
+	SV **temp;
+	SV *status;
+
 	ENTER;
 	SAVETMPS;
 
@@ -1217,6 +1197,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	{
 		q->bend_scan = bend_scan;
 	}
+
        	href = newHV();	
 	hv_store(href, "IMP_ID", 6, newSVpv("", 0), 0);
 	hv_store(href, "IMP_NAME", 8, newSVpv("", 0), 0);
@@ -1247,7 +1228,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 
 	PUSHMARK(sp);	
 
-	XPUSHs(sv_2mortal(newRV( (SV*) href)));
+	XPUSHs(sv_2mortal(newRV((SV*) href)));
 
 	PUTBACK;
 
@@ -1260,44 +1241,40 @@ bend_initresult *bend_init(bend_initrequest *q)
 	SPAGAIN;
 
 	temp = hv_fetch(href, "IMP_ID", 6, 1);
-	id = newSVsv(*temp);
+	ptr = SvPV(*temp, len);
+	q->implementation_id = nmem_strdup(nmem, ptr);
 
 	temp = hv_fetch(href, "IMP_NAME", 8, 1);
-	name = newSVsv(*temp);
+	ptr = SvPV(*temp, len);
+	q->implementation_name = nmem_strdup(nmem, ptr);
 
 	temp = hv_fetch(href, "IMP_VER", 7, 1);
-	ver = newSVsv(*temp);
+	ptr = SvPV(*temp, len);
+	q->implementation_version = nmem_strdup(nmem, ptr);
 
 	temp = hv_fetch(href, "ERR_CODE", 8, 1);
-	status = newSVsv(*temp);
+	r->errcode = SvIV(*temp);
 
 	temp = hv_fetch(href, "ERR_STR", 7, 1);
-	err_str = newSVsv(*temp);
+	ptr = SvPV(*temp, len);
+	r->errstring = (char *)odr_malloc(q->stream, len + 1);
+	strcpy(r->errstring, ptr);
 
 	temp = hv_fetch(href, "HANDLE", 6, 1);
 	handle= newSVsv(*temp);
+	zhandle->handle = handle;
+
+	r->handle = zhandle;
 
 	hv_undef(href);
+	sv_free((SV*) href);
+
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
-	zhandle->handle = handle;
-	r->errcode = SvIV(status);
-	ptr = SvPV(err_str, len);
-	r->errstring = (char *)odr_malloc(q->stream, len + 1);
-	strcpy(r->errstring, ptr);
-	sv_free(err_str);
-	r->handle = zhandle;
-	ptr = SvPV(id, len);
-	q->implementation_id = nmem_strdup(nmem, ptr);
-	ptr = SvPV(name, len);
-	q->implementation_name = nmem_strdup(nmem, ptr);
-	ptr = SvPV(ver, len);
-	q->implementation_version = nmem_strdup(nmem, ptr);
 	
-	return r;
+	return r;	
 }
-
 
 void bend_close(void *handle)
 {
@@ -1306,12 +1283,12 @@ void bend_close(void *handle)
 	SV **temp;
 	CV* handler_cv = 0;
 	int stop_flag = 0;
+	dSP;
+	ENTER;
+	SAVETMPS;
 
 	if (close_ref)
 	{
-		dSP;
-		ENTER;
-		SAVETMPS;
 		href = newHV();
 		hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 
@@ -1326,10 +1303,12 @@ void bend_close(void *handle)
 	
 		SPAGAIN;
 
-		PUTBACK;
-		FREETMPS;
-		LEAVE;
+		sv_free((SV*) href);
 	}
+	sv_free(zhandle->handle);
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
 	stop_flag = zhandle->stop_flag;
 	nmem_destroy(zhandle->nmem);
 	simpleserver_free();
@@ -1425,6 +1404,7 @@ start_server(...)
 		root_perl_context = PERL_GET_CONTEXT;
 		nmem_mutex_create(&simpleserver_mutex);
 #if 0
+		/* only for debugging perl_clone .. */
 		tst_clones();
 #endif
 		
