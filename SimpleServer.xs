@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.32 2004-06-07 16:48:38 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.33 2004-06-07 17:00:55 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1301,7 +1301,8 @@ void bend_close(void *handle)
 
 		sv_free((SV*) href);
 	}
-	sv_free(zhandle->handle);
+	else
+		sv_free(zhandle->handle);
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
