@@ -122,7 +122,6 @@ Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
 	my $record = fetch_a_record($args->{OFFSET);
 
 	$args->{RECORD} = $record;
-	$args->{LEN} = length($record);
 	if (number_of_hits() == $args->{OFFSET}) {	## Last record in set?
 		$args->{LAST} = 1;
 	} else {
