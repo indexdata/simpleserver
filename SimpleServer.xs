@@ -25,7 +25,10 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.11  2001-08-30 13:15:11  sondberg
+/*Revision 1.12  2001-08-30 14:02:10  sondberg
+/*Small changes.
+/*
+/*Revision 1.11  2001/08/30 13:15:11  sondberg
 /*Corrected a memory leak, one more to go.
 /*
 /*Revision 1.10  2001/08/29 11:48:36  sondberg
@@ -810,6 +813,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	STRLEN len;
 	int term_len;
 	SV *term_tmp;
+	SV *entries_ref;
 	
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 
@@ -868,7 +872,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	number = newSVsv(*temp);
 
 	temp = hv_fetch(href, "ENTRIES", 7, 1);
-	entries = (AV *)SvRV(newSVsv(*temp));
+	entries_ref = newSVsv(*temp);
 
 	PUTBACK;
 	FREETMPS;
@@ -883,6 +887,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	rr->status = SvIV(status);
         scan_list = (struct scan_entry *) odr_malloc (rr->stream, rr->num_entries * sizeof(*scan_list));
 	buffer = scan_list;
+	entries = (AV *)SvRV(entries_ref);
 	for (i = 0; i < rr->num_entries; i++)
 	{
 		scan_item = (HV *)SvRV(sv_2mortal(av_shift(entries)));
@@ -894,7 +899,6 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 		buffer->occurrences = SvIV(*temp);
 		buffer++;
 		hv_undef(scan_item);
-		/*sv_free((SV *)scan_item);*/
 	}
 	rr->entries = scan_list;
 	zhandle->handle = point;
@@ -910,7 +914,8 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	av_undef(list);
 	sv_free((SV *)list);
 	av_undef(entries);
-	sv_free((SV *)entries);
+	/*sv_free((SV *)entries);*/
+	sv_free(entries_ref);
 
         return 0;
 }
