@@ -25,7 +25,10 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.19  2003-09-09 11:40:10  mike
+/*Revision 1.20  2003-09-09 20:12:38  mike
+/*Return diagnostics on Init failure
+/*
+/*Revision 1.19  2003/09/09 11:40:10  mike
 /*(Finally!) support implementation-ID
 /*
 /*Revision 1.18  2003/01/03 09:05:41  sondberg
@@ -1154,6 +1157,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	hv_store(href, "IMP_NAME", 8, newSVpv("", 0), 0);
 	hv_store(href, "IMP_VER", 7, newSVpv("", 0), 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
+	hv_store(href, "ERR_STR", 7, newSViv(0), 0);
 	hv_store(href, "PEER_NAME", 9, newSVpv(q->peer_name, 0), 0);
 	hv_store(href, "HANDLE", 6, newSVsv(&sv_undef), 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
@@ -1201,6 +1205,9 @@ bend_initresult *bend_init(bend_initrequest *q)
 	temp = hv_fetch(href, "ERR_CODE", 8, 1);
 	status = newSVsv(*temp);
 
+	temp = hv_fetch(href, "ERR_STR", 7, 1);
+	err_str = newSVsv(*temp);
+
 	temp = hv_fetch(href, "HANDLE", 6, 1);
 	handle= newSVsv(*temp);
 
@@ -1210,6 +1217,10 @@ bend_initresult *bend_init(bend_initrequest *q)
 	LEAVE;
 	zhandle->handle = handle;
 	r->errcode = SvIV(status);
+	ptr = SvPV(err_str, len);
+	r->errstring = (char *)odr_malloc(q->stream, len + 1);
+	strcpy(r->errstring, ptr);
+	sv_free(err_str);
 	r->handle = zhandle;
 	ptr = SvPV(id, len);
 	q->implementation_id = (char *)xmalloc(len + 1);

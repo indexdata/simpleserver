@@ -7,6 +7,12 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  implementation-ID setting.  Now that it does (and has done
 	  for eighteen months -- since YAZ release 1.8.6 of
 	  2002/03/25!), I've finally removed the comments.
+	- Init handler now understands the setting of {ERR_CODE} as
+	  more than a boolean success indicator, and also {ERR_STR}.
+	  They are now passed back to the client (thanks to recent
+	  changes to the YAZ generic front-end server) in accordance
+	  with Z39.50 Implementor Agreement 5, found at
+		http://lcweb.loc.gov/z3950/agency/agree/initdiag.html
 
 0.07  Fri Jan 03 10:12:15 2003
         - Applied Dave Mitchell's (davem@fdgroup.com) GRS-1 parsing patch.

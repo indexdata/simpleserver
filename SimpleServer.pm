@@ -26,7 +26,10 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.17  2003-09-09 11:40:10  mike
+## Revision 1.18  2003-09-09 20:12:38  mike
+## Return diagnostics on Init failure
+##
+## Revision 1.17  2003/09/09 11:40:10  mike
 ## (Finally!) support implementation-ID
 ##
 ## Revision 1.16  2003/01/03 09:01:51  sondberg
@@ -286,6 +289,7 @@ The argument hash passed to the init handler has the form
 	     IMP_NAME  =>  "",      ## Z39.50 Implementation name
 	     IMP_VER   =>  "",      ## Z39.50 Implementation version
 	     ERR_CODE  =>  0,       ## Error code, cnf. Z39.50 manual
+	     ERR_STR   =>  "",      ## Error string (additional info.)
 	     USER      =>  "xxx"    ## If Z39.50 authentication is used,
 	     			    ## this member contains user name
 	     PASS      =>  "yyy"    ## Under same conditions, this member
@@ -308,7 +312,8 @@ Filling these in is optional.
 
 The ERR_CODE should be left at 0 (the default value) if you wish to
 accept the connection. Any other value is interpreted as a failure
-and the client will be shown the door.
+and the client will be shown the door, with the code and the
+associated additional information, ERR_STR returned.
 
 =head2 Search handler
 
