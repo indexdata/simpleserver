@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+
+## $Id: Makefile.PL,v 1.3 2004-05-28 20:27:16 sondberg Exp $
 
 my $libs = `yaz-config --libs threads` || die "ERROR: Unable to call script: yaz-config";
 

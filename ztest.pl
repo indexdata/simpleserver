@@ -1,5 +1,33 @@
 #!/usr/bin/perl -w
 
+##  $Id: ztest.pl,v 1.13 2004-05-28 20:27:16 sondberg Exp $
+##  ------------------------------------------------------------------
+##
+##  Copyright (c) 2000-2004, Index Data.
+##
+##  Permission to use, copy, modify, distribute, and sell this software and
+##  its documentation, in whole or in part, for any purpose, is hereby granted,
+##  provided that:
+##
+##  1. This copyright and permission notice appear in all copies of the
+##  software and its documentation. Notices of copyright or attribution
+##  which appear at the beginning of any file must remain unchanged.
+##
+##  2. The name of Index Data or the individual authors may not be used to
+##  endorse or promote products derived from this software without specific
+##  prior written permission.
+##
+##  THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
+##  EXPRESS, IMPLIED, OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY
+##  WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+##  IN NO EVENT SHALL INDEX DATA BE LIABLE FOR ANY SPECIAL, INCIDENTAL,
+##  INDIRECT OR CONSEQUENTIAL DAMAGES OF ANY KIND, OR ANY DAMAGES
+##  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER OR
+##  NOT ADVISED OF THE POSSIBILITY OF DAMAGE, AND ON ANY THEORY OF
+##  LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+##  OF THIS SOFTWARE.
+##
+
 use ExtUtils::testlib;
 use Net::Z3950::SimpleServer;
 use Net::Z3950::OID;
@@ -128,30 +156,3 @@ my $handler = new Net::Z3950::SimpleServer(
 		FETCH	=>	"main::my_fetch_handler" );
 
 $handler->launch_server("ztest.pl", @ARGV);
-
-
-## $Log: ztest.pl,v $
-## Revision 1.12  2004-05-11 12:15:16  sondberg
-## Simpleserver is now thread proof.
-##
-## Revision 1.11  2002/09/16 13:55:53  sondberg
-## Added support for authentication into SimpleServer.
-##
-## Revision 1.10  2001/08/30 13:15:11  sondberg
-## Corrected a memory leak, one more to go.
-##
-## Revision 1.9  2001/08/29 11:48:36  sondberg
-## Added routines
-##
-## 	Net::Z3950::SimpleServer::ScanSuccess
-## 	Net::Z3950::SimpleServer::ScanPartial
-##
-## and a bit of documentation.
-##
-## Revision 1.8  2001/08/24 14:00:20  sondberg
-## Added support for scan.
-##
-## Revision 1.7  2001/03/13 14:20:21  sondberg
-## Added CVS logging
-##
-
