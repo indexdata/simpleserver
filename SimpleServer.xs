@@ -25,7 +25,10 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.18  2003-01-03 09:05:41  sondberg
+/*Revision 1.19  2003-09-09 11:40:10  mike
+/*(Finally!) support implementation-ID
+/*
+/*Revision 1.18  2003/01/03 09:05:41  sondberg
 /*Applied Dave's GRS-1 patch - actually this was already done in revision 1.17.
 /*
 /*Revision 1.16  2002/11/26 17:09:18  mike
@@ -1208,11 +1211,9 @@ bend_initresult *bend_init(bend_initrequest *q)
 	zhandle->handle = handle;
 	r->errcode = SvIV(status);
 	r->handle = zhandle;
-#if 0 /* implementation_id support is not yet in mainstream Yaz */
 	ptr = SvPV(id, len);
 	q->implementation_id = (char *)xmalloc(len + 1);
 	strcpy(q->implementation_id, ptr);
-#endif
 	ptr = SvPV(name, len);
 	q->implementation_name = (char *)xmalloc(len + 1);
 	strcpy(q->implementation_name, ptr);

@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+0.08  (IN PROGRESS)
+	- Support for IMP_ID parameter in Init responses.  This was
+	  actually written a long time ago, but left commented out as
+	  the underlying YAZ back-end server didn't support
+	  implementation-ID setting.  Now that it does (and has done
+	  for a long while), I've finally removed the comments.
+
 0.07  Fri Jan 03 10:12:15 2003
         - Applied Dave Mitchell's (davem@fdgroup.com) GRS-1 parsing patch.
 	  Thanks Dave, and sorry it didn't find its way to release 0.06,

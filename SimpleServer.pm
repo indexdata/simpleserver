@@ -26,7 +26,10 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.16  2003-01-03 09:01:51  sondberg
+## Revision 1.17  2003-09-09 11:40:10  mike
+## (Finally!) support implementation-ID
+##
+## Revision 1.16  2003/01/03 09:01:51  sondberg
 ## Version 0.07.
 ##
 ## Revision 1.15  2002/09/16 14:00:16  sondberg
@@ -84,7 +87,7 @@ require AutoLoader;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
@@ -279,6 +282,7 @@ The argument hash passed to the init handler has the form
   $args = {
 				    ## Response parameters:
 
+	     IMP_ID    =>  "",      ## Z39.50 Implementation ID
 	     IMP_NAME  =>  "",      ## Z39.50 Implementation name
 	     IMP_VER   =>  "",      ## Z39.50 Implementation version
 	     ERR_CODE  =>  0,       ## Error code, cnf. Z39.50 manual
@@ -298,7 +302,7 @@ result sets or a handle to a back-end search engine of some sort),
 it is always best to store them in a private session structure -
 rather than leaving them in global variables in your script.
 
-The Implementation name and version are only really used by Z39.50
+The Implementation ID, name and version are only really used by Z39.50
 client developers to see what kind of server they're dealing with.
 Filling these in is optional.
 
