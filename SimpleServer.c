@@ -34,9 +34,8 @@
  */
 
 /*$Log: SimpleServer.c,v $
-/*Revision 1.8  2001-03-13 14:19:28  sondberg
-/*Added a modified version of ztest.pl called grs_test.pl, which shows how to
-/*implement support of GRS-1 record syntax.
+/*Revision 1.9  2001-05-17 13:43:04  sondberg
+/*Added method Hash2grs into GRS1 module.
 /*
 /*Revision 1.7  2001/03/13 14:17:15  sondberg
 /*Added support for GRS-1.

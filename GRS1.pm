@@ -5,18 +5,50 @@ use IO::Handle;
 use Carp;
 
 
+
 sub new {
-	my $class = shift;
+	my ($class, $href, $map) = @_;
 	my $self = {};
 
 	$self->{ELEMENTS} = [];
-	$self->{FH} = *STDOUT;		## Default output handle is STDOUT
+	$self->{FH} = *STDOUT;				## Default output handle is STDOUT
+	$self->{MAP} = $map;
 	bless $self, $class;
+	if (defined($href) && ref($href) eq 'HASH') {
+		if (!defined($map)) {
+			croak "Usage: new Net::Z3950::GRS1($href, $map);";
+		}	
+		$self->Hash2grs($href);
+	}
 
 	return $self;
 }
 
 
+sub Hash2grs {
+	my ($self, $href, $mapping) = @_;
+	my $key;
+	my $content;
+	my $aref;
+
+	$mapping = defined($mapping) ? $mapping : $self->{MAP};
+	foreach $key (keys %$href) {
+		$content = $href->{$key};
+		if (!defined($aref = $mapping->{$key})) {
+			print STDERR "Hash2grs: Unmapped key: '$key'\n";
+			next;
+		}
+		if (ref($content) eq 'HASH') {					## Subtree?
+			my $subtree = new Net::Z3950::GRS1($content);
+			$self->AddElement($aref->[0], $aref->[1], &Net::Z3950::GRS1::ElementData::Subtree, $subtree);
+		} elsif (ref($content) eq '') {					## Regular string?
+			$self->AddElement($aref->[0], $aref->[1], &Net::Z3950::GRS1::ElementData::String, $content);
+		} else {
+			print STDERR "Hash2grs: Unsupported content type\n";
+			next;
+		}
+	}
+}
 sub GetElementList {
 	my $self = shift;
 
@@ -290,7 +322,10 @@ Specification of the GRS-1 standard, for instance in the Z39.50 protocol specifi
 =cut
 
 #$Log: GRS1.pm,v $
-#Revision 1.2  2001-03-13 14:53:15  sondberg
+#Revision 1.3  2001-05-17 13:43:04  sondberg
+#Added method Hash2grs into GRS1 module.
+#
+#Revision 1.2  2001/03/13 14:53:15  sondberg
 #Added a few lines of documentation into GRS1.pm.
 #
 #Revision 1.1  2001/03/13 14:17:15  sondberg
