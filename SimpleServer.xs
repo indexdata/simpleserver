@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.29 2004-06-05 22:18:09 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.30 2004-06-05 23:09:04 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -564,7 +564,6 @@ int bend_sort(void *handle, bend_sort_rr *rr)
 	temp = hv_fetch(href, "STATUS", 6, 1);
 	status = newSVsv(*temp);
 
-
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
@@ -595,11 +594,9 @@ int bend_search(void *handle, bend_search_rr *rr)
 	STRLEN len;
 	int i;
 	char **basenames;
-	int n;
 	WRBUF query;
 	char *ptr;
 	SV *point;
-	SV *ODR_point;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
 
@@ -1045,7 +1042,6 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	char *ODR_errstr;
 	STRLEN len;
 	int term_len;
-	SV *term_tmp;
 	SV *entries_ref;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
@@ -1171,7 +1167,6 @@ bend_initresult *bend_init(bend_initrequest *q)
 	SV *handle;
 	HV *href;
 	SV **temp;
-	SV *status;
 
 	ENTER;
 	SAVETMPS;
@@ -1280,7 +1275,6 @@ void bend_close(void *handle)
 {
 	HV *href;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
-	SV **temp;
 	CV* handler_cv = 0;
 	int stop_flag = 0;
 	dSP;
