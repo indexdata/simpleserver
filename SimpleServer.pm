@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.20 2004-05-28 20:14:28 sondberg Exp $
+## $Id: SimpleServer.pm,v 1.21 2004-06-04 09:57:00 sondberg Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -195,12 +195,12 @@ After the launching of the server, all control is given away from
 the Perl script to the server. The server calls the registered
 subroutines to field incoming requests from Z39.50 clients.
 
-A reference to an anonymous hash is passed to each handle. Some of
+A reference to an anonymous hash is passed to each handler. Some of
 the entries of these hashes are to be considered input and others
 output parameters.
 
-The Perl programmer specifies the event handles for the server by
-means of the the SimpleServer object constructor
+The Perl programmer specifies the event handlers for the server by
+means of the SimpleServer object constructor
 
   my $z = new Net::Z3950::SimpleServer(
 			INIT	=>	\&my_init_handler,
@@ -210,7 +210,22 @@ means of the the SimpleServer object constructor
 			SCAN	=>	\&my_scan_handler,
 			FETCH	=>	\&my_fetch_handler);
 
-After the custom event handles are declared, the server is launched
+If you want your SimpleServer to start a thread (threaded mode) to
+handle each incoming Z39.50 request instead of forking a process
+(forking mode), you need to register the handlers by symbol rather
+than by code reference. Thus, in threaded mode, you will need to
+register your handlers this way:
+
+  my $z = new Net::Z3950::SimpleServer(
+  			INIT	=>	"my_package::my_init_handler",
+			CLOSE	=>	"my_package::my_close_handler",
+			....
+			....          );
+
+where my_package is the Perl package in which your handler is
+located.
+
+After the custom event handlers are declared, the server is launched
 by means of the method
 
   $z->launch_server("MyServer.pl", @ARGV);
@@ -219,6 +234,9 @@ Notice, the first argument should be the name of your server
 script (for logging purposes), while the rest of the arguments
 are documented in the YAZ toolkit manual: The section on
 application invocation: <http://www.indexdata.dk/yaz/yaz-7.php>
+
+In particular, you need to use the -T switch to start your SimpleServer
+in threaded mode.
 
 =head2 Init handler
 

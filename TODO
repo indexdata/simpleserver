@@ -1,6 +1,9 @@
 Todo list for the SimpleServer project:
 ---------------------------------------
 
+-- Enforce symbol registration instead of code reference registration when
+   Simpleserver is running in threaded mode.
+
 -- Add PID members to the argument hashes where they do not already occur.
 
 -- Fix memory leak in the Scan handle.
