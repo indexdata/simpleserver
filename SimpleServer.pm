@@ -26,7 +26,11 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.12  2002-03-05 20:52:22  sondberg
+## Revision 1.13  2002-03-06 11:02:04  mike
+## Added simple README file, derived from POD comments in SimpleServer.pm
+## Fixed my (Mike Taylor's) email address
+##
+## Revision 1.12  2002/03/05 20:52:22  sondberg
 ## Version 0.05 so that we can release the thing at CPAN.
 ##
 ## Revision 1.11  2002/03/05 20:49:56  sondberg
@@ -508,15 +512,12 @@ or something similar, this is the place to do it.
 =head1 AUTHORS
 
 Anders Sønderberg (sondberg@indexdata.dk) and Sebastian Hammer
-(quinn@indexdata.dk). Substantial contributions made by Mike Taylor (mike@tecc.co.uk).
+(quinn@indexdata.dk). Substantial contributions made by Mike Taylor
+(mike@miketaylor.org.uk).
 
 =head1 SEE ALSO
-
-perl(1).
 
 Any Perl module which is useful for accessing the database of your
 choice.
 
 =cut
-
-

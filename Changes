@@ -1,10 +1,14 @@
 Revision history for Perl extension Net::Z3950::Server.
 
-0.05  Tue Feb 05 21:54:30
+0.06  (in progress)
+	- We actually removed the vacuous Changelog and TODO files
+	  back in 0.05.  They should never have been here :-)
+
+0.05  Tue Feb 05 21:54:30 2002
         - Add brief documentation of the new handling
 	  of RPN.
 
-0.04  Tue Feb 05 21:49:56 
+0.04  Tue Feb 05 21:49:56 2002
 	- Add Changelog (### Why?  We already have this file!)
 	- Add TODO file (although it's empty!)
 	- Change interface to constructor, and fix test.pl script to
@@ -18,7 +22,7 @@ Revision history for Perl extension Net::Z3950::Server.
 	  for some reason.)
 	- Fix typos in documentation.
 
-0.03  Thu Nov 09 16:22:00
+0.03  Thu Nov 09 16:22:00 2000
 	- Add the INSTALL file.
 	- Add support for a present-handler (distinct from fetch).
 	- Remove `$args->{LEN} = length($record)' from the example
