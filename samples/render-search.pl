@@ -1,5 +1,14 @@
 #!/usr/bin/perl -w
 
+# $Header: /home/cvsroot/simpleserver/samples/render-search.pl,v 1.2 2002-03-05 12:03:26 mike Exp $
+#
+# Trivial example of programming using the "augmented classes"
+# paradigm.  This tiny SimpleServer-based Z39.50 server logs Type-1
+# searches in human-readable form.  It works by augmenting existing
+# classes (the RPN-node types) with additional methods -- something
+# that most OO languages would definitely not allow, but Perl does.
+# And it's sort of cute.
+
 use Net::Z3950::SimpleServer;
 use strict;
 
