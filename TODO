@@ -1,0 +1,14 @@
+Todo list for the SimpleServer project:
+---------------------------------------
+
+-- Add PID members to the argument hashes where they do not already occur.
+
+-- Fix memory leak in the Scan handle.
+
+-- Correct handling of string tags in RPN (this may already function correctly
+   in the RPN Perl object tree, but does not work in the QUERY member of the
+   argument hash.)
+
+
+Last updated: 2002/04/22 by Anders Sønderberg Mortensen <sondberg@indexdata.dk>
+
