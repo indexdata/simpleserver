@@ -26,7 +26,10 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.15  2002-09-16 14:00:16  sondberg
+## Revision 1.16  2003-01-03 09:01:51  sondberg
+## Version 0.07.
+##
+## Revision 1.15  2002/09/16 14:00:16  sondberg
 ## Updated Changes and added a few lines of documentation.
 ##
 ## Revision 1.14  2002/03/06 11:30:02  mike
@@ -81,7 +84,7 @@ require AutoLoader;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
