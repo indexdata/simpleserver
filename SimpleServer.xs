@@ -1,6 +1,6 @@
 /*
 
- * $Id: SimpleServer.xs,v 1.22 2004-05-11 12:56:37 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.23 2004-05-13 18:55:40 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000, Index Data.
@@ -52,6 +52,8 @@
 #define sv_undef PL_sv_undef
 #endif
 
+NMEM_MUTEX simpleserver_mutex;
+
 typedef struct {
 	SV *handle;
 
@@ -98,24 +100,63 @@ CV * simpleserver_sv2cv(SV *handler) {
     }
 }
 
+/* debuggin routine to check for destruction of Perl interpreters */
+#if 0
+int tst_clones(void)
+{
+    int i; 
+    PerlInterpreter *parent = PERL_GET_CONTEXT;
+    for (i = 0; i<500; i++)
+    {
+        PerlInterpreter *perl_interp = perl_clone(parent, 0);
+        PERL_SET_CONTEXT( perl_interp );
+	PL_perl_destruct_level = 2;
+        PERL_SET_CONTEXT( parent );
+        perl_destruct(perl_interp);
+        perl_free(perl_interp);
+    }
+    exit (0);
+}
+#endif
 
 int simpleserver_clone(void) {
-     PerlInterpreter *current = PERL_GET_CONTEXT;
+     nmem_mutex_enter(simpleserver_mutex);
+     if (1)
+     {
+         PerlInterpreter *current = PERL_GET_CONTEXT;
 
-     if (!current) {
-         PerlInterpreter *perl_interp = perl_clone(root_perl_context, CLONEf_COPY_STACKS);
-         PERL_SET_CONTEXT( perl_interp );
+	 /* if current is unset, then we're in a new thread with
+	  * no Perl interpreter for it. So we must create one .
+	  * This will only happen when threaded is used..
+	  */
+         if (!current) {
+             PERL_SET_CONTEXT( root_perl_context );
+             PerlInterpreter *perl_interp = perl_clone(root_perl_context, 0);
+             PERL_SET_CONTEXT( perl_interp );
+         }
      }
+     nmem_mutex_leave(simpleserver_mutex);
      return 0;
 }
 
 
 void simpleserver_free(void) {
-    PerlInterpreter *current_interp = PERL_GET_CONTEXT;
+    nmem_mutex_enter(simpleserver_mutex);
+    if (1)
+    {
+        PerlInterpreter *current_interp = PERL_GET_CONTEXT;
 
-    perl_destruct(current_interp);
-    perl_free(current_interp);
-    PERL_SYS_TERM();
+	/* If current Perl Interp is different from root interp, then
+	 * we're in threaded mode and we must destroy.. 
+	 */
+	if (current_interp != root_perl_context) {
+       	    PL_perl_destruct_level = 2;
+            PERL_SET_CONTEXT(root_perl_context);
+            perl_destruct(current_interp);
+            perl_free(current_interp);
+	}
+    }
+    nmem_mutex_leave(simpleserver_mutex);
 }
 
 
@@ -1256,33 +1297,30 @@ void bend_close(void *handle)
 	SV **temp;
 	CV* handler_cv = 0;
 
-	dSP;
-	ENTER;
-	SAVETMPS;
 
-	if (close_ref == NULL)
+	if (close_ref)
 	{
-		return;
+		dSP;
+		ENTER;
+		SAVETMPS;
+		href = newHV();
+		hv_store(href, "HANDLE", 6, zhandle->handle, 0);
+
+		PUSHMARK(sp);
+
+		XPUSHs(sv_2mortal(newRV((SV *)href)));
+
+		PUTBACK;
+	
+		handler_cv = simpleserver_sv2cv( close_ref );
+		perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
+	
+		SPAGAIN;
+
+		PUTBACK;
+		FREETMPS;
+		LEAVE;
 	}
-
-	href = newHV();
-	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
-
-	PUSHMARK(sp);
-
-	XPUSHs(sv_2mortal(newRV((SV *)href)));
-
-	PUTBACK;
-	
-	handler_cv = simpleserver_sv2cv( close_ref );
-	perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
-	
-	SPAGAIN;
-
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-
 	xfree(handle);
 	simpleserver_free();
 	
@@ -1373,6 +1411,10 @@ start_server(...)
 		}
 		*argv_buf = NULL;
 		root_perl_context = PERL_GET_CONTEXT;
+		nmem_mutex_create(&simpleserver_mutex);
+#if 0
+		tst_clones();
+#endif
 		
 		RETVAL = statserv_main(items, argv, bend_init, bend_close);
 	OUTPUT:
