@@ -25,7 +25,11 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.13  2002-02-28 11:21:57  mike
+/*Revision 1.14  2002-03-05 00:34:13  mike
+/*Support for implementation_id (commented out until it's
+/*in mainstream Yaz)
+/*
+/*Revision 1.13  2002/02/28 11:21:57  mike
 /*Add RPN structure to search-handler argument hash.
 /*
 /*Revision 1.12  2001/08/30 14:02:10  sondberg
@@ -1095,6 +1099,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	bend_initresult *r = (bend_initresult *) odr_malloc (q->stream, sizeof(*r));
 	HV *href;
 	SV **temp;
+	SV *id;
 	SV *name;
 	SV *ver;
 	SV *err_str;
@@ -1131,6 +1136,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 		q->bend_scan = bend_scan;
 	}
        	href = newHV();	
+	hv_store(href, "IMP_ID", 6, newSVpv("", 0), 0);
 	hv_store(href, "IMP_NAME", 8, newSVpv("", 0), 0);
 	hv_store(href, "IMP_VER", 7, newSVpv("", 0), 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
@@ -1151,6 +1157,9 @@ bend_initresult *bend_init(bend_initrequest *q)
 
 	SPAGAIN;
 
+	temp = hv_fetch(href, "IMP_ID", 6, 1);
+	id = newSVsv(*temp);
+
 	temp = hv_fetch(href, "IMP_NAME", 8, 1);
 	name = newSVsv(*temp);
 
@@ -1170,6 +1179,11 @@ bend_initresult *bend_init(bend_initrequest *q)
 	zhandle->handle = handle;
 	r->errcode = SvIV(status);
 	r->handle = zhandle;
+#if 0 /* implementation_id support is not yet in mainstream Yaz */
+	ptr = SvPV(id, len);
+	q->implementation_id = (char *)xmalloc(len + 1);
+	strcpy(q->implementation_id, ptr);
+#endif
 	ptr = SvPV(name, len);
 	q->implementation_name = (char *)xmalloc(len + 1);
 	strcpy(q->implementation_name, ptr);
