@@ -6,7 +6,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  logs the client-request data structures.
 	- Makefile.PL is more helpful if yaz-config isn't found.
 	- Explicitly disable prototypes in SimpleServer.xs: makes no
-	  difference but suppresses and error message for a cleaner
+	  difference but suppresses an error message for a cleaner
 	  build.
 
 0.08  Mon Jun 14 14:51:01 2004
