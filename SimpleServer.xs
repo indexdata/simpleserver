@@ -25,7 +25,10 @@
  */
 
 /*$Log: SimpleServer.xs,v $
-/*Revision 1.16  2002-11-26 17:09:18  mike
+/*Revision 1.17  2003-01-03 09:00:24  sondberg
+/**** empty log message ***
+/*
+/*Revision 1.16  2002/11/26 17:09:18  mike
 /*basic support for idPass authentication
 /*
 /*Revision 1.15  2002/09/16 13:55:53  sondberg
@@ -106,26 +109,37 @@ SV *delete_ref = NULL;
 SV *scan_ref = NULL;
 int MAX_OID = 15;
 
+#define GRS_BUF_SIZE 512
 
 Z_GenericRecord *read_grs1(char *str, ODR o)
 {
 	int type, ivalue;
-	char line[512], *buf, *ptr, *original;
-	char value[512];
+	char line[GRS_BUF_SIZE+1], *buf, *ptr, *original;
+	char value[GRS_BUF_SIZE+1];
  	Z_GenericRecord *r = 0;
 
 	original = str;
+	r = (Z_GenericRecord *)odr_malloc(o, sizeof(*r));
+	r->elements = (Z_TaggedElement **) odr_malloc(o, sizeof(Z_TaggedElement*) * GRS_MAX_FIELDS);
+	r->num_elements = 0;
+	
 	for (;;)
 	{
 		Z_TaggedElement *t;
 		Z_ElementData *c;
+		int len;
 	
 		ptr = strchr(str, '\n');
 		if (!ptr) {
 			return r;
 		}
-		strncpy(line, str, ptr - str);
-		line[ptr - str] = 0;
+		len = ptr - str;
+		if (len > GRS_BUF_SIZE) {
+		    yaz_log(LOG_WARN, "GRS string too long - truncating (%d > %d)", len, GRS_BUF_SIZE);
+		    len = GRS_BUF_SIZE;
+		}
+		strncpy(line, str, len);
+		line[len] = 0;
 		buf = line;
 		str = ptr + 1;
 		while (*buf && isspace(*buf))
@@ -137,25 +151,16 @@ Z_GenericRecord *read_grs1(char *str, ODR o)
 		if (sscanf(buf, "(%d,%[^)])", &type, value) != 2)
 		{
 			yaz_log(LOG_WARN, "Bad data in '%s'", buf);
-			return 0;
+			return r;
 		}
 		if (!type && *value == '0')
 			return r;
 		if (!(buf = strchr(buf, ')')))
-			return 0;
+			return r;
 		buf++;
 		while (*buf && isspace(*buf))
 			buf++;
-		if (!*buf)
-			return 0;
-		if (!r)
-		{
-			r = (Z_GenericRecord *)odr_malloc(o, sizeof(*r));
-			r->elements = (Z_TaggedElement **)
-			odr_malloc(o, sizeof(Z_TaggedElement*) * GRS_MAX_FIELDS);
-			r->num_elements = 0;
-		}
-		if (r->num_elements > GRS_MAX_FIELDS)
+		if (r->num_elements >= GRS_MAX_FIELDS)
 		{
 			yaz_log(LOG_WARN, "Max number of GRS-1 elements exceeded [GRS_MAX_FIELDS=%d]", GRS_MAX_FIELDS);
 			exit(0);
@@ -189,8 +194,6 @@ Z_GenericRecord *read_grs1(char *str, ODR o)
 		else
 		{
 			c->which = Z_ElementData_string;
-/*			buf[strlen(buf)-1] = '\0';*/
-			buf[strlen(buf)] = '\0';
 			c->u.string = odr_strdup(o, buf);
 		}
 		r->num_elements++;
