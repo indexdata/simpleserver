@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.30 2004-06-05 23:09:04 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.31 2004-06-06 09:07:18 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -104,17 +104,19 @@ CV * simpleserver_sv2cv(SV *handler) {
 
 /* debugging routine to check for destruction of Perl interpreters */
 #if 1
-int tst_clones(void)
+void tst_clones(void)
 {
     int i; 
     PerlInterpreter *parent = PERL_GET_CONTEXT;
-    for (i = 0; i<500; i++)
+    for (i = 0; i<5000; i++)
     {
         PerlInterpreter *perl_interp;
 
+	PERL_SET_CONTEXT(parent);
 	PL_perl_destruct_level = 2;
-        perl_interp = perl_clone(parent, 0);
+        perl_interp = perl_clone(parent, CLONEf_CLONE_HOST);
 	PL_perl_destruct_level = 2;
+	PERL_SET_CONTEXT(perl_interp);
         perl_destruct(perl_interp);
         perl_free(perl_interp);
     }
@@ -136,7 +138,7 @@ int simpleserver_clone(void) {
          if (!current) {
              PerlInterpreter *perl_interp;
              PERL_SET_CONTEXT( root_perl_context );
-             perl_interp = perl_clone(root_perl_context, 0);
+             perl_interp = perl_clone(root_perl_context, CLONEf_CLONE_HOST);
              PERL_SET_CONTEXT( perl_interp );
          }
      }
