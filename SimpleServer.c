@@ -381,7 +381,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 		if (composition->which == Z_RecordComp_simple)
 		{
 			simple = composition->u.simple;
-			if (simple->which == 1)
+			if (simple->which == Z_ElementSetNames_generic)
 			{
 				hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
 			} 
