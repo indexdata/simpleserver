@@ -1,4 +1,4 @@
-Revision history for Perl extension Net::Z3950::Server.
+Revision history for Perl extension Net::Z3950::SimpleServer
 
 0.07  Fri Jan 03 10:12:15 2003
         - Applied Dave Mitchell's (davem@fdgroup.com) GRS-1 parsing patch.
