@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.24 2004-05-13 19:04:28 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.25 2004-05-14 04:07:50 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -29,6 +29,7 @@
 
 #include "EXTERN.h"
 #include "perl.h"
+#include "proto.h"
 #include "embed.h"
 #include "XSUB.h"
 #include <yaz/backend.h>
@@ -127,8 +128,9 @@ int simpleserver_clone(void) {
 	  * This will only happen when threaded is used..
 	  */
          if (!current) {
+             PerlInterpreter *perl_interp;
              PERL_SET_CONTEXT( root_perl_context );
-             PerlInterpreter *perl_interp = perl_clone(root_perl_context, 0);
+             perl_interp = perl_clone(root_perl_context, 0);
              PERL_SET_CONTEXT( perl_interp );
          }
      }
