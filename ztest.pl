@@ -23,6 +23,10 @@ sub my_init_handler {
 	$args->{IMP_VER} = "3.14159";
 	$args->{ERR_CODE} = 0;
 	$args->{HANDLE} = $session;
+	if (defined($args->{PASS}) && defined($args->{USER})) {
+	    printf("Received USER/PASS=%s/%s\n", $args->{USER},$args->{PASS});
+	}
+	    
 }
 
 sub my_scan_handler {
@@ -126,7 +130,10 @@ $handler->launch_server("ztest.pl", @ARGV);
 
 
 ## $Log: ztest.pl,v $
-## Revision 1.10  2001-08-30 13:15:11  sondberg
+## Revision 1.11  2002-09-16 13:55:53  sondberg
+## Added support for authentication into SimpleServer.
+##
+## Revision 1.10  2001/08/30 13:15:11  sondberg
 ## Corrected a memory leak, one more to go.
 ##
 ## Revision 1.9  2001/08/29 11:48:36  sondberg
