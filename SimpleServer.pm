@@ -26,7 +26,11 @@
 ##
 
 ## $Log: SimpleServer.pm,v $
-## Revision 1.13  2002-03-06 11:02:04  mike
+## Revision 1.14  2002-03-06 11:30:02  mike
+## Add RPN structure documentation to SimpleServer.pm's POD.
+## Add README to MANIFEST.
+##
+## Revision 1.13  2002/03/06 11:02:04  mike
 ## Added simple README file, derived from POD comments in SimpleServer.pm
 ## Fixed my (Mike Taylor's) email address
 ##
@@ -306,8 +310,7 @@ mous hash. The structure is the following:
 	     DATABASES =>  ["xxx"], ## Reference to a list of data-
 				    ## bases to search
 	     QUERY     =>  "query", ## The query expression
-	     RPN       =>  $obj,    ## Blessed reference int the package
-	     			    ## Net::Z3950::APDU::Query
+	     RPN       =>  $obj,    ## Reference to a Net::Z3950::APDU::Query
 
 				    ## Response parameters:
 
@@ -352,10 +355,133 @@ it is perfectly legal to not accept boolean operators, but you SHOULD
 try to return good error codes if you run into something you can't or
 won't support.
 
-The RPN member is a blessed reference into the package Net::Z3950::APDU::Query.
-By means of an augmented type of coding, you can easily construct a
-parser of the incoming RPN. Take a look at samples/render-search.pl for
-a sample implementation of such an augmented parser technique. 
+A more convenient alternative to the QUERY member may be the RPN
+member, which is a reference to a Net::Z3950::APDU::Query object
+representing the RPN query tree.  The structure of that object is
+supposed to be self-documenting, but here's a brief summary of what
+you get:
+
+=over 4
+
+=item *
+
+C<Net::Z3950::APDU::Query> is a hash with two fields:
+
+Z<>
+
+=over 4
+
+=item C<attributeSet>
+
+Optional.  If present, it is a reference to a
+C<Net::Z3950::APDU::OID>.  This is a string of dot-separated integers
+representing the OID of the query's top-level attribute set.
+
+=item C<query>
+
+Mandatory: a refererence to the RPN tree itself.
+
+=back
+
+=item *
+
+Each node of the tree is an object of one of the following types:
+
+Z<>
+
+=over 4
+
+=item C<Net::Z3950::RPN::And>
+
+=item C<Net::Z3950::RPN::Or>
+
+=item C<Net::Z3950::RPN::AndNot>
+
+These three classes are all arrays of two elements, each of which is a
+node of one of the above types.
+
+=item C<Net::Z3950::RPN::Term>
+
+See below for details.
+
+=back
+
+(I guess I should make a superclass C<Net::Z3950::RPN::Node> and make
+all of these subclasses of it.  Not done that yet, but will do soon.)
+
+=back
+
+=over 4
+
+=item *
+
+C<Net::Z3950::RPN::Term> is a hash with two fields:
+
+Z<>
+
+=over 4
+
+=item C<term>
+
+A string containing the search term itself.
+
+=item C<attributes>
+
+A reference to a C<Net::Z3950::RPN::Attributes> object.
+
+=back
+
+=item *
+
+C<Net::Z3950::RPN::Attributes> is an array of references to
+C<Net::Z3950::RPN::Attribute> objects.  (Note the plural/singular
+distinction.)
+
+=item *
+
+C<Net::Z3950::RPN::Attribute> is a hash with three elements:
+
+Z<>
+
+=over 4
+
+=item C<attributeSet>
+
+Optional.  If present, it is dot-separated OID string, as above.
+
+=item C<attributeType>
+
+An integer indicating the type of the attribute - for example, under
+the BIB-1 attribute set, type 1 indicates a ``use'' attribute, type 2
+a ``relation'' attribute, etc.
+
+=item C<attributeValue>
+
+An integer indicating the value of the attribute - for example, under
+BIB-1, if the attribute type is 1, then value 4 indictates a title
+search and 7 indictates an ISBN search; but if the attribute type is
+2, then value 4 indicates a ``greater than or equal'' search, and 102
+indicates a relevance match.
+
+=back
+
+=back
+
+Note that, at the moment, none of these classes have any methods at
+all: the blessing into classes is largely just a documentation thing
+so that, for example, if you do
+
+	{ use Data::Dumper; print Dumper($args->{RPN}) }
+
+you get something fairly human-readable.  But of course, the type
+distinction between the three different kinds of boolean node is
+important.
+
+By adding your own methods to these classes (building what I call
+``augmented classes''), you can easily build code that walks the tree
+of the incoming RPN.  Take a look at C<samples/render-search.pl> for a
+sample implementation of such an augmented classes technique.
+
 
 =head2 Present handler
 

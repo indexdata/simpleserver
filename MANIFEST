@@ -5,6 +5,7 @@ MANIFEST
 MANIFEST.SKIP
 Makefile.PL
 OID.pm
+README
 SimpleServer.pm
 SimpleServer.xs
 grs_test.pl
