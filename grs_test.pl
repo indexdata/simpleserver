@@ -97,16 +97,19 @@ sub my_fetch_handler {
 }
 
 
-my $handler = Net::Z3950::SimpleServer->new({ 
+my $handler = new Net::Z3950::SimpleServer( 
 		INIT	=>	\&my_init_handler,
 		SEARCH	=>	\&my_search_handler,
-		FETCH	=>	\&my_fetch_handler });
+		FETCH	=>	\&my_fetch_handler );
 
 $handler->launch_server("ztest.pl", @ARGV);
 
 
 ## $Log: grs_test.pl,v $
-## Revision 1.1  2001-03-13 14:19:28  sondberg
+## Revision 1.2  2001-09-11 13:07:07  sondberg
+## Minor changes.
+##
+## Revision 1.1  2001/03/13 14:19:28  sondberg
 ## Added a modified version of ztest.pl called grs_test.pl, which shows how to
 ## implement support of GRS-1 record syntax.
 ##
