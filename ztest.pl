@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-##  $Id: ztest.pl,v 1.13 2004-05-28 20:27:16 sondberg Exp $
+##  $Id: ztest.pl,v 1.14 2005-11-09 09:35:47 adam Exp $
 ##  ------------------------------------------------------------------
 ##
 ##  Copyright (c) 2000-2004, Index Data.
@@ -148,6 +148,7 @@ sub my_fetch_handler {
 	}
 }
 
+Net::Z3950::SimpleServer::yazlog("hello");
 
 my $handler = new Net::Z3950::SimpleServer( 
 		INIT	=>	"main::my_init_handler",

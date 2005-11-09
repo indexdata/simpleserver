@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.34 2004-09-03 13:27:19 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.35 2005-11-09 09:35:47 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1441,3 +1441,11 @@ ScanPartial()
 		RETVAL
 
  
+void
+yazlog(arg)
+		SV *arg
+	CODE:
+    		STRLEN len;
+		char *ptr;
+		ptr = SvPV(arg, len);
+		yaz_log(YLOG_LOG, "%.*s", len, ptr);
