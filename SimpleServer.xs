@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.35 2005-11-09 09:35:47 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.36 2006-01-30 21:29:41 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -442,6 +442,7 @@ static SV *rpn2perl(Z_RPNStructure *s)
 	Z_Operand *o = s->u.simple;
 	Z_AttributesPlusTerm *at;
 	if (o->which == Z_Operand_resultSetId) {
+	    SV *sv2;
 	    /* This code causes a SIGBUS on my machine, and I have no
 	       idea why.  It seems as clear as day to me */
 	    char *rsid = (char*) o->u.resultSetId;
@@ -449,7 +450,7 @@ static SV *rpn2perl(Z_RPNStructure *s)
 	    sv = newObject("Net::Z3950::RPN::RSID", (SV*) (hv = newHV()));
 	    printf("Made sv=0x%lx, hv=0x%lx\n",
 		   (unsigned long) sv ,(unsigned long) hv);
-	    SV *sv2 = newSVpv(rsid, strlen(rsid));
+	    sv2 = newSVpv(rsid, strlen(rsid));
 	    setMember(hv, "id", sv2);
 	    printf("Set hv{id} to 0x%lx\n", (unsigned long) sv2);
 	    return sv;
