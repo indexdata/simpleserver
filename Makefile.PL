@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.9 2006-03-24 12:06:15 mike Exp $
+## $Id: Makefile.PL,v 1.10 2006-03-24 12:08:14 mike Exp $
 
 my $yazconf = "yaz-config";
 my $yazver = `$yazconf --version`;
@@ -15,15 +15,17 @@ SimpleServer module.
 ];
 }
 
-# Judging by the YAZ NEWS file, 2.1.10 was the first release to
-# include SRW/U support in the GFS
 chomp($yazver);
 my ($major, $minor, $trivial) = split(/\./, $yazver);
+# Judging by the YAZ NEWS file, 2.0.0 was the first release to
+# include SRW/U support in the GFS
+my ($needMaj, $needMin, $needTriv) = (2, 0, 0);
 #print "major=$major, minor=$minor, trivial=$trivial\n";
-die "You have YAZ version $major.$minor.$trivial; you need 2.1.10 or better"
-    if ($major < 2 || 
-	$major == 2 && $minor < 1 ||
-	$major == 2 && $minor == 1 && $trivial < 10);
+die "You have YAZ version $major.$minor.$trivial; " .
+    "you need $needMaj.$needMin.$needTriv or better."
+    if ($major < $needMaj || 
+	$major == $needMaj && $minor < $needMin ||
+	$major == $needMaj && $minor == $needMin && $trivial < $needTriv);
 
 # For Windows use
 # $yazinc = '-Ic:\yaz\include'
