@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.23 2006-03-24 01:21:15 mike Exp $
+## $Id: SimpleServer.pm,v 1.24 2006-03-24 11:56:39 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -39,7 +39,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
 @EXPORT = qw( );
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
@@ -627,11 +627,70 @@ What ever data structure the HANDLE value points at goes out of scope
 after this call. If you need to close down a connection to your server
 or something similar, this is the place to do it.
 
+=head2 Support for SRU and SRW
+
+Since release 1.0, SimpleServer includes support for serving the SRU
+and SRW protocols as well as Z39.50.  These ``web-friendly'' protocols
+enable similar functionality to that of Z39.50, but by means of rich
+URLs in the case of SRU, and a SOAP-based web-service in the case of
+SRW.  These protocols are described at
+http://www.loc.gov/sru
+
+In order to serve these protocols from a SimpleServer-based
+application, it is necessary to launch the application with a YAZ
+Generic Frontend Server (GFS) configuration file, which can be
+specified using the command-line argument C<-f> I<filename>.  A
+minimal configuration file looks like this:
+
+  <yazgfs>
+    <server>
+      <cql2rpn>pqf.properties</cql2rpn>
+    </server>
+  </yazgfs>
+
+This file specifies only that C<pqf.properties> should be used to
+translate the CQL queries of SRU and SRW into corresponding Z39.50
+Type-1 queries.  For more information about YAZ GFS configuration,
+including how to specify an Explain record, see the I<Virtual Hosts>
+section of the YAZ manual at
+http://indexdata.com/yaz/doc/server.vhosts.tkl
+
+The mapping of CQL queries into Z39.50 Type-1 queries is specified by
+a file that indicates which BIB-1 attributes should be generated for
+each CQL index, relation, modifiers, etc.  A typical section of this
+file looks like this:
+
+  index.dc.title                        = 1=4
+  index.dc.subject                      = 1=21
+  index.dc.creator                      = 1=1003
+  relation.<                            = 2=1
+  relation.le                           = 2=2
+
+This file specifies the BIB-1 access points (type=1) for the Dublin
+Core indexes C<title>, C<subject> and C<creator>, and the BIB-1
+relations (type=2) corresponding to the CQL relations C<E<lt>> and
+C<E<lt>=>.  For more information about the format of this file, see
+the I<CQL> section of the YAZ manual at
+http://indexdata.com/yaz/doc/tools.tkl#tools.cql
+
+The YAZ distribution include a sample CQL-to-PQF mapping configuration
+file called C<pqf.properties>; this is sufficient for many
+applications, and a good base to work from for most others.
+
+If a SimpleServer-based application is run without this SRU-specific
+configuration, it can still serve SRU; however, CQL queries will not
+be translated, but passed straight through to the search-handler
+function, as the C<CQL> member of the parameters hash.  It is then the
+responsibility of the back-end application to parse and handle the CQL
+query, which is most easily done using Ed Summers' fine C<CQL::Parser>
+module, available from CPAN at
+http://search.cpan.org/~esummers/CQL-Parser/
+
 =head1 AUTHORS
 
-Anders Sønderberg (sondberg@indexdata.dk) and Sebastian Hammer
-(quinn@indexdata.dk). Substantial contributions made by Mike Taylor
-(mike@miketaylor.org.uk).
+Anders Sønderberg (sondberg@indexdata.dk),
+Sebastian Hammer (quinn@indexdata.dk),
+Mike Taylor (indexdata.com).
 
 =head1 SEE ALSO
 
