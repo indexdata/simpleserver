@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.22 2004-09-03 13:24:55 mike Exp $
+## $Id: SimpleServer.pm,v 1.23 2006-03-24 01:21:15 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -39,7 +39,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
 @EXPORT = qw( );
-$VERSION = '0.09';
+$VERSION = '1.00';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
