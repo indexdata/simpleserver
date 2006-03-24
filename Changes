@@ -1,8 +1,8 @@
-$Id: Changes,v 1.19 2006-03-09 17:13:15 mike Exp $
+$Id: Changes,v 1.20 2006-03-24 01:20:44 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-0.09  (IN PROGRESS)
+1.00  Fri Mar 24 01:20:24 GMT 2006
 	- Support for SRU and SRW.  Mostly this is provided by the YAZ
 	  GFS, but changes are needed to allow for the case where
 	  there is no RPN query (due to absent on invalid <cql2rpn>
@@ -10,6 +10,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  natively; and also to fake up an {REQ_FORM} and {REP_FORM}
 	  parameters set to the "text/xml" OID when this information
 	  is not specified by the GFS.
+	  (The jump in version number is due to the SRU/W support.)
 	- Include "logging-server.pl" in the distribution: the
 	  simplest possible SimpleServer application, which merely
 	  logs the client-request data structures.
