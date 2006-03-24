@@ -1,9 +1,11 @@
-$Id: Changes,v 1.21 2006-03-24 11:56:56 mike Exp $
+$Id: Changes,v 1.22 2006-03-24 12:09:43 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-1.01  Fri Mar 24 11:57:07 GMT 2006
+1.01  Fri Mar 24 12:09:32 GMT 2006
 	- Documentation of release 1.00's SRU/SRW facilities.
+	- Makefile.PL now fails if YAZ version is earlier than 2.0.0,
+	  which was the first with SRU/SRW support.
 
 1.00  Fri Mar 24 01:20:24 GMT 2006
 	- Support for SRU and SRW.  Mostly this is provided by the YAZ
