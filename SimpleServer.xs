@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.38 2006-04-09 21:23:10 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.39 2006-04-09 23:01:00 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1192,8 +1192,6 @@ bend_initresult *bend_init(bend_initrequest *q)
 	bend_initresult *r = (bend_initresult *)
 		odr_malloc (q->stream, sizeof(*r));
 	char *ptr;
-	char *user = NULL;
-	char *passwd = NULL;
 	CV* handler_cv = 0;
 	dSP;
 	STRLEN len;
@@ -1239,15 +1237,16 @@ bend_initresult *bend_init(bend_initrequest *q)
 	hv_store(href, "HANDLE", 6, newSVsv(&sv_undef), 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 	if (q->auth) {
+	    char *user = NULL;
+	    char *passwd = NULL;
 	    if (q->auth->which == Z_IdAuthentication_open) {
-		char *openpass = xstrdup (q->auth->u.open);
-		char *cp = strchr (openpass, '/');
+		user = nmem_strdup (odr_getmem (q->stream), q->auth->u.open);
+		char *cp = strchr (user, '/');
 		if (cp) {
+                    /* password after / given */
 		    *cp = '\0';
-		    user = nmem_strdup (odr_getmem (q->stream), openpass);
-		    passwd = nmem_strdup (odr_getmem (q->stream), cp + 1);
+		    passwd = cp+1;
 		}
-		xfree(openpass);
 	    } else if (q->auth->which == Z_IdAuthentication_idPass) {
 		user = q->auth->u.idPass->userId;
 		passwd = q->auth->u.idPass->password;
