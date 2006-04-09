@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.37 2006-03-09 17:13:43 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.38 2006-04-09 21:23:10 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1253,8 +1253,10 @@ bend_initresult *bend_init(bend_initrequest *q)
 		passwd = q->auth->u.idPass->password;
 	    }
 	    /* ### some code paths have user/password unassigned here */
-	    hv_store(href, "USER", 4, newSVpv(user, 0), 0);
-	    hv_store(href, "PASS", 4, newSVpv(passwd, 0), 0);
+            if (user)
+	        hv_store(href, "USER", 4, newSVpv(user, 0), 0);
+            if (passwd)
+	        hv_store(href, "PASS", 4, newSVpv(passwd, 0), 0);
 	}
 
 	PUSHMARK(sp);	
