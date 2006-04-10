@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.39 2006-04-09 23:01:00 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.40 2006-04-10 20:49:24 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1240,8 +1240,9 @@ bend_initresult *bend_init(bend_initrequest *q)
 	    char *user = NULL;
 	    char *passwd = NULL;
 	    if (q->auth->which == Z_IdAuthentication_open) {
+                char *cp;
 		user = nmem_strdup (odr_getmem (q->stream), q->auth->u.open);
-		char *cp = strchr (user, '/');
+		cp = strchr (user, '/');
 		if (cp) {
                     /* password after / given */
 		    *cp = '\0';
