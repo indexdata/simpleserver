@@ -1,6 +1,9 @@
-$Id: Changes,v 1.22 2006-03-24 12:09:43 mike Exp $
+$Id: Changes,v 1.23 2006-04-11 09:53:17 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.02  (IN PROGRESS)
+	- Better support for Open and User/Password authentication.
 
 1.01  Fri Mar 24 12:09:32 GMT 2006
 	- Documentation of release 1.00's SRU/SRW facilities.
