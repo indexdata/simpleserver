@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.40 2006-04-10 20:49:24 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.41 2006-04-19 12:37:32 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -272,83 +272,14 @@ static void oid2str(Odr_oid *o, WRBUF buf)
 }
 
 
-static int rpn2pquery(Z_RPNStructure *s, WRBUF buf)
-{
-    switch (s->which) {
-	case Z_RPNStructure_simple: {
-	    Z_Operand *o = s->u.simple;
-
-	    switch (o->which) {
-		case Z_Operand_APT: {
-		    Z_AttributesPlusTerm *at = o->u.attributesPlusTerm;
-
-		    if (at->attributes) {
-			int i;
-			char ibuf[16];
-
-			for (i = 0; i < at->attributes->num_attributes; i++) {
-			    wrbuf_puts(buf, "@attr ");
-			    if (at->attributes->attributes[i]->attributeSet) {
-				oid2str(at->attributes->attributes[i]->attributeSet, buf);
-				wrbuf_putc(buf, ' ');
-			    }
-			    sprintf(ibuf, "%d=", *at->attributes->attributes[i]->attributeType);
-			    assert(at->attributes->attributes[i]->which == Z_AttributeValue_numeric);
-			    wrbuf_puts(buf, ibuf);
-			    sprintf(ibuf, "%d ", *at->attributes->attributes[i]->value.numeric);
-			    wrbuf_puts(buf, ibuf);
-			}
-		    }
-		    switch (at->term->which) {
-			case Z_Term_general: {
-			    wrbuf_putc(buf, '"');
-			    wrbuf_write(buf, (char*) at->term->u.general->buf, at->term->u.general->len);
-			    wrbuf_puts(buf, "\" ");
-			    break;
-			}
-			default: abort();
-		    }
-		    break;
-		}
-		default: abort();
-	    }
-	    break;
-	}
-	case Z_RPNStructure_complex: {
-	    Z_Complex *c = s->u.complex;
-
-	    switch (c->roperator->which) {
-		case Z_Operator_and: wrbuf_puts(buf, "@and "); break;
-		case Z_Operator_or: wrbuf_puts(buf, "@or "); break;
-		case Z_Operator_and_not: wrbuf_puts(buf, "@not "); break;
-		case Z_Operator_prox: abort();
-		default: abort();
-	    }
-	    if (!rpn2pquery(c->s1, buf))
-		return 0;
-	    if (!rpn2pquery(c->s2, buf))
-		return 0;
-	    break;
-	}
-	default: abort();
-    }
-    return 1;
-}
-
-
 WRBUF zquery2pquery(Z_Query *q)
 {
     WRBUF buf = wrbuf_alloc();
 
     if (q->which != Z_Query_type_1 && q->which != Z_Query_type_101) 
 	return 0;
-    if (q->u.type_1->attributeSetId) {
-	/* Output attribute set ID */
-	wrbuf_puts(buf, "@attrset ");
-	oid2str(q->u.type_1->attributeSetId, buf);
-	wrbuf_putc(buf, ' ');
-    }
-    return rpn2pquery(q->u.type_1->RPNStructure, buf) ? buf : 0;
+    yaz_rpnquery_to_wrbuf(buf, q->u.type_1);
+    return buf;
 }
 
 
