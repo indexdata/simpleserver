@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.41 2006-04-19 12:37:32 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.42 2006-04-19 13:17:52 sondberg Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -445,6 +445,65 @@ static SV *rpn2perl(Z_RPNStructure *s)
 }
 
 
+/* Decode the Z_SortKeySpec struct and store the whole thing in a perl hash */
+int simpleserver_SortKeySpecToHash (HV *sort_spec, Z_SortKeySpec *spec)
+{
+    Z_SortElement *element = spec->sortElement;
+
+    hv_store(sort_spec, "RELATION", 8, newSViv(*spec->sortRelation), 0);
+    hv_store(sort_spec, "CASE", 4, newSViv(*spec->caseSensitivity), 0);
+    hv_store(sort_spec, "MISSING", 7, newSViv(spec->which), 0);
+
+    if (element->which == Z_SortElement_generic)
+    {
+        Z_SortKey *key = element->u.generic;
+
+        if (key->which == Z_SortKey_sortField)
+        {
+            hv_store(sort_spec, "SORTFIELD", 9,
+                     newSVpv((char *) key->u.sortField, 0), 0);
+        }
+        else if (key->which == Z_SortKey_elementSpec)
+        {
+            Z_Specification *zspec = key->u.elementSpec;
+            
+            hv_store(sort_spec, "ELEMENTSPEC_TYPE", 16,
+                     newSViv(zspec->which), 0);
+
+            if (zspec->which == Z_Schema_oid)
+            {
+                WRBUF elementSpec = wrbuf_alloc();
+
+                oid2str(zspec->schema.oid, elementSpec);
+                hv_store(sort_spec, "ELEMENTSPEC_VALUE", 17,
+                         newSVpv(elementSpec->buf, elementSpec->pos), 0);
+                wrbuf_free(elementSpec, 1);
+            }
+            else if (zspec->which == Z_Schema_uri)
+            {
+                hv_store(sort_spec, "ELEMENTSPEC_VALUE", 17,
+                         newSVpv((char *) zspec->schema.uri, 0), 0);
+            }
+        }
+        else if (key->which == Z_SortKey_sortAttributes)
+        {
+            Z_SortAttributes *attr = key->u.sortAttributes;
+            
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+
 static SV *zquery2perl(Z_Query *q)
 {
     SV *sv;
@@ -465,15 +524,18 @@ int bend_sort(void *handle, bend_sort_rr *rr)
 {
 	HV *href;
 	AV *aref;
+        AV *sort_seq;
 	SV **temp;
 	SV *err_code;
 	SV *err_str;
 	SV *status;
+        SV *point;
 	STRLEN len;
 	char *ptr;
 	char *ODR_err_str;
 	char **input_setnames;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
+        Z_SortKeySpecList *sort_spec = rr->sort_sequence;
 	int i;
 	
 	dSP;
@@ -484,13 +546,32 @@ int bend_sort(void *handle, bend_sort_rr *rr)
 	input_setnames = rr->input_setnames;
 	for (i = 0; i < rr->num_input_setnames; i++)
 	{
-		av_push(aref, newSVpv(*input_setnames++, 0));
+            av_push(aref, newSVpv(*input_setnames++, 0));
 	}
+
+        sort_seq = newAV();
+        for (i = 0; i < sort_spec->num_specs; i++)
+        {
+            Z_SortKeySpec *spec = *sort_spec->specs++;
+            HV *sort_spec = newHV();
+
+            if ( simpleserver_SortKeySpecToHash(sort_spec, spec) )
+                av_push(sort_seq, newRV( sv_2mortal( (SV*) sort_spec ) ));
+            else
+            {
+                rr->errcode = 207;
+                return 0;
+            }
+        }
+        
 	href = newHV();
 	hv_store(href, "INPUT", 5, newRV( (SV*) aref), 0);
 	hv_store(href, "OUTPUT", 6, newSVpv(rr->output_setname, 0), 0);
+        hv_store(href, "SEQUENCE", 8, newRV( (SV*) sort_seq), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "STATUS", 6, newSViv(0), 0);
+        hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
+        hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
 
 	PUSHMARK(sp);
 
@@ -511,23 +592,34 @@ int bend_sort(void *handle, bend_sort_rr *rr)
 	temp = hv_fetch(href, "STATUS", 6, 1);
 	status = newSVsv(*temp);
 
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
+        temp = hv_fetch(href, "HANDLE", 6, 1);
+        point = newSVsv(*temp);
 
-	hv_undef(href),
+	hv_undef(href);
 	av_undef(aref);
+        av_undef(sort_seq);
+       
+	sv_free( (SV*) aref);
+	sv_free( (SV*) href);
+	sv_free( (SV*) sort_seq);
+
 	rr->errcode = SvIV(err_code);
 	rr->sort_status = SvIV(status);
+        
 	ptr = SvPV(err_str, len);
 	ODR_err_str = (char *)odr_malloc(rr->stream, len + 1);
 	strcpy(ODR_err_str, ptr);
 	rr->errstring = ODR_err_str;
+        zhandle->handle = point;
 
 	sv_free(err_code);
 	sv_free(err_str);
 	sv_free(status);
 	
+        PUTBACK;
+	FREETMPS;
+	LEAVE;
+
 	return 0;
 }
 
@@ -1138,7 +1230,11 @@ bend_initresult *bend_init(bend_initrequest *q)
 
 	zhandle->nmem = nmem;
 	zhandle->stop_flag = 0;
-	/*q->bend_sort = bend_sort;*/
+
+        if (sort_ref)
+        {
+            q->bend_sort = bend_sort;
+        }
 	if (search_ref)
 	{
 		q->bend_search = bend_search;

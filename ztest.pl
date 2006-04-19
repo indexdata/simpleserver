@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-##  $Id: ztest.pl,v 1.14 2005-11-09 09:35:47 adam Exp $
+##  $Id: ztest.pl,v 1.15 2006-04-19 13:17:52 sondberg Exp $
 ##  ------------------------------------------------------------------
 ##
 ##  Copyright (c) 2000-2004, Index Data.
@@ -29,6 +29,7 @@
 ##
 
 use ExtUtils::testlib;
+use Data::Dumper;
 use Net::Z3950::SimpleServer;
 use Net::Z3950::OID;
 use strict;
@@ -56,6 +57,14 @@ sub my_init_handler {
 	    printf("Received USER/PASS=%s/%s\n", $args->{USER},$args->{PASS});
 	}
 	    
+}
+
+
+sub my_sort_handler {
+    my ($args) = @_;
+
+    print "Sort handler called\n";
+    print Dumper( $args );
 }
 
 sub my_scan_handler {
@@ -154,6 +163,7 @@ my $handler = new Net::Z3950::SimpleServer(
 		INIT	=>	"main::my_init_handler",
 		SEARCH	=>	"main::my_search_handler",
 		SCAN	=>	"main::my_scan_handler",
+                SORT    =>      "main::my_sort_handler",
 		FETCH	=>	"main::my_fetch_handler" );
 
 $handler->launch_server("ztest.pl", @ARGV);

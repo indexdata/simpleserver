@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.25 2006-04-19 12:38:49 mike Exp $
+## $Id: SimpleServer.pm,v 1.26 2006-04-19 13:17:52 sondberg Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -82,6 +82,9 @@ sub launch_server {
 	}
 	if (defined($self->{SCAN})) {
 		set_scan_handler($self->{SCAN});
+	}
+	if (defined($self->{SORT})) {
+		set_sort_handler($self->{SORT});
 	}
 
 	start_server(@args);
