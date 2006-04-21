@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.42 2006-04-19 13:17:52 sondberg Exp $ 
+ * $Id: SimpleServer.xs,v 1.43 2006-04-21 07:30:15 sondberg Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -488,7 +488,8 @@ int simpleserver_SortKeySpecToHash (HV *sort_spec, Z_SortKeySpec *spec)
         else if (key->which == Z_SortKey_sortAttributes)
         {
             Z_SortAttributes *attr = key->u.sortAttributes;
-            
+
+            return 0;
         }
         else
         {
