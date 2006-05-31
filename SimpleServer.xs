@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.43 2006-04-21 07:30:15 sondberg Exp $ 
+ * $Id: SimpleServer.xs,v 1.44 2006-05-31 16:39:30 quinn Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -814,6 +814,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 
 	Z_RecordComposition *composition;
 	Z_ElementSetNames *simple;
+	Z_CompSpec *complex;
 	STRLEN length;
 
 	dSP;
@@ -856,13 +857,29 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 				rr->errcode = 26;
 			}
 		}
+		else if (composition->which == Z_RecordComp_complex)
+		{
+		        if (composition->u.complex->generic &&
+
+					composition->u.complex->generic &&
+					composition->u.complex->generic->elementSpec &&
+					composition->u.complex->generic->elementSpec->which ==
+					Z_ElementSpec_elementSetName)
+			{
+				complex = composition->u.complex;
+				hv_store(href, "COMP", 4,
+					newSVpv(complex->generic->elementSpec->u.elementSetName, 0), 0);
+			}
+			else
+			{
+				rr->errcode = 26;
+				return 0;
+			}
+		}
 		else
 		{
-			/* This is where we end up in the case of
-			 * SRU.  Since record composition ("element
-			 * sets") are meaningless in SRU anyway, we
-			 * just skip this.
-			 */
+			rr->errcode = 26;
+			return;
 		}
 	}
 
@@ -974,6 +991,7 @@ int bend_present(void *handle, bend_present_rr *rr)
 	STRLEN len;
 	Z_RecordComposition *composition;
 	Z_ElementSetNames *simple;
+	Z_CompSpec *complex;
 	char *ODR_errstr;
 	char *ptr;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
@@ -1012,10 +1030,29 @@ int bend_present(void *handle, bend_present_rr *rr)
 				return 0;
 			}
 		}
+		else if (composition->which == Z_RecordComp_complex)
+		{
+		        if (composition->u.complex->generic &&
+
+					composition->u.complex->generic &&
+					composition->u.complex->generic->elementSpec &&
+					composition->u.complex->generic->elementSpec->which ==
+					Z_ElementSpec_elementSetName)
+			{
+				complex = composition->u.complex;
+				hv_store(href, "COMP", 4,
+					newSVpv(complex->generic->elementSpec->u.elementSetName, 0), 0);
+			}
+			else
+			{
+				rr->errcode = 26;
+				return 0;
+			}
+		}
 		else
 		{
 			rr->errcode = 26;
-			return 0;
+			return;
 		}
 	}
 
