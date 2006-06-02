@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.44 2006-05-31 16:39:30 quinn Exp $ 
+ * $Id: SimpleServer.xs,v 1.45 2006-06-02 10:06:11 sondberg Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -445,6 +445,44 @@ static SV *rpn2perl(Z_RPNStructure *s)
 }
 
 
+/* Decode the Z_SortAttributes struct and store the whole thing into the
+ * hash by reference
+ */
+int simpleserver_ExpandSortAttributes (HV *sort_spec, Z_SortAttributes *sattr)
+{
+    WRBUF attrset_wr = wrbuf_alloc();
+    AV *list = newAV();
+    Z_AttributeList *attr_list = sattr->list;
+    int i;
+
+    oid2str(sattr->id, attrset_wr);
+    hv_store(sort_spec, "ATTRSET", 7,
+             newSVpv(attrset_wr->buf, attrset_wr->pos), 0);
+    wrbuf_free(attrset_wr, 1);
+
+    hv_store(sort_spec, "SORT_ATTR", 9, newRV( sv_2mortal( (SV*) list ) ), 0);
+
+    for (i = 0; i < attr_list->num_attributes; i++) 
+    {
+        Z_AttributeElement *attr = *attr_list->attributes++; 
+        HV *attr_spec = newHV();
+                
+        av_push(list, newRV( sv_2mortal( (SV*) attr_spec ) ));
+        hv_store(attr_spec, "ATTR_TYPE", 9, newSViv(*attr->attributeType), 0);
+
+        if (attr->which == Z_AttributeValue_numeric)
+        {
+            hv_store(attr_spec, "ATTR_VALUE", 10,
+                     newSViv(*attr->value.numeric), 0);
+        } else {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+
 /* Decode the Z_SortKeySpec struct and store the whole thing in a perl hash */
 int simpleserver_SortKeySpecToHash (HV *sort_spec, Z_SortKeySpec *spec)
 {
@@ -487,9 +525,8 @@ int simpleserver_SortKeySpecToHash (HV *sort_spec, Z_SortKeySpec *spec)
         }
         else if (key->which == Z_SortKey_sortAttributes)
         {
-            Z_SortAttributes *attr = key->u.sortAttributes;
-
-            return 0;
+            return simpleserver_ExpandSortAttributes(sort_spec,
+                                                     key->u.sortAttributes);
         }
         else
         {
