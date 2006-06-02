@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.26 2006-04-19 13:17:52 sondberg Exp $
+## $Id: SimpleServer.pm,v 1.27 2006-06-02 16:03:25 quinn Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -85,6 +85,9 @@ sub launch_server {
 	}
 	if (defined($self->{SORT})) {
 		set_sort_handler($self->{SORT});
+	}
+	if (defined($self->{EXPLAIN})) {
+		set_explain_handler($self->{EXPLAIN});
 	}
 
 	start_server(@args);
@@ -212,7 +215,8 @@ means of the SimpleServer object constructor
 			SEARCH	=>	\&my_search_handler,
 			PRESENT	=>	\&my_present_handler,
 			SCAN	=>	\&my_scan_handler,
-			FETCH	=>	\&my_fetch_handler);
+			FETCH	=>	\&my_fetch_handler,
+  			EXPLAIN =>	\&my_explain_handler);
 
 If you want your SimpleServer to start a thread (threaded mode) to
 handle each incoming Z39.50 request instead of forking a process

@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.45 2006-06-02 10:06:11 sondberg Exp $ 
+ * $Id: SimpleServer.xs,v 1.46 2006-06-02 16:03:25 quinn Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -64,6 +64,7 @@ typedef struct {
 	SV *esrequest_ref;
 	SV *delete_ref;
 	SV *scan_ref;
+	SV *explain_ref;
 	NMEM nmem;
 	int stop_flag;  /* is used to stop server prematurely .. */
 } Zfront_handle;
@@ -79,6 +80,7 @@ SV *present_ref = NULL;
 SV *esrequest_ref = NULL;
 SV *delete_ref = NULL;
 SV *scan_ref = NULL;
+SV *explain_ref = NULL;
 PerlInterpreter *root_perl_context;
 int MAX_OID = 15;
 
@@ -1284,6 +1286,46 @@ int bend_scan(void *handle, bend_scan_rr *rr)
         return 0;
 }
 
+int bend_explain(void *handle, bend_explain_rr *q)
+{
+	HV *href;
+	CV *handler_cv = 0;
+	SV **temp;
+	char *explain;
+	SV *explainsv;
+	STRLEN len;
+
+	dSP;
+	ENTER;
+	SAVETMPS;
+
+	href = newHV();
+	hv_store(href, "EXPLAIN", 7, newSVpv("", 0), 0);
+	hv_store(href, "DATABASE", 8, newSVpv(q->database, 0), 0);
+
+	PUSHMARK(sp);
+	XPUSHs(sv_2mortal(newRV((SV*) href)));
+	PUTBACK;
+
+	handler_cv = simpleserver_sv2cv(explain_ref);
+	perl_call_sv((SV*) handler_cv, G_SCALAR | G_DISCARD);
+
+	SPAGAIN;
+
+	temp = hv_fetch(href, "EXPLAIN", 7, 1);
+	explainsv = newSVsv(*temp);
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+
+	explain = SvPV(explainsv, len);
+	q->explain_buf = (char*) odr_malloc(q->stream, len + 1);
+	strcpy(q->explain_buf, explain);
+
+        return 0;
+}
+
 bend_initresult *bend_init(bend_initrequest *q)
 {
 	int dummy = simpleserver_clone();
@@ -1327,6 +1369,10 @@ bend_initresult *bend_init(bend_initrequest *q)
 	if (scan_ref)
 	{
 		q->bend_scan = bend_scan;
+	}
+	if (explain_ref)
+	{
+		q->bend_explain = bend_explain;
 	}
 
        	href = newHV();	
@@ -1520,6 +1566,11 @@ set_scan_handler(arg)
 	CODE:
 		scan_ref = newSVsv(arg);
 
+void
+set_explain_handler(arg)
+		SV *arg
+	CODE:
+		explain_ref = newSVsv(arg);
 
 int
 start_server(...)
