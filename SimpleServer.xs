@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.46 2006-06-02 16:03:25 quinn Exp $ 
+ * $Id: SimpleServer.xs,v 1.47 2006-06-05 18:01:25 quinn Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1294,6 +1294,7 @@ int bend_explain(void *handle, bend_explain_rr *q)
 	char *explain;
 	SV *explainsv;
 	STRLEN len;
+	Zfront_handle *zhandle = (Zfront_handle *)handle;
 
 	dSP;
 	ENTER;
@@ -1302,6 +1303,7 @@ int bend_explain(void *handle, bend_explain_rr *q)
 	href = newHV();
 	hv_store(href, "EXPLAIN", 7, newSVpv("", 0), 0);
 	hv_store(href, "DATABASE", 8, newSVpv(q->database, 0), 0);
+	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 
 	PUSHMARK(sp);
 	XPUSHs(sv_2mortal(newRV((SV*) href)));
