@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.47 2006-06-05 18:01:25 quinn Exp $ 
+ * $Id: SimpleServer.xs,v 1.48 2006-06-07 18:25:15 quinn Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -698,6 +698,8 @@ int bend_search(void *handle, bend_search_rr *rr)
 #endif
 	href = newHV();		
 	hv_store(href, "SETNAME", 7, newSVpv(rr->setname, 0), 0);
+	if (rr->srw_sortKeys && *rr->srw_sortKeys) 
+	    hv_store(href, "SRW_SORTKEYS", 12, newSVpv(rr->srw_sortKeys, 0), 0);
 	hv_store(href, "REPL_SET", 8, newSViv(rr->replace_set), 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
