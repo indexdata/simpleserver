@@ -1,4 +1,4 @@
-$Id: Changes,v 1.24 2006-04-19 12:38:37 mike Exp $
+$Id: Changes,v 1.25 2006-07-21 22:14:05 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
@@ -8,6 +8,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  yaz_rpnquery_to_wrbuf() used instead.  This is more robust
 	  in dealing with unusual cases such as string-valued
 	  attributes.
+	- Support for SCHEMA element when fetching records.
 
 1.01  Fri Mar 24 12:09:32 GMT 2006
 	- Documentation of release 1.00's SRU/SRW facilities.

@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.48 2006-06-07 18:25:15 quinn Exp $ 
+ * $Id: SimpleServer.xs,v 1.49 2006-07-21 22:14:12 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -843,6 +843,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	SV *sur_flag;
 	SV *point;
 	SV *rep_form;
+	SV *schema;
 	char *ptr;
 	char *ODR_record;
 	char *ODR_basename;
@@ -865,6 +866,8 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	rr->errcode = 0;
 	href = newHV();
 	hv_store(href, "SETNAME", 7, newSVpv(rr->setname, 0), 0);
+	if (rr->schema)
+		hv_store(href, "SCHEMA", 6, newSVpv(rr->schema, 0), 0);
 	temp = hv_store(href, "OFFSET", 6, newSViv(rr->number), 0);
 	if (rr->request_format_raw != 0) {
 	    oid_dotted = oid2dotted(rr->request_format_raw);
@@ -956,6 +959,9 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	temp = hv_fetch(href, "REP_FORM", 8, 1);
 	rep_form = newSVsv(*temp);
 
+	temp = hv_fetch(href, "SCHEMA", 8, 1);
+	schema = newSVsv(*temp);
+
 	temp = hv_fetch(href, "HANDLE", 6, 1);
 	point = newSVsv(*temp);
 
@@ -966,6 +972,10 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	ODR_basename = (char *)odr_malloc(rr->stream, length + 1);
 	strcpy(ODR_basename, ptr);
 	rr->basename = ODR_basename;
+
+	ptr = SvPV(schema, length);
+	rr->schema = (char *)odr_malloc(rr->stream, length + 1);
+	strcpy(rr->schema, ptr);
 
 	ptr = SvPV(rep_form, length);
 	ODR_oid_buf = (int *)odr_malloc(rr->stream, (MAX_OID + 1) * sizeof(int));
@@ -1012,6 +1022,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	sv_free(err_code),
 	sv_free(sur_flag);
 	sv_free(rep_form);
+	sv_free(schema);
 
 	PUTBACK;
 	FREETMPS;

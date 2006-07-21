@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.27 2006-06-02 16:03:25 quinn Exp $
+## $Id: SimpleServer.pm,v 1.28 2006-07-21 22:14:19 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -538,6 +538,7 @@ The parameters exchanged between the server and the fetch handler are
 	     OFFSET    =>  nnn      ## Record offset number
 	     REQ_FORM  =>  "n.m.k.l"## Client requested format OID
 	     COMP      =>  "xyz"    ## Formatting instructions
+	     SCHEMA    =>  "abc"    ## Requested schema, if any
 
 				    ## Handler response:
 
@@ -548,6 +549,7 @@ The parameters exchanged between the server and the fetch handler are
 	     ERR_STR   =>  ""       ## Error string
 	     SUR_FLAG  =>  0        ## Surrogate diagnostic flag
 	     REP_FORM  =>  "n.m.k.l"## Provided format OID
+	     SCHEMA    =>  "abc"    ## Provided schema, if any
 	  };
 
 The REP_FORM value has by default the REQ_FORM value but can be set to
