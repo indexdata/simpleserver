@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.49 2006-07-21 22:14:12 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.50 2006-07-24 23:05:22 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -916,8 +916,11 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 			}
 			else
 			{
+#if 0	/* For now ignore this error, which is ubiquitous in SRU */
+				fprintf(stderr, "complex is weird\n");
 				rr->errcode = 26;
 				return 0;
+#endif /*0*/
 			}
 		}
 		else
