@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.10 2006-03-24 12:08:14 mike Exp $
+## $Id: Makefile.PL,v 1.11 2006-07-24 23:04:33 mike Exp $
 
 my $yazconf = "yaz-config";
 my $yazver = `$yazconf --version`;
@@ -37,4 +37,5 @@ WriteMakefile(
     'LIBS'	=> [$yazlibs],   # e.g., '-lm' 
     'DEFINE'	=> '',     # e.g., '-DHAVE_SOMETHING' 
     'INC'	=> $yazinc,     # e.g., '-I/usr/include/other' 
+#    OPTIMIZE   => "-Wdeclaration-after-statement -g -O0",
 );
