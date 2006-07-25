@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.50 2006-07-24 23:05:22 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.51 2006-07-25 23:14:49 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -962,8 +962,17 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	temp = hv_fetch(href, "REP_FORM", 8, 1);
 	rep_form = newSVsv(*temp);
 
-	temp = hv_fetch(href, "SCHEMA", 8, 1);
-	schema = newSVsv(*temp);
+	fprintf(stderr, "about to get SCHEMA\n");
+	temp = hv_fetch(href, "SCHEMA", 6, 1);
+	if (temp != 0) {
+		schema = newSVsv(*temp);
+		fprintf(stderr, "got schema = %0p\n", schema);
+		ptr = SvPV(schema, length);
+		fprintf(stderr, "got ptr=%0p, length=%d\n", ptr, length);
+		rr->schema = (char *)odr_malloc(rr->stream, length + 1);
+		strcpy(rr->schema, ptr);
+		fprintf(stderr, "copied schema len %d = '%.*s'\n", length, length+5, ptr);
+	}
 
 	temp = hv_fetch(href, "HANDLE", 6, 1);
 	point = newSVsv(*temp);
@@ -975,10 +984,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	ODR_basename = (char *)odr_malloc(rr->stream, length + 1);
 	strcpy(ODR_basename, ptr);
 	rr->basename = ODR_basename;
-
-	ptr = SvPV(schema, length);
-	rr->schema = (char *)odr_malloc(rr->stream, length + 1);
-	strcpy(rr->schema, ptr);
 
 	ptr = SvPV(rep_form, length);
 	ODR_oid_buf = (int *)odr_malloc(rr->stream, (MAX_OID + 1) * sizeof(int));
@@ -1206,7 +1211,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	if (rr->term->term->which == Z_Term_general)
 	{
 		term_len = rr->term->term->u.general->len;
-		hv_store(href, "TERM", 4, newSVpv(rr->term->term->u.general->buf, term_len), 0);
+		hv_store(href, "TERM", 4, newSVpv((char*) rr->term->term->u.general->buf, term_len), 0);
 	} else {
 		rr->errcode = 229;	/* Unsupported term type */
 		return 0;
