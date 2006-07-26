@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.52 2006-07-26 01:08:44 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.53 2006-07-26 11:09:14 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -966,8 +966,10 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	if (temp != 0) {
 		schema = newSVsv(*temp);
 		ptr = SvPV(schema, length);
-		rr->schema = (char *)odr_malloc(rr->stream, length + 1);
-		strcpy(rr->schema, ptr);
+		if (length > 0) {
+			rr->schema = (char *)odr_malloc(rr->stream, length + 1);
+			strcpy(rr->schema, ptr);
+		}
 	}
 
 	temp = hv_fetch(href, "HANDLE", 6, 1);
