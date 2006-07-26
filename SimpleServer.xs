@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.51 2006-07-25 23:14:49 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.52 2006-07-26 01:08:44 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -962,16 +962,12 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	temp = hv_fetch(href, "REP_FORM", 8, 1);
 	rep_form = newSVsv(*temp);
 
-	fprintf(stderr, "about to get SCHEMA\n");
 	temp = hv_fetch(href, "SCHEMA", 6, 1);
 	if (temp != 0) {
 		schema = newSVsv(*temp);
-		fprintf(stderr, "got schema = %0p\n", schema);
 		ptr = SvPV(schema, length);
-		fprintf(stderr, "got ptr=%0p, length=%d\n", ptr, length);
 		rr->schema = (char *)odr_malloc(rr->stream, length + 1);
 		strcpy(rr->schema, ptr);
-		fprintf(stderr, "copied schema len %d = '%.*s'\n", length, length+5, ptr);
 	}
 
 	temp = hv_fetch(href, "HANDLE", 6, 1);
