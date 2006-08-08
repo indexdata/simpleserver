@@ -1,6 +1,12 @@
-$Id: Changes,v 1.27 2006-08-08 16:15:55 mike Exp $
+$Id: Changes,v 1.28 2006-08-08 16:27:27 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.03  Tue Aug  8 17:27:16 BST 2006
+	- Rely on version 2.1.14 or later of YAZ; this is the first
+	  version that reliably passes through the additional
+	  information associated with errors generated while serving
+	  SRU/W requests.  No functional differences since 1.02.
 
 1.02  Wed Jul 26 12:09:50 BST 2006
 	- Better support for Open and User/Password authentication.
