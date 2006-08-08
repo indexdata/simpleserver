@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.11 2006-07-24 23:04:33 mike Exp $
+## $Id: Makefile.PL,v 1.12 2006-08-08 16:25:37 mike Exp $
 
 my $yazconf = "yaz-config";
 my $yazver = `$yazconf --version`;
@@ -17,9 +17,8 @@ SimpleServer module.
 
 chomp($yazver);
 my ($major, $minor, $trivial) = split(/\./, $yazver);
-# Judging by the YAZ NEWS file, 2.0.0 was the first release to
-# include SRW/U support in the GFS
-my ($needMaj, $needMin, $needTriv) = (2, 0, 0);
+# YAZ 2.1.14 is the first to propagate SRW/U addinfo correctly
+my ($needMaj, $needMin, $needTriv) = (2, 1, 24);
 #print "major=$major, minor=$minor, trivial=$trivial\n";
 die "You have YAZ version $major.$minor.$trivial; " .
     "you need $needMaj.$needMin.$needTriv or better."
