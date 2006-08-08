@@ -1,4 +1,4 @@
-$Id: Changes,v 1.26 2006-07-26 11:10:05 mike Exp $
+$Id: Changes,v 1.27 2006-08-08 16:15:55 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
@@ -64,7 +64,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  of RPN.
 
 0.04  Tue Feb 05 21:49:56 2002
-	- Add Changelog (### Why?  We already have this file!)
+	- Add Changelog (Why?  We already have this file!)
 	- Add TODO file (although it's empty!)
 	- Change interface to constructor, and fix test.pl script to
 	  use the new interface.
