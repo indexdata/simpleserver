@@ -22,6 +22,7 @@ and it will spawn a new process (or thread, in some environments)
 whenever a new connection is received.
 
 AUTHORS
-	Anders Sønderberg (sondberg@indexdata.dk) and Sebastian Hammer
-	(quinn@indexdata.dk).  Substantial contributions made by Mike
-	Taylor (mike@miketaylor.org.uk).
+	Anders Sønderberg <sondberg@indexdata.dk>
+	Sebastian Hammer <quinn@indexdata.dk>
+	Mike Taylor <mike@indexdata.com>
+
