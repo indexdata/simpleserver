@@ -1,0 +1,12 @@
+This is the debian package for the Net-Z3950-SimpleServer module.
+It was created by Anders Mortensen <sondberg@indexdata.dk> using dh-make-perl.
+
+This copyright info was automatically extracted from the perl module.
+It may not be accurate, so you better check the module sources
+if don't want to get into legal troubles.
+
+The upstream author is: 
+
+Anders Sønderberg Mortensen <sondberg@indexdata.dk>
+Index Data ApS, Copenhagen, Denmark.
+2001/03/09.

@@ -1,0 +1,16 @@
+Source: libnet-z3950-simpleserver-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 4.0.2), libyaz-dev
+Build-Depends-Indep: perl (>= 5.8.0-7)
+Maintainer: Anders Mortensen <sondberg@indexdata.dk>
+Standards-Version: 3.6.1
+
+Package: libnet-z3950-simpleserver-perl
+Architecture: any
+Depends: ${perl:Depends}, ${shlibs:Depends}, ${misc:Depends}, 
+Description:  Perl package used to encode GRS-1 records.
+ This Perl module helps you to create and manipulate GRS-1 records (generic record syntax).
+ So far, you have only access to three methods:
+ .
+ This description was automagically extracted from the module by dh-make-perl.

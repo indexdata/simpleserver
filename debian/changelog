@@ -1,0 +1,6 @@
+libnet-z3950-simpleserver-perl (1.03-1) testing; urgency=low
+
+  * Initial Release.
+
+ -- Anders Mortensen <sondberg@indexdata.dk>  Thu, 17 Aug 2006 10:27:59 +0200 
+
