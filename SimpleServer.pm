@@ -1,5 +1,5 @@
 ##
-##  Copyright (c) 2000-2004, Index Data.
+##  Copyright (c) 2000-2006, Index Data.
 ##
 ##  Permission to use, copy, modify, distribute, and sell this software and
 ##  its documentation, in whole or in part, for any purpose, is hereby granted,
@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.29 2006-08-08 16:27:04 mike Exp $
+## $Id: SimpleServer.pm,v 1.30 2006-12-01 09:38:37 sondberg Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -39,7 +39,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
 @EXPORT = qw( );
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
