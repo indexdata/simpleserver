@@ -9,8 +9,8 @@ Standards-Version: 3.6.1
 Package: libnet-z3950-simpleserver-perl
 Architecture: any
 Depends: ${perl:Depends}, ${shlibs:Depends}, ${misc:Depends}, 
-Description:  Perl package used to encode GRS-1 records.
- This Perl module helps you to create and manipulate GRS-1 records (generic record syntax).
- So far, you have only access to three methods:
- .
- This description was automagically extracted from the module by dh-make-perl.
+Description:  Perl API to the YAZ generic front-end server (Z39.50 server). 
+ The SimpleServer module is a tool for constructing Z39.50 "Information
+ Retrieval" servers in Perl. The module is easy to use, but it
+ does help to have an understanding of the Z39.50 query
+ structure and the construction of structured retrieval records.
