@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.53 2006-07-26 11:09:14 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.54 2006-12-01 10:44:58 sondberg Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -35,6 +35,7 @@
 #include <yaz/backend.h>
 #include <yaz/log.h>
 #include <yaz/wrbuf.h>
+#include <yaz/querytowrbuf.h>
 #include <stdio.h>
 #ifdef WIN32
 #else
@@ -843,7 +844,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	SV *sur_flag;
 	SV *point;
 	SV *rep_form;
-	SV *schema;
+	SV *schema = 0;
 	char *ptr;
 	char *ODR_record;
 	char *ODR_basename;
@@ -926,7 +927,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 		else
 		{
 			rr->errcode = 26;
-			return;
+			return 0;
 		}
 	}
 
@@ -1028,7 +1029,9 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	sv_free(err_code),
 	sv_free(sur_flag);
 	sv_free(rep_form);
-	sv_free(schema);
+
+	if (schema)
+		sv_free(schema);
 
 	PUTBACK;
 	FREETMPS;
@@ -1110,7 +1113,7 @@ int bend_present(void *handle, bend_present_rr *rr)
 		else
 		{
 			rr->errcode = 26;
-			return;
+			return 0;
 		}
 	}
 
