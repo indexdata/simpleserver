@@ -1,4 +1,4 @@
-libnet-z3950-simpleserver-perl (1.03-2) testing; urgency=low
+libnet-z3950-simpleserver-perl (1.04-1) testing; urgency=low
 
   * Take into account that the yaz/configure setting enable_shared is no longer
     valid.

@@ -1,6 +1,9 @@
-$Id: Changes,v 1.28 2006-08-08 16:27:27 mike Exp $
+$Id: Changes,v 1.29 2006-12-01 09:53:00 sondberg Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.04  Fri Dec  1 10:48:32 CET 2006
+        - Build such that SimpleServer links to new yaz shared object.
 
 1.03  Tue Aug  8 17:27:16 BST 2006
 	- Rely on version 2.1.14 or later of YAZ; this is the first
