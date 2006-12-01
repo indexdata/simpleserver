@@ -13,3 +13,4 @@ samples/render-search.pl
 test.pl
 ztest.pl
 logging-server.pl
+META.yml                                 Module meta-data (added by MakeMaker)
