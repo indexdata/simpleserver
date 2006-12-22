@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.54 2006-12-01 10:44:58 sondberg Exp $ 
+ * $Id: SimpleServer.xs,v 1.55 2006-12-22 12:27:19 sondberg Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -195,7 +195,7 @@ Z_GenericRecord *read_grs1(char *str, ODR o)
 		}
 		len = ptr - str;
 		if (len > GRS_BUF_SIZE) {
-		    yaz_log(LOG_WARN, "GRS string too long - truncating (%d > %d)", len, GRS_BUF_SIZE);
+		    yaz_log(YLOG_WARN, "GRS string too long - truncating (%d > %d)", len, GRS_BUF_SIZE);
 		    len = GRS_BUF_SIZE;
 		}
 		strncpy(line, str, len);
@@ -210,7 +210,7 @@ Z_GenericRecord *read_grs1(char *str, ODR o)
 		}
 		if (sscanf(buf, "(%d,%[^)])", &type, value) != 2)
 		{
-			yaz_log(LOG_WARN, "Bad data in '%s'", buf);
+			yaz_log(YLOG_WARN, "Bad data in '%s'", buf);
 			return r;
 		}
 		if (!type && *value == '0')
@@ -222,7 +222,7 @@ Z_GenericRecord *read_grs1(char *str, ODR o)
 			buf++;
 		if (r->num_elements >= GRS_MAX_FIELDS)
 		{
-			yaz_log(LOG_WARN, "Max number of GRS-1 elements exceeded [GRS_MAX_FIELDS=%d]", GRS_MAX_FIELDS);
+			yaz_log(YLOG_WARN, "Max number of GRS-1 elements exceeded [GRS_MAX_FIELDS=%d]", GRS_MAX_FIELDS);
 			exit(0);
 		}
 		r->elements[r->num_elements] = t = (Z_TaggedElement *) odr_malloc(o, sizeof(Z_TaggedElement));
