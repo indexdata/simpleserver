@@ -1,6 +1,9 @@
-$Id: Changes,v 1.29 2006-12-01 09:53:00 sondberg Exp $
+$Id: Changes,v 1.30 2006-12-27 12:24:50 sondberg Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.05  Wed Dec 27 13:19:13 CET 2006
+        - Taking new naming convention for YAZ constants into account.
 
 1.04  Fri Dec  1 10:48:32 CET 2006
         - Build such that SimpleServer links to new yaz shared object.
