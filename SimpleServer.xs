@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.55 2006-12-22 12:27:19 sondberg Exp $ 
+ * $Id: SimpleServer.xs,v 1.56 2007-03-05 11:47:16 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -85,7 +85,7 @@ SV *explain_ref = NULL;
 PerlInterpreter *root_perl_context;
 int MAX_OID = 15;
 
-#define GRS_BUF_SIZE 512
+#define GRS_BUF_SIZE 8192
 
 CV * simpleserver_sv2cv(SV *handler) {
     STRLEN len;
