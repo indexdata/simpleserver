@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-##  $Id: ztest.pl,v 1.16 2007-03-07 11:25:29 mike Exp $
+##  $Id: ztest.pl,v 1.17 2007-03-08 14:51:32 mike Exp $
 ##  ------------------------------------------------------------------
 ##
 ##  Copyright (c) 2000-2004, Index Data.
@@ -106,10 +106,6 @@ my $_counter = 0;
 sub my_search_handler { 
 	my $args = shift;
 
-	if ($_fail_frequency != 0 && ++$_counter % $_fail_frequency == 0) {
-	    print "Exiting to be nasty to client\n";
-	    exit(1);
-	}
 	my $data = [{
 			name		=>	"Peter Dornan",
 			title		=>	"Spokesman",
@@ -139,6 +135,10 @@ sub my_search_handler {
 	$args->{HITS} = $hits;
 	$session->{$set_id} = $data;
 	$session->{__HITS} = $hits;
+	if ($_fail_frequency != 0 && ++$_counter % $_fail_frequency == 0) {
+	    print "Exiting to be nasty to client\n";
+	    exit(1);
+	}
 }
 
 
