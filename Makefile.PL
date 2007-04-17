@@ -1,8 +1,8 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.13 2007-04-17 07:55:02 adam Exp $
+## $Id: Makefile.PL,v 1.14 2007-04-17 07:56:29 adam Exp $
 
-my $yazconf = "yaz-config";
+my $yazconf = "../yaz/yaz-config";
 my $yazver = `$yazconf --version`;
 my $yazinc = `$yazconf --cflags threads`;
 my $yazlibs = `$yazconf --libs threads`;

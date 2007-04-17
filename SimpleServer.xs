@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.57 2007-04-17 07:55:02 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.58 2007-04-17 07:56:29 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -791,47 +791,6 @@ WRBUF oid2dotted(int *oid)
 	return buf;
 }
 		
-
-int dotted2oid(char *dotted, int *buffer)
-{
-        int *oid;
-        char ibuf[16];
-        char *ptr;
-        int n = 0;
-
-        ptr = ibuf;
-        oid = buffer;
-        while (*dotted)
-        {
-                if (*dotted == '.')
-                {
-                        n++;
-			if (n == MAX_OID)  /* Terminate if more than MAX_OID entries */
-			{
-				*oid = -1;
-				return -1;
-			}
-                        *ptr = 0;
-                        sscanf(ibuf, "%d", oid++);
-                        ptr = ibuf;
-                        dotted++;
-
-                }
-                else
-                {
-                        *ptr++ = *dotted++;
-                }
-        }
-        if (n < MAX_OID)
-	{
-		*ptr = 0;
-        	sscanf(ibuf, "%d", oid++);
-	}
-        *oid = -1;
-	return 0;
-}
-
-
 int bend_fetch(void *handle, bend_fetch_rr *rr)
 {
 	HV *href;
