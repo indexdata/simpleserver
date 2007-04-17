@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.59 2007-04-17 08:06:47 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.60 2007-04-17 20:26:58 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -37,6 +37,7 @@
 #include <yaz/wrbuf.h>
 #include <yaz/querytowrbuf.h>
 #include <stdio.h>
+#include <yaz/mutex.h>
 #ifdef WIN32
 #else
 #include <unistd.h>
@@ -51,7 +52,7 @@
 #define sv_undef PL_sv_undef
 #endif
 
-NMEM_MUTEX simpleserver_mutex;
+YAZ_MUTEX simpleserver_mutex;
 
 typedef struct {
 	SV *handle;
@@ -129,7 +130,7 @@ void tst_clones(void)
 
 int simpleserver_clone(void) {
 #ifdef USE_ITHREADS
-     nmem_mutex_enter(simpleserver_mutex);
+     yaz_mutex_enter(simpleserver_mutex);
      if (1)
      {
          PerlInterpreter *current = PERL_GET_CONTEXT;
@@ -145,14 +146,14 @@ int simpleserver_clone(void) {
              PERL_SET_CONTEXT( perl_interp );
          }
      }
-     nmem_mutex_leave(simpleserver_mutex);
+     yaz_mutex_leave(simpleserver_mutex);
 #endif
      return 0;
 }
 
 
 void simpleserver_free(void) {
-    nmem_mutex_enter(simpleserver_mutex);
+    yaz_mutex_enter(simpleserver_mutex);
     if (1)
     {
         PerlInterpreter *current_interp = PERL_GET_CONTEXT;
@@ -167,7 +168,7 @@ void simpleserver_free(void) {
             perl_free(current_interp);
 	}
     }
-    nmem_mutex_leave(simpleserver_mutex);
+    yaz_mutex_leave(simpleserver_mutex);
 }
 
 
@@ -1556,7 +1557,7 @@ start_server(...)
 		}
 		*argv_buf = NULL;
 		root_perl_context = PERL_GET_CONTEXT;
-		nmem_mutex_create(&simpleserver_mutex);
+		yaz_mutex_create(&simpleserver_mutex);
 #if 0
 		/* only for debugging perl_clone .. */
 		tst_clones();

@@ -1,11 +1,11 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.15 2007-04-17 08:06:28 adam Exp $
+## $Id: Makefile.PL,v 1.16 2007-04-17 20:26:58 adam Exp $
 
 my $yazconf = "yaz-config";
 my $yazver = `$yazconf --version`;
-my $yazinc = `$yazconf --cflags threads`;
-my $yazlibs = `$yazconf --libs threads`;
+my $yazinc = `$yazconf --cflags servers`;
+my $yazlibs = `$yazconf --libs server`;
 if (!$yazver || (!$yazinc && !$yazlibs)) {
    die qq[
 ERROR: Unable to call script: yaz-config
