@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.12 2006-08-08 16:25:37 mike Exp $
+## $Id: Makefile.PL,v 1.13 2007-04-17 07:55:02 adam Exp $
 
 my $yazconf = "yaz-config";
 my $yazver = `$yazconf --version`;
@@ -18,7 +18,7 @@ SimpleServer module.
 chomp($yazver);
 my ($major, $minor, $trivial) = split(/\./, $yazver);
 # YAZ 2.1.14 is the first to propagate SRW/U addinfo correctly
-my ($needMaj, $needMin, $needTriv) = (2, 1, 24);
+my ($needMaj, $needMin, $needTriv) = (2, 1, 99);
 #print "major=$major, minor=$minor, trivial=$trivial\n";
 die "You have YAZ version $major.$minor.$trivial; " .
     "you need $needMaj.$needMin.$needTriv or better."

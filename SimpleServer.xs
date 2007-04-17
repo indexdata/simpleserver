@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.56 2007-03-05 11:47:16 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.57 2007-04-17 07:55:02 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -461,7 +461,7 @@ int simpleserver_ExpandSortAttributes (HV *sort_spec, Z_SortAttributes *sattr)
     oid2str(sattr->id, attrset_wr);
     hv_store(sort_spec, "ATTRSET", 7,
              newSVpv(attrset_wr->buf, attrset_wr->pos), 0);
-    wrbuf_free(attrset_wr, 1);
+    wrbuf_destroy(attrset_wr);
 
     hv_store(sort_spec, "SORT_ATTR", 9, newRV( sv_2mortal( (SV*) list ) ), 0);
 
@@ -518,7 +518,7 @@ int simpleserver_SortKeySpecToHash (HV *sort_spec, Z_SortKeySpec *spec)
                 oid2str(zspec->schema.oid, elementSpec);
                 hv_store(sort_spec, "ELEMENTSPEC_VALUE", 17,
                          newSVpv(elementSpec->buf, elementSpec->pos), 0);
-                wrbuf_free(elementSpec, 1);
+                wrbuf_destroy(elementSpec);
             }
             else if (zspec->which == Z_Schema_uri)
             {
@@ -759,7 +759,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	sv_free( (SV*) aref);
 	sv_free( (SV*) href);
 	if (query)
-	    wrbuf_free(query, 1);
+	    wrbuf_destroy(query);
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
@@ -850,7 +850,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	char *ODR_basename;
 	char *ODR_errstr;
 	int *ODR_oid_buf;
-	oident *oid;
 	WRBUF oid_dotted;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
@@ -870,8 +869,8 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	if (rr->schema)
 		hv_store(href, "SCHEMA", 6, newSVpv(rr->schema, 0), 0);
 	temp = hv_store(href, "OFFSET", 6, newSViv(rr->number), 0);
-	if (rr->request_format_raw != 0) {
-	    oid_dotted = oid2dotted(rr->request_format_raw);
+	if (rr->request_format != 0) {
+	    oid_dotted = oid2dotted(rr->request_format);
 	} else {
 	    /* Probably an SRU request: assume XML is required */
 	    oid_dotted = wrbuf_alloc();
@@ -985,16 +984,17 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	rr->basename = ODR_basename;
 
 	ptr = SvPV(rep_form, length);
+
 	ODR_oid_buf = (int *)odr_malloc(rr->stream, (MAX_OID + 1) * sizeof(int));
-	if (dotted2oid(ptr, ODR_oid_buf) == -1)		/* Maximum number of OID elements exceeded */
+	if (oid_dotstring_to_oid(ptr, ODR_oid_buf))
 	{
 		printf("Net::Z3950::SimpleServer: WARNING: OID structure too long, max length is %d\n", MAX_OID);
 	}
-	rr->output_format_raw = ODR_oid_buf;	
+	rr->output_format = ODR_oid_buf;	
 	
 	ptr = SvPV(record, length);
-	oid = oid_getentbyoid(ODR_oid_buf);
-	if (oid->value == VAL_GRS1)		/* Treat GRS-1 records separately */
+        /* Treat GRS-1 records separately */
+	if (!oid_oidcmp(ODR_oid_buf, yaz_oid_recsyn_grs_1))
 	{
 		rr->record = (char *) read_grs1(ptr, rr->stream);
 		rr->len = -1;
@@ -1020,7 +1020,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	}
 	rr->surrogate_flag = SvIV(sur_flag);
 
-	wrbuf_free(oid_dotted, 1);
+	wrbuf_destroy(oid_dotted);
 	sv_free((SV*) href);
 	sv_free(basename);
 	sv_free(record);
