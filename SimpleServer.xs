@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.58 2007-04-17 07:56:29 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.59 2007-04-17 08:06:47 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -262,7 +262,6 @@ Z_GenericRecord *read_grs1(char *str, ODR o)
 
 
 
-
 static void oid2str(Odr_oid *o, WRBUF buf)
 {
     for (; *o >= 0; o++) {
@@ -274,6 +273,13 @@ static void oid2str(Odr_oid *o, WRBUF buf)
     }
 }
 
+WRBUF oid2dotted(int *oid)
+{
+    WRBUF buf = wrbuf_alloc();
+    oid2str(oid, buf);
+    return buf;
+}
+		
 
 WRBUF zquery2pquery(Z_Query *q)
 {
@@ -767,30 +773,6 @@ int bend_search(void *handle, bend_search_rr *rr)
 }
 
 
-/* ### this is worryingly similar to oid2str() */
-WRBUF oid2dotted(int *oid)
-{
-
-	WRBUF buf = wrbuf_alloc();
-	int dot = 0;
-
-	for (; *oid != -1 ; oid++)
-	{
-		char ibuf[16];
-		if (dot)
-		{
-			wrbuf_putc(buf, '.');
-		}
-		else
-		{
-			dot = 1;
-		}
-		sprintf(ibuf, "%d", *oid);
-		wrbuf_puts(buf, ibuf);
-	}
-	return buf;
-}
-		
 int bend_fetch(void *handle, bend_fetch_rr *rr)
 {
 	HV *href;
