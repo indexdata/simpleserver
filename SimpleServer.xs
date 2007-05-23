@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.60 2007-04-17 20:26:58 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.61 2007-05-23 07:41:08 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -227,21 +227,18 @@ Z_GenericRecord *read_grs1(char *str, ODR o)
 			exit(0);
 		}
 		r->elements[r->num_elements] = t = (Z_TaggedElement *) odr_malloc(o, sizeof(Z_TaggedElement));
-		t->tagType = (int *)odr_malloc(o, sizeof(int));
-		*t->tagType = type;
+		t->tagType = odr_intdup(o, type);
 		t->tagValue = (Z_StringOrNumeric *)
 			odr_malloc(o, sizeof(Z_StringOrNumeric));
 		if ((ivalue = atoi(value)))
 		{
 			t->tagValue->which = Z_StringOrNumeric_numeric;
-			t->tagValue->u.numeric = (int *)odr_malloc(o, sizeof(int));
-			*t->tagValue->u.numeric = ivalue;
+			t->tagValue->u.numeric = odr_intdup(o, ivalue);
 		}
 		else
 		{
 			t->tagValue->which = Z_StringOrNumeric_string;
-			t->tagValue->u.string = (char *)odr_malloc(o, strlen(value)+1);
-			strcpy(t->tagValue->u.string, value);
+			t->tagValue->u.string = odr_strdup(o, value);
 		}
 		t->tagOccurrence = 0;
 		t->metaData = 0;
@@ -274,7 +271,7 @@ static void oid2str(Odr_oid *o, WRBUF buf)
     }
 }
 
-WRBUF oid2dotted(int *oid)
+WRBUF oid2dotted(Odr_oid *oid)
 {
     WRBUF buf = wrbuf_alloc();
     oid2str(oid, buf);
@@ -791,7 +788,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	char *ODR_record;
 	char *ODR_basename;
 	char *ODR_errstr;
-	int *ODR_oid_buf;
+	Odr_oid *ODR_oid_buf;
 	WRBUF oid_dotted;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
@@ -927,7 +924,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 
 	ptr = SvPV(rep_form, length);
 
-	ODR_oid_buf = (int *)odr_malloc(rr->stream, (MAX_OID + 1) * sizeof(int));
+	ODR_oid_buf = (Odr_oid *)odr_malloc(rr->stream, (MAX_OID + 1) * sizeof(Odr_oid));
 	if (oid_dotstring_to_oid(ptr, ODR_oid_buf))
 	{
 		printf("Net::Z3950::SimpleServer: WARNING: OID structure too long, max length is %d\n", MAX_OID);
