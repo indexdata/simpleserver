@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.61 2007-05-23 07:41:08 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.62 2007-05-23 07:55:07 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -38,6 +38,7 @@
 #include <yaz/querytowrbuf.h>
 #include <stdio.h>
 #include <yaz/mutex.h>
+#include <yaz/oid_db.h>
 #ifdef WIN32
 #else
 #include <unistd.h>
@@ -84,7 +85,6 @@ SV *delete_ref = NULL;
 SV *scan_ref = NULL;
 SV *explain_ref = NULL;
 PerlInterpreter *root_perl_context;
-int MAX_OID = 15;
 
 #define GRS_BUF_SIZE 8192
 
@@ -788,7 +788,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	char *ODR_record;
 	char *ODR_basename;
 	char *ODR_errstr;
-	Odr_oid *ODR_oid_buf;
 	WRBUF oid_dotted;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
@@ -924,16 +923,17 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 
 	ptr = SvPV(rep_form, length);
 
-	ODR_oid_buf = (Odr_oid *)odr_malloc(rr->stream, (MAX_OID + 1) * sizeof(Odr_oid));
-	if (oid_dotstring_to_oid(ptr, ODR_oid_buf))
+	rr->output_format = yaz_string_to_oid_odr(yaz_oid_std(),
+					CLASS_RECSYN, ptr, rr->stream);
+	if (!rr->output_format)
 	{
-		printf("Net::Z3950::SimpleServer: WARNING: OID structure too long, max length is %d\n", MAX_OID);
+		printf("Net::Z3950::SimpleServer: WARNING: Bad OID %s\n", ptr);
+		rr->output_format =
+			odr_oiddup(rr->stream, yaz_oid_recsyn_sutrs);
 	}
-	rr->output_format = ODR_oid_buf;	
-	
 	ptr = SvPV(record, length);
         /* Treat GRS-1 records separately */
-	if (!oid_oidcmp(ODR_oid_buf, yaz_oid_recsyn_grs_1))
+	if (!oid_oidcmp(rr->output_format, yaz_oid_recsyn_grs_1))
 	{
 		rr->record = (char *) read_grs1(ptr, rr->stream);
 		rr->len = -1;
