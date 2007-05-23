@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.62 2007-05-23 07:55:07 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.63 2007-05-23 10:22:00 sondberg Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -806,6 +806,9 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	hv_store(href, "SETNAME", 7, newSVpv(rr->setname, 0), 0);
 	if (rr->schema)
 		hv_store(href, "SCHEMA", 6, newSVpv(rr->schema, 0), 0);
+        else
+                hv_store(href, "SCHEMA", 6, newSVpv("", 0), 0);
+
 	temp = hv_store(href, "OFFSET", 6, newSViv(rr->number), 0);
 	if (rr->request_format != 0) {
 	    oid_dotted = oid2dotted(rr->request_format);
