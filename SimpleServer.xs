@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.63 2007-05-23 10:22:00 sondberg Exp $ 
+ * $Id: SimpleServer.xs,v 1.64 2007-08-08 12:11:42 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -56,8 +56,10 @@
 YAZ_MUTEX simpleserver_mutex;
 
 typedef struct {
-	SV *handle;
-
+	SV *ghandle;	/* Global handle specified at creation */
+	SV *handle;	/* Per-connection handle set at Init */
+#if 0
+/* ### These callback-reference elements are never used! */
 	SV *init_ref;
 	SV *close_ref;
 	SV *sort_ref;
@@ -68,12 +70,14 @@ typedef struct {
 	SV *delete_ref;
 	SV *scan_ref;
 	SV *explain_ref;
+#endif /*0*/
 	NMEM nmem;
 	int stop_flag;  /* is used to stop server prematurely .. */
 } Zfront_handle;
 
 #define ENABLE_STOP_SERVER 0
 
+SV *_global_ghandle = NULL; /* To be copied into zhandle then ignored */
 SV *init_ref = NULL;
 SV *close_ref = NULL;
 SV *sort_ref = NULL;
@@ -613,6 +617,7 @@ int bend_sort(void *handle, bend_sort_rr *rr)
 	hv_store(href, "INPUT", 5, newRV( (SV*) aref), 0);
 	hv_store(href, "OUTPUT", 6, newSVpv(rr->output_setname, 0), 0);
         hv_store(href, "SEQUENCE", 8, newRV( (SV*) sort_seq), 0);
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "STATUS", 6, newSViv(0), 0);
         hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
@@ -710,6 +715,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
 	hv_store(href, "HITS", 4, newSViv(0), 0);
 	hv_store(href, "DATABASES", 9, newRV( (SV*) aref), 0);
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 	if ((rpnSV = zquery2perl(rr->query)) != 0) {
@@ -825,6 +831,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
 	hv_store(href, "SUR_FLAG", 8, newSViv(0), 0);
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 	if (rr->comp)
@@ -1007,6 +1014,7 @@ int bend_present(void *handle, bend_present_rr *rr)
 	SAVETMPS;
 
 	href = newHV();
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
         hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
@@ -1164,6 +1172,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	hv_store(href, "POS", 3, newSViv(rr->term_position), 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "STATUS", 6, newSViv(BEND_SCAN_SUCCESS), 0);
 	hv_store(href, "ENTRIES", 7, newRV((SV *) list), 0);
@@ -1267,6 +1276,7 @@ int bend_explain(void *handle, bend_explain_rr *q)
 	href = newHV();
 	hv_store(href, "EXPLAIN", 7, newSVpv("", 0), 0);
 	hv_store(href, "DATABASE", 8, newSVpv(q->database, 0), 0);
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 
 	PUSHMARK(sp);
@@ -1311,6 +1321,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	ENTER;
 	SAVETMPS;
 
+	zhandle->ghandle = _global_ghandle;
 	zhandle->nmem = nmem;
 	zhandle->stop_flag = 0;
 
@@ -1348,6 +1359,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "ERR_STR", 7, newSViv(0), 0);
 	hv_store(href, "PEER_NAME", 9, newSVpv(q->peer_name, 0), 0);
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 	hv_store(href, "HANDLE", 6, newSVsv(&sv_undef), 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 	if (q->auth) {
@@ -1436,6 +1448,7 @@ void bend_close(void *handle)
 	if (close_ref)
 	{
 		href = newHV();
+		hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 		hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 
 		PUSHMARK(sp);
@@ -1470,6 +1483,13 @@ MODULE = Net::Z3950::SimpleServer	PACKAGE = Net::Z3950::SimpleServer
 
 PROTOTYPES: DISABLE
 
+
+void
+set_ghandle(arg)
+		SV *arg
+	CODE:
+		_global_ghandle = newSVsv(arg);
+		
 
 void
 set_init_handler(arg)
