@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.31 2006-12-27 12:24:50 sondberg Exp $
+## $Id: SimpleServer.pm,v 1.32 2007-08-08 10:27:43 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -39,7 +39,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
 @EXPORT = qw( );
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
@@ -151,15 +151,14 @@ Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
 	}
   }
 
-
   ## Register custom event handlers:
+  my $z = new Net::Z3950::SimpleServer(GHANDLE = $someObject,
+				       INIT   =>  \&my_init_handler,
+				       CLOSE  =>  \&my_close_handler,
+				       SEARCH =>  \&my_search_handler,
+				       FETCH  =>  \&my_fetch_handler);
 
-  my $z = new Net::Z3950::SimpleServer(		INIT   =>  \&my_init_handler,
-						CLOSE  =>  \&my_close_handler,
-						SEARCH =>  \&my_search_handler,
-						FETCH  =>  \&my_fetch_handler);
   ## Launch server:
-
   $z->launch_server("ztest.pl", @ARGV);
 
 =head1 DESCRIPTION
@@ -218,6 +217,11 @@ means of the SimpleServer object constructor
 			FETCH	=>	\&my_fetch_handler,
   			EXPLAIN =>	\&my_explain_handler);
 
+In addition, the arguments to the constructor may include GHANDLE, a
+global handle which is made available to each invocation of every
+callback function.  This is typically a reference to either a hash or
+an object.
+
 If you want your SimpleServer to start a thread (threaded mode) to
 handle each incoming Z39.50 request instead of forking a process
 (forking mode), you need to register the handlers by symbol rather
@@ -269,6 +273,7 @@ The argument hash passed to the init handler has the form
 	     			    ## this member contains user name
 	     PASS      =>  "yyy"    ## Under same conditions, this member
 	     			    ## contains the password in clear text
+	     GHANDLE   =>  $obj     ## Global handler specified at creation
 	     HANDLE    =>  undef    ## Handler of Perl data structure
 	  };
 
@@ -298,6 +303,7 @@ mous hash. The structure is the following:
   $args = {
 	  			    ## Request parameters:
 
+	     GHANDLE   =>  $obj     ## Global handler specified at creation
 	     HANDLE    =>  ref,     ## Your session reference.
 	     SETNAME   =>  "id",    ## ID of the result set
 	     REPL_SET  =>  0,       ## Replace set if already existing?
@@ -507,6 +513,7 @@ The informations exchanged between client and present handle are:
   $args = {
 				    ## Client/server request:
 
+	     GHANDLE   =>  $obj     ## Global handler specified at creation
 	     HANDLE    =>  ref,     ## Reference to datastructure
 	     SETNAME   =>  "id",    ## Result set ID
 	     START     =>  xxx,     ## Start position
@@ -533,6 +540,7 @@ The parameters exchanged between the server and the fetch handler are
   $args = {
 				    ## Client/server request:
 
+	     GHANDLE   =>  $obj     ## Global handler specified at creation
 	     HANDLE    =>  ref	    ## Reference to data structure
 	     SETNAME   =>  "id"     ## ID of the requested result set
 	     OFFSET    =>  nnn      ## Record offset number
@@ -581,6 +589,7 @@ an index of a book, you always find something! The parameters exchanged are
   $args = {
 						## Client request
 
+		GHANDLE		=> $obj		## Global handler specified at creation
 		HANDLE		=> $ref		## Reference to data structure
 		TERM		=> 'start',	## The start term
 		NUMBER		=> xx,		## Number of requested terms
@@ -625,10 +634,12 @@ between two adjacent entries in the response.
 
 =head2 Close handler
 
-The argument hash recieved by the close handler has one element only:
+The argument hash recieved by the close handler has two elements only:
 
   $args = {
 				    ## Server provides:
+
+	     GHANDLE   =>  $obj     ## Global handler specified at creation
 	     HANDLE    =>  ref      ## Reference to data structure
 	  };
 
