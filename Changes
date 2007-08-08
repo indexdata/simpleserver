@@ -1,6 +1,12 @@
-$Id: Changes,v 1.30 2006-12-27 12:24:50 sondberg Exp $
+$Id: Changes,v 1.31 2007-08-08 12:09:36 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.06  (IN PROGRESS)
+	- New global-handle element can be specified when creating a
+	  simple-server object and will be passed to all callback
+	  functions.  This allows global state to be eliminated from
+	  SimpleServer applications ... finally!
 
 1.05  Wed Dec 27 13:19:13 CET 2006
         - Taking new naming convention for YAZ constants into account.
