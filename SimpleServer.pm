@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.32 2007-08-08 10:27:43 mike Exp $
+## $Id: SimpleServer.pm,v 1.33 2007-08-08 12:09:19 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -69,6 +69,13 @@ sub launch_server {
 	my $self = shift;
 	my @args = @_;
 
+	### This modal internal interface, in which we set a bunch of
+	#   globals and then call start_server(), is asking for
+	#   trouble.  Instead, we should just pass the $self object
+	#   as a parameter into start_server().
+	if (defined($self->{GHANDLE})) {
+		set_ghandle($self->{GHANDLE});
+	}
 	if (defined($self->{INIT})) {
 		set_init_handler($self->{INIT});
 	}
