@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.64 2007-08-08 12:11:42 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.65 2007-08-10 00:00:14 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -91,6 +91,28 @@ SV *explain_ref = NULL;
 PerlInterpreter *root_perl_context;
 
 #define GRS_BUF_SIZE 8192
+
+
+/*
+ * Inspects the SV indicated by svp, and returns a null pointer if
+ * it's an undefined value, or a string allocation from `stream'
+ * otherwise.  Using this when filling in addinfo avoids those
+ * irritating "Use of uninitialized value in subroutine entry"
+ * warnings from Perl.
+ */
+char *string_or_undef(SV **svp, ODR stream) {
+	STRLEN len;
+	char *ptr, *buf;
+
+	if (!SvOK(*svp))
+		return 0;
+
+	ptr = SvPV(*svp, len);
+	buf = (char*) odr_malloc(stream, len+1);
+	strcpy(buf, ptr);
+	return buf;
+}
+
 
 CV * simpleserver_sv2cv(SV *handler) {
     STRLEN len;
@@ -679,12 +701,9 @@ int bend_search(void *handle, bend_search_rr *rr)
 	HV *href;
 	AV *aref;
 	SV **temp;
-	char *ODR_errstr;
-	STRLEN len;
 	int i;
 	char **basenames;
 	WRBUF query;
-	char *ptr;
 	SV *point;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
@@ -754,10 +773,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	rr->errcode = SvIV(*temp);
 
 	temp = hv_fetch(href, "ERR_STR", 7, 1);
-	ptr = SvPV(*temp, len);
-	ODR_errstr = (char *)odr_malloc(rr->stream, len + 1);
-	strcpy(ODR_errstr, ptr);
-	rr->errstring = ODR_errstr;
+	rr->errstring = string_or_undef(temp, rr->stream);
 
 	temp = hv_fetch(href, "HANDLE", 6, 1);
 	point = newSVsv(*temp);
