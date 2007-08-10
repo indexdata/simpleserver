@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.66 2007-08-10 16:37:05 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.67 2007-08-10 16:44:00 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1631,4 +1631,8 @@ yazlog(arg)
 int
 yaz_diag_srw_to_bib1(srw_code)
 	int srw_code
+
+int
+yaz_diag_bib1_to_srw(bib1_code)
+	int bib1_code
 
