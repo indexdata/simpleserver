@@ -1,4 +1,4 @@
-$Id: Changes,v 1.33 2007-08-10 16:34:53 mike Exp $
+$Id: Changes,v 1.34 2007-08-10 16:37:37 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
@@ -12,6 +12,8 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	- Add Perl API to yaz_diag_srw_to_bib1(), which SimpleServer
 	  applications will need if they access SRU/SRW back-end
 	  databases and need to report errors.
+	- Add Perl API to yaz_diag_bib1_to_srw(), because it would
+	  seem churlish not to.
 
 1.05  Wed Dec 27 13:19:13 CET 2006
         - Taking new naming convention for YAZ constants into account.
