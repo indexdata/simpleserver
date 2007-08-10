@@ -6,13 +6,19 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..1\n"; }
+BEGIN { $| = 1; print "1..4\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Net::Z3950::SimpleServer;
 $loaded = 1;
 print "ok 1\n";
 
 ######################### End of black magic.
+
+print "not " if Net::Z3950::SimpleServer::yaz_diag_srw_to_bib1(11) != 3;
+print "ok 2\n";
+
+print "not " if Net::Z3950::SimpleServer::yaz_diag_bib1_to_srw(3) != 11;
+print "ok 3\n";
 
 # Insert your test code below (better if it prints "ok 13"
 # (correspondingly "not ok 13") depending on the success of chunk 13
@@ -76,6 +82,8 @@ sub my_close_handler {
 		print "\nEverything is ok!\n";
 	}
 	print "-----------------------------------------------\n";
+	print "not " if $error;
+	print "ok 4\n";
 }
 
 
@@ -99,4 +107,3 @@ if (!defined($pid = fork() )) {
 	print CLIENT "quit\n";
 	close(CLIENT) or die "Couldn't close: $!\n";
 }
-	
