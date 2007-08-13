@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.18 2007-08-13 16:15:42 mike Exp $
+## $Id: Makefile.PL,v 1.19 2007-08-13 16:41:19 mike Exp $
 
 my $yazconf = "yaz-config";
 my $yazver = `$yazconf --version`;
@@ -14,6 +14,10 @@ will also need to install "libyaz-dev" in order to build the
 SimpleServer module.
 ];
 }
+
+### Although this release of SimpleServer will work with version 3.0.2
+#   of YAZ, you will not be able to take advantage of the new CCL
+#   support in the YAZ GFS unless you have version 3.0.9 or better.
 
 chomp($yazver);
 my ($major, $minor, $trivial) = split(/\./, $yazver);
