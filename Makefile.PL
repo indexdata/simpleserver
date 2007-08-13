@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.17 2007-05-23 07:56:07 adam Exp $
+## $Id: Makefile.PL,v 1.18 2007-08-13 16:15:42 mike Exp $
 
 my $yazconf = "yaz-config";
 my $yazver = `$yazconf --version`;
@@ -9,7 +9,7 @@ my $yazlibs = `$yazconf --libs server`;
 if (!$yazver || (!$yazinc && !$yazlibs)) {
    die qq[
 ERROR: Unable to call script: yaz-config
-If you're using a YAZ installation from the Debian package "yaz", you
+If you are using a YAZ installation from the Debian package "yaz", you
 will also need to install "libyaz-dev" in order to build the
 SimpleServer module.
 ];
@@ -17,7 +17,6 @@ SimpleServer module.
 
 chomp($yazver);
 my ($major, $minor, $trivial) = split(/\./, $yazver);
-# YAZ 2.1.14 is the first to propagate SRW/U addinfo correctly
 my ($needMaj, $needMin, $needTriv) = (3, 0, 2);
 #print "major=$major, minor=$minor, trivial=$trivial\n";
 die "You have YAZ version $major.$minor.$trivial; " .
