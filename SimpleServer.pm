@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.33 2007-08-08 12:09:19 mike Exp $
+## $Id: SimpleServer.pm,v 1.34 2007-08-15 13:14:29 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -596,8 +596,10 @@ an index of a book, you always find something! The parameters exchanged are
   $args = {
 						## Client request
 
-		GHANDLE		=> $obj		## Global handler specified at creation
-		HANDLE		=> $ref		## Reference to data structure
+		GHANDLE		=> $obj,	## Global handler specified at creation
+		HANDLE		=> $ref,	## Reference to data structure
+		DATABASES	=> ["xxx"],	## Reference to a list of data-
+						## bases to search
 		TERM		=> 'start',	## The start term
 		NUMBER		=> xx,		## Number of requested terms
 		POS		=> yy,		## Position of starting point
