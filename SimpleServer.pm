@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.34 2007-08-15 13:14:29 mike Exp $
+## $Id: SimpleServer.pm,v 1.35 2007-08-15 13:21:22 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -633,10 +633,11 @@ should point at a data structure of this kind,
 				...
 	];
 
-The $status flag should be assigned one of two values:
+The $status flag is only meaningful after a successful scan, and
+should be assigned one of two values:
 
-  Net::Z3950::SimpleServer::ScanSuccess  On success (default)
-  Net::Z3950::SimpleServer::ScanPartial  Less terms returned than requested
+  Net::Z3950::SimpleServer::ScanSuccess  Full success (default)
+  Net::Z3950::SimpleServer::ScanPartial  Fewer terms returned than requested
 
 The STEP member contains the requested number of entries in the term-list
 between two adjacent entries in the response.
