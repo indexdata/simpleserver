@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.67 2007-08-10 16:44:00 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.68 2007-08-16 15:12:58 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1243,7 +1243,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
         scan_list = (struct scan_entry *) odr_malloc (rr->stream, rr->num_entries * sizeof(*scan_list));
 	buffer = scan_list;
 	entries = (AV *)SvRV(entries_ref);
-	for (i = 0; i < rr->num_entries; i++)
+	if (rr->errcode == 0) for (i = 0; i < rr->num_entries; i++)
 	{
 		scan_item = (HV *)SvRV(sv_2mortal(av_shift(entries)));
 		temp = hv_fetch(scan_item, "TERM", 4, 1);
