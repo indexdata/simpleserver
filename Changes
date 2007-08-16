@@ -1,8 +1,13 @@
-$Id: Changes,v 1.37 2007-08-15 13:28:17 mike Exp $
+$Id: Changes,v 1.38 2007-08-16 15:12:10 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
 1.07  (IN PROGRESS)
+	- When the scan-handler callback returns, do not attempt to
+	  copy the terms from Perl structures if the error-code is
+	  non-zero (i.e. if an error has occurred).  This protects
+	  against a segmentation fault when the Perl callback does not
+	  explicitly set $args->{NUMBER} = 0 on error.
 	- Some clarifications to documentation.
 
 1.06  Fri Aug 10 23:30:00 BST 2007
