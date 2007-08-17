@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.69 2007-08-17 12:31:40 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.70 2007-08-17 16:21:41 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -401,16 +401,19 @@ static SV *rpn2perl(Z_RPNStructure *s)
     SV *sv;
     HV *hv;
     AV *av;
+    SV *sv2;
+    char *rsid;
+    Z_Operand *o;
+    Z_AttributesPlusTerm *at;
 
     switch (s->which) {
-    case Z_RPNStructure_simple: {
-	Z_Operand *o = s->u.simple;
-	Z_AttributesPlusTerm *at;
-	if (o->which == Z_Operand_resultSetId) {
-	    SV *sv2;
+    case Z_RPNStructure_simple:
+	o = s->u.simple;
+	switch (o->which) {
+	case Z_Operand_resultSetId:
 	    /* This code causes a SIGBUS on my machine, and I have no
 	       idea why.  It seems as clear as day to me */
-	    char *rsid = (char*) o->u.resultSetId;
+	    rsid = (char*) o->u.resultSetId;
 	    printf("Encoding resultSetId '%s'\n", rsid);
 	    sv = newObject("Net::Z3950::RPN::RSID", (SV*) (hv = newHV()));
 	    printf("Made sv=0x%lx, hv=0x%lx\n",
@@ -419,54 +422,58 @@ static SV *rpn2perl(Z_RPNStructure *s)
 	    setMember(hv, "id", sv2);
 	    printf("Set hv{id} to 0x%lx\n", (unsigned long) sv2);
 	    return sv;
-	}
-	if (o->which != Z_Operand_APT)
-	    fatal("can't handle RPN simples other than APT and RSID");
-	at = o->u.attributesPlusTerm;
-	if (at->term->which != Z_Term_general)
-	    fatal("can't handle RPN terms other than general");
 
-	sv = newObject("Net::Z3950::RPN::Term", (SV*) (hv = newHV()));
-	if (at->attributes) {
-	    int i;
-	    SV *attrs = newObject("Net::Z3950::RPN::Attributes",
-				  (SV*) (av = newAV()));
-	    for (i = 0; i < at->attributes->num_attributes; i++) {
-		Z_AttributeElement *elem = at->attributes->attributes[i];
-		HV *hv2;
-		SV *tmp = newObject("Net::Z3950::RPN::Attribute",
-				    (SV*) (hv2 = newHV()));
-		if (elem->attributeSet)
-		    setMember(hv2, "attributeSet",
-			      translateOID(elem->attributeSet));
-		setMember(hv2, "attributeType",
-			  newSViv(*elem->attributeType));
-		if (elem->which == Z_AttributeValue_numeric) {
-		    setMember(hv2, "attributeValue",
-			      newSViv(*elem->value.numeric));
-		} else {
-		    assert(elem->which == Z_AttributeValue_complex);
-		    Z_ComplexAttribute *complex = elem->value.complex;
-		    Z_StringOrNumeric *son;
-		    /* We ignore semantic actions and multiple values */
-		    assert(complex->num_list > 0);
-		    son = complex->list[0];
-		    if (son->which == Z_StringOrNumeric_numeric) {
+	case  Z_Operand_APT:
+	    at = o->u.attributesPlusTerm;
+	    if (at->term->which != Z_Term_general)
+		fatal("can't handle RPN terms other than general");
+
+	    sv = newObject("Net::Z3950::RPN::Term", (SV*) (hv = newHV()));
+	    if (at->attributes) {
+		int i;
+		SV *attrs = newObject("Net::Z3950::RPN::Attributes",
+				      (SV*) (av = newAV()));
+		for (i = 0; i < at->attributes->num_attributes; i++) {
+		    Z_AttributeElement *elem = at->attributes->attributes[i];
+		    HV *hv2;
+		    SV *tmp = newObject("Net::Z3950::RPN::Attribute",
+					(SV*) (hv2 = newHV()));
+		    if (elem->attributeSet)
+			setMember(hv2, "attributeSet",
+				  translateOID(elem->attributeSet));
+		    setMember(hv2, "attributeType",
+			      newSViv(*elem->attributeType));
+		    if (elem->which == Z_AttributeValue_numeric) {
 			setMember(hv2, "attributeValue",
-				  newSViv(*son->u.numeric));
-		    } else { /*Z_StringOrNumeric_string*/
-			setMember(hv2, "attributeValue",
-				  newSVpv(son->u.string, 0));
+				  newSViv(*elem->value.numeric));
+		    } else {
+			assert(elem->which == Z_AttributeValue_complex);
+			Z_ComplexAttribute *complex = elem->value.complex;
+			Z_StringOrNumeric *son;
+			/* We ignore semantic actions and multiple values */
+			assert(complex->num_list > 0);
+			son = complex->list[0];
+			if (son->which == Z_StringOrNumeric_numeric) {
+			    setMember(hv2, "attributeValue",
+				      newSViv(*son->u.numeric));
+			} else { /*Z_StringOrNumeric_string*/
+			    setMember(hv2, "attributeValue",
+				      newSVpv(son->u.string, 0));
+			}
 		    }
+		    av_push(av, tmp);
 		}
-		av_push(av, tmp);
+		setMember(hv, "attributes", attrs);
 	    }
-	    setMember(hv, "attributes", attrs);
+	    setMember(hv, "term", newSVpv((char*) at->term->u.general->buf,
+					  at->term->u.general->len));
+	    return sv;
+
+	default:
+	    fatal("can't handle RPN simples other than APT and RSID");
+
 	}
-	setMember(hv, "term", newSVpv((char*) at->term->u.general->buf,
-				      at->term->u.general->len));
-	return sv;
-    }
+
     case Z_RPNStructure_complex: {
 	SV *tmp;
 	Z_Complex *c = s->u.complex;
@@ -487,7 +494,8 @@ static SV *rpn2perl(Z_RPNStructure *s)
 	av_push(av, tmp);
 	return sv;
     }
-    default: fatal("unknown RPN node type %d", (int) s->which);
+    default:
+	fatal("unknown RPN node type %d", (int) s->which);
     }
 
     return 0;
