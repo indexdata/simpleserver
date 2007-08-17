@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.68 2007-08-16 15:12:58 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.69 2007-08-17 12:31:40 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -32,6 +32,7 @@
 #include "proto.h"
 #include "embed.h"
 #include "XSUB.h"
+#include <assert.h>
 #include <yaz/backend.h>
 #include <yaz/log.h>
 #include <yaz/wrbuf.h>
@@ -440,9 +441,24 @@ static SV *rpn2perl(Z_RPNStructure *s)
 			      translateOID(elem->attributeSet));
 		setMember(hv2, "attributeType",
 			  newSViv(*elem->attributeType));
-		assert(elem->which == Z_AttributeValue_numeric);
-		setMember(hv2, "attributeValue",
-			  newSViv(*elem->value.numeric));
+		if (elem->which == Z_AttributeValue_numeric) {
+		    setMember(hv2, "attributeValue",
+			      newSViv(*elem->value.numeric));
+		} else {
+		    assert(elem->which == Z_AttributeValue_complex);
+		    Z_ComplexAttribute *complex = elem->value.complex;
+		    Z_StringOrNumeric *son;
+		    /* We ignore semantic actions and multiple values */
+		    assert(complex->num_list > 0);
+		    son = complex->list[0];
+		    if (son->which == Z_StringOrNumeric_numeric) {
+			setMember(hv2, "attributeValue",
+				  newSViv(*son->u.numeric));
+		    } else { /*Z_StringOrNumeric_string*/
+			setMember(hv2, "attributeValue",
+				  newSVpv(son->u.string, 0));
+		    }
+		}
 		av_push(av, tmp);
 	    }
 	    setMember(hv, "attributes", attrs);
