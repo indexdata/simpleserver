@@ -1,3 +1,9 @@
+libnet-z3950-simpleserver-perl (1.06-1) testing; urgency=low
+
+  * Introducing global handle GHANDLE.
+
+ -- Anders Mortensen <sondberg@indexdata.dk>  Fri, 17 Aug 2007 11:01:45 +0200 
+
 libnet-z3950-simpleserver-perl (1.05-1) testing; urgency=low
 
   * Respecting new naming convention for YAZ constants
