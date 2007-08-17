@@ -1,4 +1,4 @@
-$Id: Changes,v 1.38 2007-08-16 15:12:10 mike Exp $
+$Id: Changes,v 1.39 2007-08-17 12:31:58 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
@@ -9,6 +9,8 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  against a segmentation fault when the Perl callback does not
 	  explicitly set $args->{NUMBER} = 0 on error.
 	- Some clarifications to documentation.
+	- Correct transcription of string-valued attributes in
+	  $args->{RPN}.
 
 1.06  Fri Aug 10 23:30:00 BST 2007
 	- New global-handle element can be specified when creating a
