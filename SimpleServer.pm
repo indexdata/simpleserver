@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.35 2007-08-15 13:21:22 mike Exp $
+## $Id: SimpleServer.pm,v 1.36 2007-08-17 16:45:22 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -601,6 +601,8 @@ an index of a book, you always find something! The parameters exchanged are
 		DATABASES	=> ["xxx"],	## Reference to a list of data-
 						## bases to search
 		TERM		=> 'start',	## The start term
+		RPN		=>  $obj,       ## Reference to a Net::Z3950::RPN::Term
+
 		NUMBER		=> xx,		## Number of requested terms
 		POS		=> yy,		## Position of starting point
 						## within returned list
@@ -641,6 +643,14 @@ should be assigned one of two values:
 
 The STEP member contains the requested number of entries in the term-list
 between two adjacent entries in the response.
+
+A better alternative to the TERM member is the the RPN
+member, which is a reference to a Net::Z3950::RPN::Term object
+representing the scan cloause.  The structure of that object is the
+same as for Term objects included as part of the RPN tree passed to
+search handlers.  This is more useful than the simple TERM because it
+includes attributes (e.g. access points associated with the term),
+which are discarded by the TERM element.
 
 =head2 Close handler
 
