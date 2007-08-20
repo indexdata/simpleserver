@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.38 2007-08-20 10:55:29 mike Exp $
+## $Id: SimpleServer.pm,v 1.39 2007-08-20 10:59:50 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -463,11 +463,6 @@ of the result-set is in the C<id> element.
 
 =back
 
-All of these classes are subclasses of the abstrac class
-C<Net::Z3950::RPN::Node>.  That class has a single method, C<toPQF()>,
-which may be used to turn an RPN tree, or part of one, back into a
-textual prefix query.
-
 =back
 
 =over 4
@@ -525,6 +520,11 @@ indicates a relevance match.
 =back
 
 =back
+
+All of these classes except C<Attributes> and C<Attribute> are
+subclasses of the abstract class C<Net::Z3950::RPN::Node>.  That class
+has a single method, C<toPQF()>, which may be used to turn an RPN
+tree, or part of one, back into a textual prefix query.
 
 Note that, apart to C<toPQF()>, none of these classes have any methods at
 all: the blessing into classes is largely just a documentation thing
