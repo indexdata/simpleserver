@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.74 2007-08-20 15:36:13 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.75 2007-08-20 16:46:05 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -824,6 +824,59 @@ int bend_search(void *handle, bend_search_rr *rr)
 }
 
 
+/* ### I am not 100% about the memory management in this handler */
+int bend_delete(void *handle, bend_delete_rr *rr)
+{
+	Zfront_handle *zhandle = (Zfront_handle *)handle;
+	HV *href;
+	CV* handler_cv;
+	int i;
+	SV **temp;
+
+	dSP;
+	ENTER;
+	SAVETMPS;
+
+	href = newHV();
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
+	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
+	hv_store(href, "STATUS", 6, newSViv(0), 0);
+
+	PUSHMARK(sp);
+	XPUSHs(sv_2mortal(newRV( (SV*) href)));
+	PUTBACK;
+
+	handler_cv = simpleserver_sv2cv(delete_ref);
+
+	if (rr->function == 1) {
+	    /* Delete all result setss in the session */
+	    perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
+	    temp = hv_fetch(href, "STATUS", 6, 1);
+	    rr->delete_status = SvIV(*temp);
+	} else {
+	    rr->delete_status = 0;
+	    for (i = 0; i < rr->num_setnames; i++) {
+		hv_store(href, "SETNAME", 7, newSVpv(rr->setnames[i], 0), 0);
+		perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
+		temp = hv_fetch(href, "STATUS", 6, 1);
+		rr->statuses[i] = SvIV(*temp);
+		if (rr->statuses[i] != 0)
+		    rr->delete_status = rr->statuses[i];
+	    }
+	}
+
+	SPAGAIN;
+
+	sv_free( (SV*) href);	
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+
+	return 0;
+}
+
+
 int bend_fetch(void *handle, bend_fetch_rr *rr)
 {
 	HV *href;
@@ -1164,59 +1217,6 @@ int bend_present(void *handle, bend_present_rr *rr)
 int bend_esrequest(void *handle, bend_esrequest_rr *rr)
 {
 	perl_call_sv(esrequest_ref, G_VOID | G_DISCARD | G_NOARGS);
-	return 0;
-}
-
-
-/* ### I am not 100% about the memory management in this handler */
-int bend_delete(void *handle, bend_delete_rr *rr)
-{
-	Zfront_handle *zhandle = (Zfront_handle *)handle;
-	HV *href;
-	CV* handler_cv;
-	int i;
-	SV **temp;
-
-	dSP;
-	ENTER;
-	SAVETMPS;
-
-	href = newHV();
-	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
-	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
-	hv_store(href, "STATUS", 6, newSViv(0), 0);
-
-	PUSHMARK(sp);
-	XPUSHs(sv_2mortal(newRV( (SV*) href)));
-	PUTBACK;
-
-	handler_cv = simpleserver_sv2cv(delete_ref);
-
-	if (rr->function == 1) {
-	    /* Delete all result setss in the session */
-	    perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
-	    temp = hv_fetch(href, "STATUS", 6, 1);
-	    rr->delete_status = SvIV(*temp);
-	} else {
-	    rr->delete_status = 0;
-	    for (i = 0; i < rr->num_setnames; i++) {
-		hv_store(href, "SETNAME", 7, newSVpv(rr->setnames[i], 0), 0);
-		perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
-		temp = hv_fetch(href, "STATUS", 6, 1);
-		rr->statuses[i] = SvIV(*temp);
-		if (rr->statuses[i] != 0)
-		    rr->delete_status = rr->statuses[i];
-	    }
-	}
-
-	SPAGAIN;
-
-	sv_free( (SV*) href);	
-
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-
 	return 0;
 }
 
