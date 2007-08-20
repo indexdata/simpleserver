@@ -1,4 +1,4 @@
-$Id: Changes,v 1.41 2007-08-20 10:58:35 mike Exp $
+$Id: Changes,v 1.42 2007-08-20 15:34:01 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
@@ -25,6 +25,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	- A utility method toPQF() is provided for
 	  Net::Z3950::RPN::Node, enabling the RPN tree to be converted
 	  back into a flat PQF query.
+	- Add support for the Delete Result Set service.
 
 1.06  Fri Aug 10 23:30:00 BST 2007
 	- New global-handle element can be specified when creating a
