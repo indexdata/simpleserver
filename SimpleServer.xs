@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.72 2007-08-17 16:45:22 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.73 2007-08-20 10:59:11 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -464,13 +464,12 @@ static SV *rpn2perl(Z_RPNStructure *s)
 	       idea why.  It seems as clear as day to me */
 	    SV *sv2;
 	    char *rsid = (char*) o->u.resultSetId;
-	    printf("Encoding resultSetId '%s'\n", rsid);
+	    /*printf("Encoding resultSetId '%s'\n", rsid);*/
 	    sv = newObject("Net::Z3950::RPN::RSID", (SV*) (hv = newHV()));
-	    printf("Made sv=0x%lx, hv=0x%lx\n",
-		   (unsigned long) sv ,(unsigned long) hv);
+	    /*printf("Made sv=0x%lx, hv=0x%lx\n", (unsigned long) sv ,(unsigned long) hv);*/
 	    sv2 = newSVpv(rsid, strlen(rsid));
 	    setMember(hv, "id", sv2);
-	    printf("Set hv{id} to 0x%lx\n", (unsigned long) sv2);
+	    /*printf("Set hv{id} to 0x%lx\n", (unsigned long) sv2);*/
 	    return sv;
 	}
 
