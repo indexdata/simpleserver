@@ -1,4 +1,4 @@
-$Id: Changes,v 1.40 2007-08-17 16:45:22 mike Exp $
+$Id: Changes,v 1.41 2007-08-20 10:58:35 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
@@ -15,6 +15,16 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  Perl structures representing the entire scan clause
 	  including access-points and other attributes (which are
 	  discarded from TERM).
+	- The various classes used to represent nodes in the RPN query
+	  tree (Net::Z3950::APDU::Query, Net::Z3950::RPN::And,
+	  Net::Z3950::RPN::Or, Net::Z3950::RPN::AndNot,
+	  Net::Z3950::RPN::Term and Net::Z3950::RPN::RSID) now all
+	  share a newly introduced superclass Net::Z3950::RPN::Node,
+	  making it possible to write methods that apply to all node
+	  types.
+	- A utility method toPQF() is provided for
+	  Net::Z3950::RPN::Node, enabling the RPN tree to be converted
+	  back into a flat PQF query.
 
 1.06  Fri Aug 10 23:30:00 BST 2007
 	- New global-handle element can be specified when creating a
