@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.39 2007-08-20 10:59:50 mike Exp $
+## $Id: SimpleServer.pm,v 1.40 2007-08-20 11:06:09 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -146,7 +146,6 @@ sub toPQF {
 
     my $res = "";
     foreach my $attr (@{ $this->{attributes} }) {
-	use Data::Dumper; print "considering attr: ", Dumper($attr);
 	$res .= "\@attr ";
 	my $set = $attr->{attributeSet};
 	$res .= "$set " if defined $set;
