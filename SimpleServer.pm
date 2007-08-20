@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.40 2007-08-20 11:06:09 mike Exp $
+## $Id: SimpleServer.pm,v 1.41 2007-08-20 15:34:29 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -95,6 +95,9 @@ sub launch_server {
 	}
 	if (defined($self->{EXPLAIN})) {
 		set_explain_handler($self->{EXPLAIN});
+	}
+	if (defined($self->{DELETE})) {
+		set_delete_handler($self->{DELETE});
 	}
 
 	start_server(@args);
@@ -266,7 +269,8 @@ means of the SimpleServer object constructor
 			PRESENT	=>	\&my_present_handler,
 			SCAN	=>	\&my_scan_handler,
 			FETCH	=>	\&my_fetch_handler,
-  			EXPLAIN =>	\&my_explain_handler);
+  			EXPLAIN =>	\&my_explain_handler,
+  			DELETE =>	\&my_delete_handler);
 
 In addition, the arguments to the constructor may include GHANDLE, a
 global handle which is made available to each invocation of every
@@ -712,6 +716,30 @@ The argument hash recieved by the close handler has two elements only:
 What ever data structure the HANDLE value points at goes out of scope
 after this call. If you need to close down a connection to your server
 or something similar, this is the place to do it.
+
+=head2 Delete handler
+
+The argument hash recieved by the delete handler has the following elements:
+
+  $args = {
+				    ## Client request:
+	     GHANDLE   =>  $obj,    ## Global handler specified at creation
+	     HANDLE    =>  ref,     ## Reference to data structure
+	     SETNAME   =>  "id",    ## Result set ID
+
+				    ## Server response:
+	     STATUS    => 0         ## Deletion status
+	  };
+
+The SETNAME element of the argument hash may or may not be defined.
+If it is, then SETNAME is the name of a result set to be deleted; if
+not, then all result-sets associated with the current session should
+be deleted.  In either case, the callback function should report on
+success or failure by setting the STATUS element either to zero, on
+success, or to an integer from 1 to 10, to indicate one of the ten
+possible failure codes described in section 3.2.4.1.4 of the Z39.50
+standard -- see 
+http://www.loc.gov/z3950/agency/markup/05.html#Delete-list-statuses1
 
 =head2 Support for SRU and SRW
 
