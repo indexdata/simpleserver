@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.75 2007-08-20 16:46:05 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.76 2007-08-20 21:27:50 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -832,6 +832,7 @@ int bend_delete(void *handle, bend_delete_rr *rr)
 	CV* handler_cv;
 	int i;
 	SV **temp;
+	SV *point;
 
 	dSP;
 	ENTER;
@@ -849,12 +850,23 @@ int bend_delete(void *handle, bend_delete_rr *rr)
 	handler_cv = simpleserver_sv2cv(delete_ref);
 
 	if (rr->function == 1) {
-	    /* Delete all result setss in the session */
+	    /* Delete all result sets in the session */
 	    perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
 	    temp = hv_fetch(href, "STATUS", 6, 1);
 	    rr->delete_status = SvIV(*temp);
 	} else {
 	    rr->delete_status = 0;
+	    /*
+	     * For some reason, deleting two or more result-sets in
+	     * one operation goes horribly wrong, and ### I don't have
+	     * time to debug it right now.
+	     */
+	    if (rr->num_setnames > 1) {
+		rr->delete_status = 3; /* "System problem at target" */
+		/* There's no way to sent delete-msg using the GFS */
+		return;
+	    }
+
 	    for (i = 0; i < rr->num_setnames; i++) {
 		hv_store(href, "SETNAME", 7, newSVpv(rr->setnames[i], 0), 0);
 		perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
@@ -866,6 +878,13 @@ int bend_delete(void *handle, bend_delete_rr *rr)
 	}
 
 	SPAGAIN;
+
+	temp = hv_fetch(href, "HANDLE", 6, 1);
+	point = newSVsv(*temp);
+
+	hv_undef(href);
+
+	zhandle->handle = point;
 
 	sv_free( (SV*) href);	
 
