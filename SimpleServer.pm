@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.37 2007-08-17 16:45:45 mike Exp $
+## $Id: SimpleServer.pm,v 1.38 2007-08-20 10:55:29 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -102,15 +102,60 @@ sub launch_server {
 
 
 # Register packages that we will use in translated RPNs
+package Net::Z3950::RPN::Node;
 package Net::Z3950::APDU::Query;
+our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::APDU::OID;
 package Net::Z3950::RPN::And;
+our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::Or;
+our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::AndNot;
+our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::Term;
+our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::RSID;
+our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::Attributes;
 package Net::Z3950::RPN::Attribute;
+
+
+# Utility method for re-rendering Type-1 query back down to PQF
+package Net::Z3950::RPN::Node;
+
+sub toPQF {
+    my $this = shift();
+    my $class = ref $this;
+
+    if ($class eq "Net::Z3950::APDU::Query") {
+	my $res = "";
+	my $set = $this->{attributeSet};
+	$res .= "\@attrset $set " if defined $set;
+	return $res . $this->{query}->toPQF();
+    } elsif ($class eq "Net::Z3950::RPN::Or") {
+	return '@or ' . $this->[0]->toPQF() . ' ' . $this->[1]->toPQF();
+    } elsif ($class eq "Net::Z3950::RPN::And") {
+	return '@and ' . $this->[0]->toPQF() . ' ' . $this->[1]->toPQF();
+    } elsif ($class eq "Net::Z3950::RPN::AndNot") {
+	return '@not ' . $this->[0]->toPQF() . ' ' . $this->[1]->toPQF();
+    } elsif ($class eq "Net::Z3950::RPN::RSID") {
+	return '@set ' . $this->{id};
+    } elsif ($class ne "Net::Z3950::RPN::Term") {
+	die "unknown PQF node-type '$class'";
+    }
+
+    my $res = "";
+    foreach my $attr (@{ $this->{attributes} }) {
+	use Data::Dumper; print "considering attr: ", Dumper($attr);
+	$res .= "\@attr ";
+	my $set = $attr->{attributeSet};
+	$res .= "$set " if defined $set;
+	$res .= $attr->{attributeType} . "=" . $attr->{attributeValue} . " ";
+    }
+
+    return $res . $this->{term};
+}
+
 
 # Must revert to original package for Autoloader's benefit
 package Net::Z3950::SimpleServer;
@@ -418,8 +463,10 @@ of the result-set is in the C<id> element.
 
 =back
 
-(I guess I should make a superclass C<Net::Z3950::RPN::Node> and make
-all of these subclasses of it.  Not done that yet, but will do one day.)
+All of these classes are subclasses of the abstrac class
+C<Net::Z3950::RPN::Node>.  That class has a single method, C<toPQF()>,
+which may be used to turn an RPN tree, or part of one, back into a
+textual prefix query.
 
 =back
 
@@ -469,7 +516,7 @@ a ``relation'' attribute, etc.
 
 =item C<attributeValue>
 
-An integer indicating the value of the attribute - for example, under
+An integer or string indicating the value of the attribute - for example, under
 BIB-1, if the attribute type is 1, then value 4 indictates a title
 search and 7 indictates an ISBN search; but if the attribute type is
 2, then value 4 indicates a ``greater than or equal'' search, and 102
@@ -479,7 +526,7 @@ indicates a relevance match.
 
 =back
 
-Note that, at the moment, none of these classes have any methods at
+Note that, apart to C<toPQF()>, none of these classes have any methods at
 all: the blessing into classes is largely just a documentation thing
 so that, for example, if you do
 
