@@ -1,4 +1,4 @@
-$Id: Changes,v 1.42 2007-08-20 15:34:01 mike Exp $
+$Id: Changes,v 1.43 2007-08-21 16:33:50 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
@@ -8,7 +8,6 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  non-zero (i.e. if an error has occurred).  This protects
 	  against a segmentation fault when the Perl callback does not
 	  explicitly set $args->{NUMBER} = 0 on error.
-	- Some clarifications to documentation.
 	- Correct transcription of string-valued attributes in
 	  $args->{RPN}.
 	- Scan handler is now passed RPN as well as TERM, a tree of
@@ -26,6 +25,8 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  Net::Z3950::RPN::Node, enabling the RPN tree to be converted
 	  back into a flat PQF query.
 	- Add support for the Delete Result Set service.
+	- Add documentation for the Sort service.
+	- Some clarifications to documentation.
 
 1.06  Fri Aug 10 23:30:00 BST 2007
 	- New global-handle element can be specified when creating a
