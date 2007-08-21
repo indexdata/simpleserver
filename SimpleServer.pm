@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.41 2007-08-20 15:34:29 mike Exp $
+## $Id: SimpleServer.pm,v 1.42 2007-08-21 16:29:29 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -270,7 +270,8 @@ means of the SimpleServer object constructor
 			SCAN	=>	\&my_scan_handler,
 			FETCH	=>	\&my_fetch_handler,
   			EXPLAIN =>	\&my_explain_handler,
-  			DELETE =>	\&my_delete_handler);
+  			DELETE  =>	\&my_delete_handler,
+  			SORT    =>	\&my_sort_handler);
 
 In addition, the arguments to the constructor may include GHANDLE, a
 global handle which is made available to each invocation of every
@@ -740,6 +741,84 @@ success, or to an integer from 1 to 10, to indicate one of the ten
 possible failure codes described in section 3.2.4.1.4 of the Z39.50
 standard -- see 
 http://www.loc.gov/z3950/agency/markup/05.html#Delete-list-statuses1
+
+=head2 Sort handler
+
+The argument hash recieved by the sort handler has the following elements:
+
+	$args = {
+					## Client request:
+		GHANDLE => $obj,	## Global handler specified at creation
+		HANDLE => ref,		## Reference to data structure
+		INPUT => [ a, b ... ],	## Names of result-sets to sort
+		OUTPUT => "name",	## Name of result-set to sort into
+		SEQUENCE		## Sort specification: see below
+
+					## Server response:
+		STATUS => 0,		## Success, Partial or Failure
+		ERR_CODE => 0,		## Error code
+		ERR_STR => '',		## Diagnostic message
+
+	};
+
+The SEQUENCE element is a reference to an array, each element of which
+is a hash representing a sort key.  Each hash contains the following
+elements:
+
+=over 4
+
+=item RELATION
+
+0 for an ascending sort, 1 for descending, 3 for ascending by
+frequency, or 4 for descending by frequency.
+
+=item CASE
+
+0 for a case-sensitive sort, 1 for case-insensitive
+
+=item MISSING
+
+How to respond if one or more records in the set to be sorted are
+missing the fields indicated in the sort specification.  1 to abort
+the sort, 2 to use a "null value", 3 if a value is provided to use in
+place of the missing data (although in the latter case, the actual
+value to use is currently not made available, so this is useless).
+
+=back
+
+And one or other of the following:
+
+=over 4
+
+=item SORTFIELD
+
+A string indicating the field to be sorted, which the server may
+interpret as it sees fit (presumably by an out-of-band agreement with
+the client).
+
+=item ELEMENTSPEC_TYPE and ELEMENTSPEC_VALUE
+
+I have no idea what this is.
+
+=item ATTRSET and SORT_ATTR
+
+ATTRSET is the attribute set from which the attributes are taken, and
+SORT_ATTR is a reference to an array containing the attributes
+themselves.  Each attribute is represented by (are you following this
+carefully?) yet another hash, this one containing the elements
+ATTR_TYPE and ATTR_VALUE: for example, type=1 and value=4 in the BIB-1
+attribute set would indicate access-point 4 which is title, so that a
+sort of title is requested.
+
+=back
+
+Precisely why all of the above is so is not clear, but goes some way
+to explain why, in the Z39.50 world, the developers of the standard
+are not so much worshipped as blamed.
+
+The backend function should set STATUS to 0 on success, 1 for "partial
+success" (don't ask) or 2 on failure, in which case ERR_CODE and
+ERR_STR should be set.
 
 =head2 Support for SRU and SRW
 
