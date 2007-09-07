@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.76 2007-08-20 21:27:50 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.77 2007-09-07 16:54:01 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -966,6 +966,8 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 			else
 			{
 				rr->errcode = 26;
+				rr->errstring = odr_strdup(rr->stream, "non-generic 'simple' composition");
+				return 0;
 			}
 		}
 		else if (composition->which == Z_RecordComp_complex)
@@ -984,8 +986,8 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 			else
 			{
 #if 0	/* For now ignore this error, which is ubiquitous in SRU */
-				fprintf(stderr, "complex is weird\n");
 				rr->errcode = 26;
+				rr->errstring = odr_strdup(rr->stream, "'complex' composition is not generic ESN");
 				return 0;
 #endif /*0*/
 			}
@@ -993,6 +995,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 		else
 		{
 			rr->errcode = 26;
+			rr->errstring = odr_strdup(rr->stream, "composition neither simple nor complex");
 			return 0;
 		}
 	}
@@ -1157,6 +1160,7 @@ int bend_present(void *handle, bend_present_rr *rr)
 			else
 			{
 				rr->errcode = 26;
+				rr->errstring = odr_strdup(rr->stream, "non-generic 'simple' composition");
 				return 0;
 			}
 		}
@@ -1176,12 +1180,14 @@ int bend_present(void *handle, bend_present_rr *rr)
 			else
 			{
 				rr->errcode = 26;
+				rr->errstring = odr_strdup(rr->stream, "'complex' composition is not generic ESN");
 				return 0;
 			}
 		}
 		else
 		{
 			rr->errcode = 26;
+			rr->errstring = odr_strdup(rr->stream, "composition neither simple nor complex");
 			return 0;
 		}
 	}
