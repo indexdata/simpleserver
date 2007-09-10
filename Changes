@@ -1,6 +1,9 @@
-$Id: Changes,v 1.44 2007-09-01 09:31:51 mike Exp $
+$Id: Changes,v 1.45 2007-09-10 11:16:49 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.08  Mon Sep 10 12:15:29 BST 2007
+	- *Sigh*  Fix mixed statement/declaration.
 
 1.07  Sat Sep  1 10:31:26 BST 2007
 	- When the scan-handler callback returns, do not attempt to
