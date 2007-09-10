@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.78 2007-09-10 11:17:13 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.79 2007-09-10 14:50:31 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -425,9 +425,9 @@ static SV *apt2perl(Z_AttributesPlusTerm *at)
 			  newSViv(*elem->value.numeric));
 	    } else {
 		Z_ComplexAttribute *c;
+		Z_StringOrNumeric *son;
 		assert(elem->which == Z_AttributeValue_complex);
 		c = elem->value.complex;
-		Z_StringOrNumeric *son;
 		/* We ignore semantic actions and multiple values */
 		assert(c->num_list > 0);
 		son = c->list[0];
