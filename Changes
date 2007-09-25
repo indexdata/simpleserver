@@ -1,6 +1,9 @@
-$Id: Changes,v 1.46 2007-09-10 14:54:51 mike Exp $
+$Id: Changes,v 1.47 2007-09-25 09:02:03 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.10  (IN PROGRESS)
+	- Document the init-handler's PEER_NAME argument.
 
 1.09  Mon Sep 10 15:54:38 BST 2007
 	- *Argh*  Another mixed statement/declaration.
