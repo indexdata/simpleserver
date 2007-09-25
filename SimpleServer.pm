@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.44 2007-09-10 14:54:27 mike Exp $
+## $Id: SimpleServer.pm,v 1.45 2007-09-25 09:01:41 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -320,6 +320,7 @@ The argument hash passed to the init handler has the form
   $args = {
 				    ## Response parameters:
 
+	     PEER_NAME =>  "",      ## Name or IP address of connecting client
 	     IMP_ID    =>  "",      ## Z39.50 Implementation ID
 	     IMP_NAME  =>  "",      ## Z39.50 Implementation name
 	     IMP_VER   =>  "",      ## Z39.50 Implementation version
