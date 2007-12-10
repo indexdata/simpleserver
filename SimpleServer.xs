@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.79 2007-09-10 14:50:31 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.80 2007-12-10 09:37:00 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1481,9 +1481,12 @@ bend_initresult *bend_init(bend_initrequest *q)
 	}
 
        	href = newHV();	
+
+	### These should be given initial values from the client
 	hv_store(href, "IMP_ID", 6, newSVpv("", 0), 0);
 	hv_store(href, "IMP_NAME", 8, newSVpv("", 0), 0);
 	hv_store(href, "IMP_VER", 7, newSVpv("", 0), 0);
+
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "ERR_STR", 7, newSViv(0), 0);
 	hv_store(href, "PEER_NAME", 9, newSVpv(q->peer_name, 0), 0);
