@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.46 2007-09-25 09:02:14 mike Exp $
+## $Id: SimpleServer.pm,v 1.47 2008-04-03 10:46:46 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -301,7 +301,7 @@ by means of the method
 Notice, the first argument should be the name of your server
 script (for logging purposes), while the rest of the arguments
 are documented in the YAZ toolkit manual: The section on
-application invocation: <http://www.indexdata.dk/yaz/yaz-7.php>
+application invocation: <http://indexdata.com/yaz/doc/server.invocation.tkl>
 
 In particular, you need to use the -T switch to start your SimpleServer
 in threaded mode.
