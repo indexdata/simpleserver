@@ -1,10 +1,12 @@
-$Id: Changes,v 1.48 2008-04-10 12:19:27 mike Exp $
+$Id: Changes,v 1.49 2008-04-16 14:53:44 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
 1.10  (IN PROGRESS)
 	- Document the init-handler's PEER_NAME argument.
 	- Update URL into YAZ documentation.
+	- ### When invoking Init callback, set initial values of
+	  IMP_ID, IMP_NAME and IMP_VER from the client's Init request.
 
 1.09  Mon Sep 10 15:54:38 BST 2007
 	- *Argh*  Another mixed statement/declaration.
