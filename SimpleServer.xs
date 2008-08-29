@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.81 2007-12-20 13:52:06 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.82 2008-08-29 18:58:40 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -865,7 +865,7 @@ int bend_delete(void *handle, bend_delete_rr *rr)
 	    if (rr->num_setnames > 1) {
 		rr->delete_status = 3; /* "System problem at target" */
 		/* There's no way to sent delete-msg using the GFS */
-		return;
+		return 0;
 	    }
 
 	    for (i = 0; i < rr->num_setnames; i++) {
