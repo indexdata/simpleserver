@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.20 2007-09-10 14:54:20 mike Exp $
+## $Id: Makefile.PL,v 1.21 2008-09-02 15:11:48 mike Exp $
 
 # Use: perl Makefile.PL OPTIMIZE="-O0 -g -Wdeclaration-after-statement"
 
@@ -33,7 +33,7 @@ die "You have YAZ version $major.$minor.$trivial; " .
 
 # For Windows use
 # $yazinc = '-Ic:\yaz\include'
-# $yazlibs = 'c:\yaz\lib\yaz.lib'
+# $yazlibs = 'c:\yaz\lib\yaz3.lib'
 
 WriteMakefile(
     'NAME'	=> 'Net::Z3950::SimpleServer',
