@@ -1,4 +1,4 @@
-$Id: Changes,v 1.50 2008-08-29 18:58:57 mike Exp $
+$Id: Changes,v 1.51 2008-09-02 15:12:22 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
@@ -6,6 +6,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	- Document the init-handler's PEER_NAME argument.
 	- Update URL into YAZ documentation.
 	- bend_delete() no longer returns without value.
+	- Route around ActivePerl's damage to the "open" symbol.
 	- ### When invoking Init callback, set initial values of
 	  IMP_ID, IMP_NAME and IMP_VER from the client's Init request.
 
