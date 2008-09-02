@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.82 2008-08-29 18:58:40 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.83 2008-09-02 15:16:34 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1427,6 +1427,21 @@ int bend_explain(void *handle, bend_explain_rr *q)
 
         return 0;
 }
+
+
+/*
+ * You'll laugh when I tell you this ...  Astonishingly, it turns out
+ * that ActivePerl (which is widely used on Windows) has, in the
+ * header file Perl\lib\CORE\XSUB.h, the following heinous crime:
+ *	    #    define open		PerlLIO_open
+ * This of course screws up the use of the "open" member of the
+ * Z_IdAuthentication structure below, so we have to undo this
+ * brain-damage.
+ */
+#ifdef open
+#undef open
+#endif
+
 
 bend_initresult *bend_init(bend_initrequest *q)
 {
