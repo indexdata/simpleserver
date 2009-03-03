@@ -3,3 +3,4 @@ SimpleServer.bs
 SimpleServer.c
 blib
 pm_to_blib
+build-stamp
