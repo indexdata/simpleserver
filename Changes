@@ -1,4 +1,4 @@
-$Id: Changes,v 1.51 2008-09-02 15:12:22 mike Exp $
+$Id: Changes,v 1.52 2009-03-03 21:58:49 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
@@ -7,8 +7,6 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	- Update URL into YAZ documentation.
 	- bend_delete() no longer returns without value.
 	- Route around ActivePerl's damage to the "open" symbol.
-	- ### When invoking Init callback, set initial values of
-	  IMP_ID, IMP_NAME and IMP_VER from the client's Init request.
 
 1.09  Mon Sep 10 15:54:38 BST 2007
 	- *Argh*  Another mixed statement/declaration.
@@ -164,4 +162,8 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 
 0.01  Wed Aug 30 14:54:01 2000
 	- original version; created by h2xs 1.19
+
+### To do
+	- When invoking Init callback, set initial values of IMP_ID,
+	  IMP_NAME and IMP_VER from the client's Init request.
 
