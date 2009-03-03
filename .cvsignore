@@ -5,7 +5,3 @@ blib
 pm_to_blib
 build-stamp
 install-stamp
-debian/files
-debian/libnet-z3950-simpleserver-perl
-debian/libnet-z3950-simpleserver-perl.debhelper.log
-debian/libnet-z3950-simpleserver-perl.substvars
