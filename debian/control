@@ -8,7 +8,7 @@ Standards-Version: 3.6.1
 
 Package: libnet-z3950-simpleserver-perl
 Architecture: any
-Depends: ${perl:Depends}, ${shlibs:Depends}, ${misc:Depends}, 
+Depends: ${perl:Depends}
 Description:  Perl API to the YAZ generic front-end server (Z39.50 server). 
  The SimpleServer module is a tool for constructing Z39.50 "Information
  Retrieval" servers in Perl. The module is easy to use, but it
