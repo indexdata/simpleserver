@@ -1,8 +1,8 @@
-$Id: Changes,v 1.52 2009-03-03 21:58:49 mike Exp $
+$Id: Changes,v 1.53 2009-03-03 22:47:11 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-1.10  (IN PROGRESS)
+1.10  Tue Mar  3 22:47:16 GMT 2009
 	- Document the init-handler's PEER_NAME argument.
 	- Update URL into YAZ documentation.
 	- bend_delete() no longer returns without value.
