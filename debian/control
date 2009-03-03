@@ -3,7 +3,7 @@ Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 4.0.2), libyaz3-dev
 Build-Depends-Indep: perl (>= 5.8.0-7)
-Maintainer: Anders Mortensen <sondberg@indexdata.dk>
+Maintainer: Mike Taylor <mike@indexdata.com>
 Standards-Version: 3.6.1
 
 Package: libnet-z3950-simpleserver-perl
