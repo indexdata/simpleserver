@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.48 2009-03-04 15:02:20 mike Exp $
+## $Id: SimpleServer.pm,v 1.49 2009-03-04 15:10:23 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -39,7 +39,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
 @EXPORT = qw( );
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
@@ -896,7 +896,7 @@ at your option, any later version of Perl 5 you may have available.
 
 =head1 SEE ALSO
 
-Any Perl module which is useful for accessing the database of your
+Any Perl module which is useful for accessing the data source of your
 choice.
 
 =cut
