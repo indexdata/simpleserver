@@ -1,10 +1,16 @@
+libnet-z3950-simpleserver-perl (1.11-1) testing; urgency=low
+
+  * Add explicit statement of license (same terms as Perl).
+
+ -- Mike Taylor <mike@indexdata.com>  Wed, 04 Mar 2009 15:14:23 +0000
+
 libnet-z3950-simpleserver-perl (1.10-1) testing; urgency=low
 
   * Many changes as from CPAN releases 1.07 to 1.10 (see the Changes
     file), and also the long-overdue change of maintainer to Mike Taylor,
-    since Anders life Index Data some time ago.
+    since Anders left Index Data some time ago.
 
- -- Mike Taylor <mike@indexdata.com>  Tue, 3  Mar 2009 22:52:56 +0000 
+ -- Mike Taylor <mike@indexdata.com>  Tue, 03 Mar 2009 22:52:56 +0000 
 
 libnet-z3950-simpleserver-perl (1.06-1) testing; urgency=low
 
