@@ -25,7 +25,7 @@
 ##
 ##
 
-## $Id: SimpleServer.pm,v 1.47 2008-04-03 10:46:46 mike Exp $
+## $Id: SimpleServer.pm,v 1.48 2009-03-04 15:02:20 mike Exp $
 
 package Net::Z3950::SimpleServer;
 
@@ -885,6 +885,14 @@ http://search.cpan.org/~esummers/CQL-Parser/
 Anders Sønderberg (sondberg@indexdata.dk),
 Sebastian Hammer (quinn@indexdata.dk),
 Mike Taylor (indexdata.com).
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2000-2009 by Index Data.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
 
 =head1 SEE ALSO
 
