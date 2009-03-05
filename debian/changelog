@@ -1,3 +1,9 @@
+libnet-z3950-simpleserver-perl (1.11-2indexdata) testing; urgency=low
+
+  * Build requires yaz-client (i.e package yaz).
+
+ -- Adam Dickmeiss <adam@indexdata.dk>  Thu, 05 Mar 2009 09:13:47 +0100
+
 libnet-z3950-simpleserver-perl (1.11-1) testing; urgency=low
 
   * Add explicit statement of license (same terms as Perl).
