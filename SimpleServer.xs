@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.83 2008-09-02 15:16:34 mike Exp $ 
+ * $Id: SimpleServer.xs,v 1.84 2009-08-10 08:01:28 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1756,7 +1756,7 @@ yazlog(arg)
     		STRLEN len;
 		char *ptr;
 		ptr = SvPV(arg, len);
-		yaz_log(YLOG_LOG, "%.*s", len, ptr);
+		yaz_log(YLOG_LOG, "%.*s", (int) len, ptr);
 
 int
 yaz_diag_srw_to_bib1(srw_code)
