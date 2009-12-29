@@ -1,10 +1,10 @@
 use ExtUtils::MakeMaker;
 
-## $Id: Makefile.PL,v 1.21 2008-09-02 15:11:48 mike Exp $
+## $Id: Makefile.PL,v 1.22 2009-12-29 10:23:22 adam Exp $
 
 # Use: perl Makefile.PL OPTIMIZE="-O0 -g -Wdeclaration-after-statement"
 
-my $yazconf = "yaz-config";
+my $yazconf = "../yaz/yaz-config";
 my $yazver = `$yazconf --version`;
 my $yazinc = `$yazconf --cflags servers`;
 my $yazlibs = `$yazconf --libs server`;

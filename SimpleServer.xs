@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.84 2009-08-10 08:01:28 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.85 2009-12-29 10:23:22 adam Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1119,7 +1119,6 @@ int bend_present(void *handle, bend_present_rr *rr)
 	SV **temp;
 	SV *err_code;
 	SV *err_string;
-	SV *hits;
 	SV *point;
 	STRLEN len;
 	Z_RecordComposition *composition;
@@ -1210,9 +1209,6 @@ int bend_present(void *handle, bend_present_rr *rr)
 	temp = hv_fetch(href, "ERR_STR", 7, 1);
 	err_string = newSVsv(*temp);
 
-	temp = hv_fetch(href, "HITS", 4, 1);
-	hits = newSVsv(*temp);
-
 	temp = hv_fetch(href, "HANDLE", 6, 1);
 	point = newSVsv(*temp);
 
@@ -1222,7 +1218,6 @@ int bend_present(void *handle, bend_present_rr *rr)
 	
 	hv_undef(href);
 	rr->errcode = SvIV(err_code);
-	rr->hits = SvIV(hits);
 
 	ptr = SvPV(err_string, len);
 	ODR_errstr = (char *)odr_malloc(rr->stream, len + 1);
@@ -1233,7 +1228,6 @@ int bend_present(void *handle, bend_present_rr *rr)
 	handle = zhandle;
 	sv_free(err_code);
 	sv_free(err_string);
-	sv_free(hits);
 	sv_free( (SV*) href);
 
 	return 0;
