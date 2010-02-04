@@ -1,6 +1,12 @@
-$Id: Changes,v 1.54 2009-03-04 15:12:41 mike Exp $
+$Id: Changes,v 1.55 2010-02-04 16:31:56 mike Exp $
 
 Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.12  Thu Feb  4 16:33:19 GMT 2010
+	- Remove handling of "hits" parameter in the present handler.
+	  That should never have been there (and was probably sloppy
+	  copy), and prevents compilation under YAZ 4, which has
+	  removed the member from the bend_present_rr structure.
 
 1.11  Wed Mar  4 15:12:53 GMT 2009
 	- Add explicit statement of license (same terms as Perl).
