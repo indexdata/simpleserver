@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleServer.xs,v 1.85 2009-12-29 10:23:22 adam Exp $ 
+ * $Id: SimpleServer.xs,v 1.86 2010-02-04 16:30:20 mike Exp $ 
  * ----------------------------------------------------------------------
  * 
  * Copyright (c) 2000-2004, Index Data.
@@ -1145,7 +1145,6 @@ int bend_present(void *handle, bend_present_rr *rr)
 	hv_store(href, "NUMBER", 6, newSViv(rr->number), 0);
 	/*oid_dotted = oid2dotted(rr->request_format_raw);
         hv_store(href, "REQ_FORM", 8, newSVpv((char *)oid_dotted->buf, oid_dotted->pos), 0);*/
-	hv_store(href, "HITS", 4, newSViv(0), 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 	if (rr->comp)
 	{
