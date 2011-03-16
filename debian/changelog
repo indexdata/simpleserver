@@ -1,3 +1,9 @@
+libnet-z3950-simpleserver-perl (1.12-1) testing; urgency=low
+
+  * Upstream.
+
+ -- Mike Taylor <mike@indexdata.com>  Wed, 16 Mar 2011 13:00:13 +0000
+
 libnet-z3950-simpleserver-perl (1.11-2indexdata) testing; urgency=low
 
   * Build requires yaz-client (i.e package yaz).
