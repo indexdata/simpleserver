@@ -1,3 +1,11 @@
+libnet-z3950-simpleserver-perl (1.13-1) testing; urgency=low
+
+  * Upstream.  Actually, the only change is to the test script, but that
+    change is required to enable concurrent builds to pass their tests
+    without colliding with each other.
+
+ -- Mike Taylor <mike@indexdata.com>  Wed, 16 Mar 2011 13:00:13 +0000
+
 libnet-z3950-simpleserver-perl (1.12-1) testing; urgency=low
 
   * Upstream.
