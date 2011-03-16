@@ -1,6 +1,13 @@
-$Id: Changes,v 1.55 2010-02-04 16:31:56 mike Exp $
-
 Revision history for Perl extension Net::Z3950::SimpleServer
+
+1.13 [IN PROGRESS]
+	  The SimpleServer test-script now uses a Unix-domain socket,
+	  with a filename generated from the process-ID, rather than
+	  the default Inet-document socket on port 9999.  Hopefully
+	  this should resolve the race-condition problems that have
+	  been affecting the "make test" part of the build cycle when
+	  building packages for four systems simultaneously under
+	  id-pbuild.sh
 
 1.12  Thu Feb  4 16:33:19 GMT 2010
 	- Remove handling of "hits" parameter in the present handler.
