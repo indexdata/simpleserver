@@ -33,3 +33,11 @@ Copyright (C) 2000-2009 by Index Data.
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
 at your option, any later version of Perl 5 you may have available.
+
+CONVERSION FROM CVS
+
+This module was originally maintained under CVS, and was converted to
+git as follows:
+
+$ cd /usr/local/src/git/git-tools/id-cvs-to-git/
+$ CVSROOT=:ext:mike@bagel.indexdata.com:/home/cvsroot ./id-cvs-to-git.sh CVS simpleserver "Simple Perl API for building Z39.50 servers."
