@@ -98,7 +98,7 @@ if (!defined($pid = fork() )) {
 
 	$handler->launch_server("test.pl", "-1", @ARGV);
 } else {						## Child starts the client
-	sleep(2);
+	sleep(1);
 	open(CLIENT, "| yaz-client tcp:localhost:9999 > /dev/null")
 		or die "Couldn't fork client: $!\n";
 	print CLIENT "f test\n";
