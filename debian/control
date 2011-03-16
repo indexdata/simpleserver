@@ -1,7 +1,7 @@
 Source: libnet-z3950-simpleserver-perl
 Section: perl
 Priority: optional
-Build-Depends: debhelper (>= 4.0.2), libyaz3-dev, yaz
+Build-Depends: debhelper (>= 4.0.2), libyaz4-dev, yaz
 Build-Depends-Indep: perl (>= 5.8.0-7)
 Maintainer: Mike Taylor <mike@indexdata.com>
 Standards-Version: 3.6.1
