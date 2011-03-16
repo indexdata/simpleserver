@@ -87,6 +87,9 @@ sub my_close_handler {
 }
 
 
+my $socketFile = "/tmp/SimpleServer-test-$$";
+my $socket = "unix:$socketFile";
+
 if (!defined($pid = fork() )) {
 	die "Cannot fork: $!\n";
 } elsif ($pid) {                                        ## Parent launches server
@@ -96,14 +99,15 @@ if (!defined($pid = fork() )) {
 		SEARCH		=>      \&my_search_handler,
 		FETCH		=>	\&my_fetch_handler);
 
-	$handler->launch_server("test.pl", "-1", @ARGV);
+	$handler->launch_server("test.pl", "-1", $socket);
 } else {						## Child starts the client
 	sleep(1);
-	open(CLIENT, "| yaz-client tcp:localhost:9999 > /dev/null")
+	open(CLIENT, "| yaz-client $socket > /dev/null")
 		or die "Couldn't fork client: $!\n";
 	print CLIENT "f test\n";
 	print CLIENT "s\n";
 	print CLIENT "close\n";
 	print CLIENT "quit\n";
 	close(CLIENT) or die "Couldn't close: $!\n";
+	unlink($socketFile);
 }
