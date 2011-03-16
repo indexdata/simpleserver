@@ -1,6 +1,7 @@
 Makefile
 SimpleServer.bs
 SimpleServer.c
+SimpleServer.o
 blib
 pm_to_blib
 build-stamp
