@@ -1,5 +1,6 @@
 .gitignore
 .git
+IDMETA
 TODO
 archive
 debian
