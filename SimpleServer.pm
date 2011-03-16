@@ -39,7 +39,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
 @EXPORT = qw( );
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
