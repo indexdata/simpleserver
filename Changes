@@ -1,6 +1,6 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-1.13 Wed Mar 16 17:07:10 GMT 2011
+1.13  Wed Mar 16 17:07:10 GMT 2011
 	- The SimpleServer test-script now uses a Unix-domain socket,
 	  with a filename generated from the process-ID, rather than
 	  the default Inet-document socket on port 9999.  Hopefully
