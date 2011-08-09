@@ -227,7 +227,7 @@ Z39.50 is a network protocol for searching remote databases and
 retrieving the results in the form of structured "records". It is widely
 used in libraries around the world, as well as in the US Federal Government.
 In addition, it is generally useful whenever you wish to integrate a number
-of different database systems around a shared, asbtract data model.
+of different database systems around a shared, abstract data model.
 
 The model of the module is simple: It implements a "generic" Z39.50
 server, which invokes callback functions supplied by you to search
@@ -372,7 +372,7 @@ mous hash. The structure is the following:
 
 				    ## Response parameters:
 
-	     ERR_CODE  =>  0,       ## Error code (0=Succesful search)
+	     ERR_CODE  =>  0,       ## Error code (0=Successful search)
 	     ERR_STR   =>  "",      ## Error string
 	     HITS      =>  0        ## Number of matches
 	  };
@@ -437,7 +437,7 @@ representing the OID of the query's top-level attribute set.
 
 =item C<query>
 
-Mandatory: a refererence to the RPN tree itself.
+Mandatory: a reference to the RPN tree itself.
 
 =back
 
@@ -518,8 +518,8 @@ a ``relation'' attribute, etc.
 =item C<attributeValue>
 
 An integer or string indicating the value of the attribute - for example, under
-BIB-1, if the attribute type is 1, then value 4 indictates a title
-search and 7 indictates an ISBN search; but if the attribute type is
+BIB-1, if the attribute type is 1, then value 4 indicates a title
+search and 7 indicates an ISBN search; but if the attribute type is
 2, then value 4 indicates a ``greater than or equal'' search, and 102
 indicates a relevance match.
 
@@ -568,7 +568,7 @@ records are expected to be retrieved. If on the other hand, large result
 sets are likely to occur, the implementation of a reasonable present
 handler can gain performance significantly.
 
-The informations exchanged between client and present handle are:
+The information exchanged between client and present handle is:
 
   $args = {
 				    ## Client/server request:
@@ -581,7 +581,7 @@ The informations exchanged between client and present handle are:
 	     NUMBER    =>  yyy,	    ## Number of requested records
 
 
-				    ## Respons parameters:
+				    ## Response parameters:
 
 	     HITS      =>  zzz,	    ## Number of returned records
 	     ERR_CODE  =>  0,	    ## Error code
@@ -699,7 +699,7 @@ between two adjacent entries in the response.
 
 A better alternative to the TERM member is the the RPN
 member, which is a reference to a Net::Z3950::RPN::Term object
-representing the scan cloause.  The structure of that object is the
+representing the scan clause.  The structure of that object is the
 same as for Term objects included as part of the RPN tree passed to
 search handlers.  This is more useful than the simple TERM because it
 includes attributes (e.g. access points associated with the term),
@@ -707,7 +707,7 @@ which are discarded by the TERM element.
 
 =head2 Close handler
 
-The argument hash recieved by the close handler has two elements only:
+The argument hash received by the close handler has two elements only:
 
   $args = {
 				    ## Server provides:
@@ -722,7 +722,7 @@ or something similar, this is the place to do it.
 
 =head2 Delete handler
 
-The argument hash recieved by the delete handler has the following elements:
+The argument hash received by the delete handler has the following elements:
 
   $args = {
 				    ## Client request:
@@ -746,7 +746,7 @@ http://www.loc.gov/z3950/agency/markup/05.html#Delete-list-statuses1
 
 =head2 Sort handler
 
-The argument hash recieved by the sort handler has the following elements:
+The argument hash received by the sort handler has the following elements:
 
 	$args = {
 					## Client request:
@@ -816,7 +816,7 @@ sort of title is requested.
 
 Precisely why all of the above is so is not clear, but goes some way
 to explain why, in the Z39.50 world, the developers of the standard
-are not so much worshipped as blamed.
+are not so much worshiped as blamed.
 
 The backend function should set STATUS to 0 on success, 1 for "partial
 success" (don't ask) or 2 on failure, in which case ERR_CODE and
