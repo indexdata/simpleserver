@@ -1,18 +1,15 @@
 Building and installation
 -------------------------
-
-
 1. Requirements
 
-The Net::Z3950::SimpleServer Perl module requires the YAZ toolkit: the
-development version 1.7 or any subsequent version is fine. You can
-download it via this link,
+The Net::Z3950::SimpleServer Perl module requires the YAZ toolkit.
+Version 4 or later is recommended. You can download it via this link:
 
-	http://ftp.indexdata.dk/pub/yaz/development/
+	http://ftp.indexdata.dk/pub/yaz/
 
 You need to configure the YAZ toolkit with the command
 
-	% ./configure --enable-shared
+	% ./configure
 
 Then compile and install
 
@@ -44,9 +41,4 @@ The installation takes place by issuing the following commands:
 The last command has to be issued as super user.
 
 Good luck!
-
-Anders Sønderberg <sondberg@indexdata.dk>
-http://www.indexdata.dk/
-
-
 
