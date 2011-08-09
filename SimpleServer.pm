@@ -118,6 +118,10 @@ package Net::Z3950::RPN::RSID;
 our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::Attributes;
 package Net::Z3950::RPN::Attribute;
+package Net::Z3950::FacetList;
+package Net::Z3950::FacetField;
+package Net::Z3950::FacetTerms;
+package Net::Z3950::FacetTerm;
 
 
 # Utility method for re-rendering Type-1 query back down to PQF

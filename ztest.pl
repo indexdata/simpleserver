@@ -120,15 +120,21 @@ sub my_search_handler {
 
 	my $session = $args->{HANDLE};
 	my $set_id = $args->{SETNAME};
+	my $rpn = $args->{RPN};
 	my @database_list = @{ $args->{DATABASES} };
 	my $query = $args->{QUERY};
+	my $facets = $args->{INPUTFACETS};
 	my $hits = 3;
 
 	print "------------------------------------------------------------\n";
 	print "Processing query : $query\n";
 	printf("Database set     : %s\n", join(" ", @database_list));
 	print "Setname          : $set_id\n";
+	print " inputfacets:\n";
+	print Dumper($facets);
 	print "------------------------------------------------------------\n";
+
+	$args->{OUTPUTFACETS} = $facets;
 
 	$args->{HITS} = $hits;
 	$session->{$set_id} = $data;
