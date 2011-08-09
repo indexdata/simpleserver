@@ -744,9 +744,19 @@ static SV *f_FacetField_to_SV(Z_FacetField *facet_field)
 	terms = newObject("Net::Z3950::FacetTerms", (SV *) (av = newAV()));
 
 	for (i = 0; i < facet_field->num_terms; i++) {
+	    Z_Term *z_term = facet_field->terms[i]->term;
+            HV *hv;
 	    SV *sv_count = newSViv(*facet_field->terms[i]->count);
-	    SV *sv_term = f_Term_to_SV(facet_field->terms[i]->term, 0);
-	    SV *tmp = newObject("Net::Z3950::FacetTerm", (SV *) (hv = newHV()));
+            SV *sv_term;
+	    SV *tmp;
+	    if (z_term->which == Z_Term_general) {
+	        sv_term = newSVpv((char*) z_term->u.general->buf,
+	                           z_term->u.general->len);
+            } else if (z_term->which == Z_Term_characterString) {
+                sv_term = newSVpv(z_term->u.characterString,
+		                  strlen(z_term->u.characterString));
+            }
+	    tmp = newObject("Net::Z3950::FacetTerm", (SV *) (hv = newHV()));
 	    
 	    setMember(hv, "count", sv_count);
 	    setMember(hv, "term", sv_term);
@@ -782,12 +792,10 @@ static void f_SV_to_FacetField(HV *facet_field_hv, Z_FacetField **fl, ODR odr)
 	Z_AttributeList *attributes = odr_malloc(odr, sizeof(*attributes));
 
         AV *sv_terms, *sv_attributes;
-        printf("facet_field=%p\n", facet_field_hv);
 
 	temp = hv_fetch(facet_field_hv, "attributes", 10, 1);
 	sv_attributes = (AV *) SvRV(*temp);
 	num_attributes = av_len(sv_attributes) + 1;
-	printf(" attributes length=%d\n", num_attributes);
 	attributes->num_attributes = num_attributes;
 	attributes->attributes = (Z_AttributeElement **)
 	     odr_malloc(odr, sizeof(*attributes->attributes) * num_attributes);
@@ -831,9 +839,13 @@ static void f_SV_to_FacetField(HV *facet_field_hv, Z_FacetField **fl, ODR odr)
         }
 
 	temp = hv_fetch(facet_field_hv, "terms", 5, 1);
+
 	sv_terms = (AV *) SvRV(*temp);
-	num_terms = av_len(sv_terms) + 1;
-	printf(" terms length=%d\n", num_terms);
+	if (SvTYPE(sv_terms) == SVt_PVAV) {
+  	    num_terms = av_len(sv_terms) + 1;
+        } else {
+            num_terms = 0;
+	}
 	*fl = facet_field_create(odr, attributes, num_terms);
 	for (i = 0; i < num_terms; i++) {
 	    STRLEN s_len;
@@ -847,33 +859,32 @@ static void f_SV_to_FacetField(HV *facet_field_hv, Z_FacetField **fl, ODR odr)
   	    temp = hv_fetch(hv_elem, "count", 5, 1);
 	    facet_term->count = odr_intdup(odr, SvIV(*temp));
 
-
-
   	    temp = hv_fetch(hv_elem, "term", 4, 1);
 
             s_buf = SvPV(*temp, s_len);
 	    facet_term->term = z_Term_create(odr, Z_Term_general, s_buf, s_len);
-	    hv_under(hv_elem);
+	    hv_undef(hv_elem);
 	}
-
 }
 
 static void f_SV_to_FacetList(SV *sv, Z_OtherInformation **oip, ODR odr)
 {
-    AV *entries = (AV *) SvRV(sv);
-    int num_facets;
-    if (SvTYPE(entries) == SVt_PVAV && (num_facets = av_len(entries) + 1) > 0)
-    {
-	    int i;
+	AV *entries = (AV *) SvRV(sv);
+	int num_facets;
+	if (entries && SvTYPE(entries) == SVt_PVAV && 
+       		(num_facets = av_len(entries) + 1) > 0)
+ 	{
+            Z_OtherInformation *oi;
+            Z_OtherInformationUnit *oiu;
 	    Z_FacetList *facet_list = facet_list_create(odr, num_facets);
-	    for (; i < num_facets; i++) {
+	    int i;
+	    for (i = 0; i < num_facets; i++) {
 	        HV *facet_field = (HV*) SvRV(sv_2mortal(av_shift(entries)));
 	    	f_SV_to_FacetField(facet_field, &facet_list->elements[i], odr);
-
 		hv_undef(facet_field);
 	    }
-            Z_OtherInformation *oi = odr_malloc(odr, sizeof(*oi));
-            Z_OtherInformationUnit *oiu = odr_malloc(odr, sizeof(*oiu));
+            oi = odr_malloc(odr, sizeof(*oi));
+            oiu = odr_malloc(odr, sizeof(*oiu));
             oi->num_elements = 1;
             oi->list = odr_malloc(odr, oi->num_elements * sizeof(*oi->list));
             oiu->category = 0;
@@ -886,7 +897,7 @@ static void f_SV_to_FacetList(SV *sv, Z_OtherInformation **oip, ODR odr)
             oiu->information.externallyDefinedInfo->u.facetList = facet_list;
             oi->list[0] = oiu;
             *oip = oi;
-     }
+	}
 }
 
 int bend_search(void *handle, bend_search_rr *rr)
