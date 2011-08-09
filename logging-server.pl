@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
 
-# $Id: logging-server.pl,v 1.1 2004-09-03 11:42:35 mike Exp $
-#
 # This is just about the simplest possible SimpleServer-based Z39.50
 # server.  It exists only to log the data-structures that are handed
 # to the back-end functions, and does only enough work otherwise to
