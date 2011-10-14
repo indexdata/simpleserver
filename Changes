@@ -1,6 +1,8 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-1.15  IN PROGRESS
+1.15  Fri Oct 14 14:01:18 CEST 2011
+        - Fix decoding of OUTPUTFACETS (optinal) ; crashed on some Perl
+          versions
 
 1.14  Thu Aug 18 08:47:13 UTC 2011
 	- Support for facets in search handler

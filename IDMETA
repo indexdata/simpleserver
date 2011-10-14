@@ -1,5 +1,5 @@
 NAME=libnet-z3950-simpleserver-perl
-VERSION=1.14
+VERSION=1.15
 OMIT_FROM_DIST="archive"
 DEBIAN_DIST="wheezy squeeze lenny"
 UBUNTU_DIST="natty maverick lucid karmic"
