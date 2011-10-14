@@ -989,8 +989,9 @@ int bend_search(void *handle, bend_search_rr *rr)
 	point = newSVsv(*temp);
 
 	temp = hv_fetch(href, "OUTPUTFACETS", 12, 1);
-	f_SV_to_FacetList(*temp, &rr->search_info, rr->stream);
-
+        if (SvTYPE(*temp) != SVt_NULL)
+	    f_SV_to_FacetList(*temp, &rr->search_info, rr->stream);
+        
 	hv_undef(href);
 	av_undef(aref);
 
