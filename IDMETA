@@ -2,4 +2,4 @@ NAME=libnet-z3950-simpleserver-perl
 VERSION=1.15
 OMIT_FROM_DIST="archive"
 DEBIAN_DIST="wheezy squeeze"
-UBUNTU_DIST="natty maverick lucid karmic"
+UBUNTU_DIST="quantal precise oneiric natty lucid"
