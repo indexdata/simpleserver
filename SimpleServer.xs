@@ -89,6 +89,7 @@ SV *esrequest_ref = NULL;
 SV *delete_ref = NULL;
 SV *scan_ref = NULL;
 SV *explain_ref = NULL;
+SV *start_ref = NULL;
 PerlInterpreter *root_perl_context;
 
 #define GRS_BUF_SIZE 8192
@@ -1799,6 +1800,41 @@ void bend_close(void *handle)
 	return;
 }
 
+static void start_stop(struct statserv_options_block *sob, SV *handler_ref)
+{
+	HV *href;
+	dSP;
+	ENTER;
+	SAVETMPS;
+
+	href = newHV();
+	hv_store(href, "CONFIG", 6, newSVpv(sob->configname, 0), 0);
+
+	PUSHMARK(sp);
+
+	XPUSHs(sv_2mortal(newRV((SV*) href)));
+
+	PUTBACK;
+
+	if (handler_ref != NULL)
+	{
+		CV* handler_cv = simpleserver_sv2cv( handler_ref );
+		perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
+	}
+
+	SPAGAIN;
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+
+
+}
+
+void bend_start(struct statserv_options_block *sob)
+{
+	start_stop(sob, start_ref);
+}
 
 MODULE = Net::Z3950::SimpleServer	PACKAGE = Net::Z3950::SimpleServer
 
@@ -1879,6 +1915,12 @@ set_explain_handler(arg)
 	CODE:
 		explain_ref = newSVsv(arg);
 
+void
+set_start_handler(arg)
+		SV *arg
+	CODE:
+		start_ref = newSVsv(arg);
+
 int
 start_server(...)
 	PREINIT:
@@ -1887,6 +1929,7 @@ start_server(...)
 		char *ptr;
 		int i;
 		STRLEN len;
+		struct statserv_options_block *sob;
 	CODE:
 		argv_buf = (char **)xmalloc((items + 1) * sizeof(char *));
 		argv = argv_buf;
@@ -1897,13 +1940,18 @@ start_server(...)
 			strcpy(*argv_buf++, ptr); 
 		}
 		*argv_buf = NULL;
+
+		sob = statserv_getcontrol();
+		sob->bend_start = bend_start;
+		statserv_setcontrol(sob);
+
 		root_perl_context = PERL_GET_CONTEXT;
 		yaz_mutex_create(&simpleserver_mutex);
 #if 0
 		/* only for debugging perl_clone .. */
 		tst_clones();
 #endif
-		
+
 		RETVAL = statserv_main(items, argv, bend_init, bend_close);
 	OUTPUT:
 		RETVAL

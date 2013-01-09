@@ -169,9 +169,15 @@ sub my_fetch_handler {
 	}
 }
 
+sub my_start_handler {
+    my $args = shift;
+    my $config = $args->{CONFIG};
+}
+
 Net::Z3950::SimpleServer::yazlog("hello");
 
 my $handler = new Net::Z3950::SimpleServer( 
+                START   =>      "main::my_start_handler",
 		INIT	=>	"main::my_init_handler",
 		SEARCH	=>	"main::my_search_handler",
 		SCAN	=>	"main::my_scan_handler",
