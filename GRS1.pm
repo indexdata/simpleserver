@@ -1,5 +1,5 @@
 ## This file is part of simpleserver
-## Copyright (C) 2000-2011 Index Data.
+## Copyright (C) 2000-2013 Index Data.
 ## All rights reserved.
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions are met:
@@ -41,7 +41,7 @@ sub new {
 	if (defined($href) && ref($href) eq 'HASH') {
 		if (!defined($map)) {
 			croak 'Usage: new Net::Z3950::GRS1($href, $map);';
-		}	
+		}
 		$self->Hash2grs($href, $map);
 	}
 
@@ -152,7 +152,7 @@ sub CreateElementData {
 
 	return $ElementData;
 }
-	
+
 
 sub AddElement {
 	my ($self, $type, $value, $which, $content) = @_;
@@ -192,7 +192,7 @@ sub Render {
 	my $self = shift;
 	my %args = (
 			FORMAT	=>	&Net::Z3950::GRS1::Render::Plain,
-			FILE	=>	'/dev/null',	
+			FILE	=>	'/dev/null',
 			LEVEL	=>	0,
 			HANDLE	=>	undef,
 			POOL	=>	undef,
@@ -222,10 +222,10 @@ sub Render {
 	}
 	if ($level == 1) {
 		$self->_RecordLine($level, $ref, "(0,0)\n");
-	}	
-}		
+	}
+}
 
-	
+
 package Net::Z3950::GRS1::ElementData;
 
 ## Define some constants according to the GRS-1 specification

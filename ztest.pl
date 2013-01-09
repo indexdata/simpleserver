@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 ## This file is part of simpleserver
-## Copyright (C) 2000-2011 Index Data.
+## Copyright (C) 2000-2013 Index Data.
 ## All rights reserved.
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions are met:
@@ -54,7 +54,7 @@ sub my_init_handler {
 	if (defined($args->{PASS}) && defined($args->{USER})) {
 	    printf("Received USER/PASS=%s/%s\n", $args->{USER},$args->{PASS});
 	}
-	    
+
 }
 
 
@@ -101,7 +101,7 @@ sub my_scan_handler {
 my $_fail_frequency = 0;
 my $_counter = 0;
 
-sub my_search_handler { 
+sub my_search_handler {
 	my $args = shift;
 
 	my $data = [{
@@ -176,7 +176,7 @@ sub my_start_handler {
 
 Net::Z3950::SimpleServer::yazlog("hello");
 
-my $handler = new Net::Z3950::SimpleServer( 
+my $handler = new Net::Z3950::SimpleServer(
                 START   =>      "main::my_start_handler",
 		INIT	=>	"main::my_init_handler",
 		SEARCH	=>	"main::my_search_handler",

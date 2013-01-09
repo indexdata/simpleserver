@@ -1,5 +1,5 @@
 /* This file is part of simpleserver.
- * Copyright (C) 2000-2011 Index Data.
+ * Copyright (C) 2000-2013 Index Data.
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -46,7 +46,7 @@
 #endif
 #include <stdlib.h>
 #include <ctype.h>
-#define GRS_MAX_FIELDS 500 
+#define GRS_MAX_FIELDS 500
 #ifdef ASN_COMPILED
 #include <yaz/ill.h>
 #endif
@@ -59,19 +59,6 @@ YAZ_MUTEX simpleserver_mutex;
 typedef struct {
 	SV *ghandle;	/* Global handle specified at creation */
 	SV *handle;	/* Per-connection handle set at Init */
-#if 0
-/* ### These callback-reference elements are never used! */
-	SV *init_ref;
-	SV *close_ref;
-	SV *sort_ref;
-	SV *search_ref;
-	SV *fetch_ref;
-	SV *present_ref;
-	SV *esrequest_ref;
-	SV *delete_ref;
-	SV *scan_ref;
-	SV *explain_ref;
-#endif /*0*/
 	NMEM nmem;
 	int stop_flag;  /* is used to stop server prematurely .. */
 } Zfront_handle;
@@ -119,7 +106,7 @@ char *string_or_undef(SV **svp, ODR stream) {
 CV * simpleserver_sv2cv(SV *handler) {
     STRLEN len;
     char *buf;
-   
+
     if (SvPOK(handler)) {
 	CV *ret;
 	buf = SvPV( handler, len);
@@ -127,7 +114,7 @@ CV * simpleserver_sv2cv(SV *handler) {
 	    fprintf( stderr, "simpleserver_sv2cv: No such handler '%s'\n\n", buf );
 	    exit(1);
 	}
-	
+
 	return ret;
     } else {
 	return (CV *) handler;
@@ -138,7 +125,7 @@ CV * simpleserver_sv2cv(SV *handler) {
 #ifdef USE_ITHREADS
 void tst_clones(void)
 {
-    int i; 
+    int i;
     PerlInterpreter *parent = PERL_GET_CONTEXT;
     for (i = 0; i<5000; i++)
     {
@@ -187,7 +174,7 @@ void simpleserver_free(void) {
         PerlInterpreter *current_interp = PERL_GET_CONTEXT;
 
 	/* If current Perl Interp is different from root interp, then
-	 * we're in threaded mode and we must destroy.. 
+	 * we're in threaded mode and we must destroy..
 	 */
 	if (current_interp != root_perl_context) {
        	    PL_perl_destruct_level = 2;
@@ -211,13 +198,13 @@ Z_GenericRecord *read_grs1(char *str, ODR o)
 	r = (Z_GenericRecord *)odr_malloc(o, sizeof(*r));
 	r->elements = (Z_TaggedElement **) odr_malloc(o, sizeof(Z_TaggedElement*) * GRS_MAX_FIELDS);
 	r->num_elements = 0;
-	
+
 	for (;;)
 	{
 		Z_TaggedElement *t;
 		Z_ElementData *c;
 		int len;
-	
+
 		ptr = strchr(str, '\n');
 		if (!ptr) {
 			return r;
@@ -305,13 +292,13 @@ WRBUF oid2dotted(Odr_oid *oid)
     oid2str(oid, buf);
     return buf;
 }
-		
+
 
 WRBUF zquery2pquery(Z_Query *q)
 {
     WRBUF buf = wrbuf_alloc();
 
-    if (q->which != Z_Query_type_1 && q->which != Z_Query_type_101) 
+    if (q->which != Z_Query_type_1 && q->which != Z_Query_type_101)
 	return 0;
     yaz_rpnquery_to_wrbuf(buf, q->u.type_1);
     return buf;
@@ -480,7 +467,7 @@ static SV *rpn2perl(Z_RPNStructure *s)
 
 	case  Z_Operand_APT:
 	    return f_Term_to_SV(o->u.attributesPlusTerm->term,
-			o->u.attributesPlusTerm->attributes);	
+			o->u.attributesPlusTerm->attributes);
 	default:
 	    fatal("unknown RPN simple type %d", (int) o->which);
 	}
@@ -509,7 +496,7 @@ static SV *rpn2perl(Z_RPNStructure *s)
     default:
 	fatal("unknown RPN node type %d", (int) s->which);
     }
-    
+
     return 0;
 }
 
@@ -531,11 +518,11 @@ int simpleserver_ExpandSortAttributes (HV *sort_spec, Z_SortAttributes *sattr)
 
     hv_store(sort_spec, "SORT_ATTR", 9, newRV( sv_2mortal( (SV*) list ) ), 0);
 
-    for (i = 0; i < attr_list->num_attributes; i++) 
+    for (i = 0; i < attr_list->num_attributes; i++)
     {
-        Z_AttributeElement *attr = *attr_list->attributes++; 
+        Z_AttributeElement *attr = *attr_list->attributes++;
         HV *attr_spec = newHV();
-                
+
         av_push(list, newRV( sv_2mortal( (SV*) attr_spec ) ));
         hv_store(attr_spec, "ATTR_TYPE", 9, newSViv(*attr->attributeType), 0);
 
@@ -573,7 +560,7 @@ int simpleserver_SortKeySpecToHash (HV *sort_spec, Z_SortKeySpec *spec)
         else if (key->which == Z_SortKey_elementSpec)
         {
             Z_Specification *zspec = key->u.elementSpec;
-            
+
             hv_store(sort_spec, "ELEMENTSPEC_TYPE", 16,
                      newSViv(zspec->which), 0);
 
@@ -616,7 +603,7 @@ static SV *zquery2perl(Z_Query *q)
     SV *sv;
     HV *hv;
 
-    if (q->which != Z_Query_type_1 && q->which != Z_Query_type_101) 
+    if (q->which != Z_Query_type_1 && q->which != Z_Query_type_101)
 	return 0;
     sv = newObject("Net::Z3950::APDU::Query", (SV*) (hv = newHV()));
     if (q->u.type_1->attributeSetId)
@@ -644,11 +631,11 @@ int bend_sort(void *handle, bend_sort_rr *rr)
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
         Z_SortKeySpecList *sort_spec = rr->sort_sequence;
 	int i;
-	
+
 	dSP;
 	ENTER;
 	SAVETMPS;
-	
+
 	aref = newAV();
 	input_setnames = rr->input_setnames;
 	for (i = 0; i < rr->num_input_setnames; i++)
@@ -670,7 +657,7 @@ int bend_sort(void *handle, bend_sort_rr *rr)
                 return 0;
             }
         }
-        
+
 	href = newHV();
 	hv_store(href, "INPUT", 5, newRV( (SV*) aref), 0);
 	hv_store(href, "OUTPUT", 6, newSVpv(rr->output_setname, 0), 0);
@@ -706,14 +693,14 @@ int bend_sort(void *handle, bend_sort_rr *rr)
 	hv_undef(href);
 	av_undef(aref);
         av_undef(sort_seq);
-       
+
 	sv_free( (SV*) aref);
 	sv_free( (SV*) href);
 	sv_free( (SV*) sort_seq);
 
 	rr->errcode = SvIV(err_code);
 	rr->sort_status = SvIV(status);
-        
+
 	ptr = SvPV(err_str, len);
 	ODR_err_str = (char *)odr_malloc(rr->stream, len + 1);
 	strcpy(ODR_err_str, ptr);
@@ -723,7 +710,7 @@ int bend_sort(void *handle, bend_sort_rr *rr)
 	sv_free(err_code);
 	sv_free(err_str);
 	sv_free(status);
-	
+
         PUTBACK;
 	FREETMPS;
 	LEAVE;
@@ -741,7 +728,7 @@ static SV *f_FacetField_to_SV(Z_FacetField *facet_field)
 	if (facet_field->attributes) {
                 setMember(hv, "attributes",
                      attributes2perl(facet_field->attributes));
-        }	     
+        }
 	terms = newObject("Net::Z3950::FacetTerms", (SV *) (av = newAV()));
 
 	for (i = 0; i < facet_field->num_terms; i++) {
@@ -758,10 +745,10 @@ static SV *f_FacetField_to_SV(Z_FacetField *facet_field)
 		                  strlen(z_term->u.characterString));
             }
 	    tmp = newObject("Net::Z3950::FacetTerm", (SV *) (hv = newHV()));
-	    
+
 	    setMember(hv, "count", sv_count);
 	    setMember(hv, "term", sv_term);
-	    
+
 	    av_push(av, tmp);
 	}
 	setMember(hv, "terms", terms);
@@ -775,7 +762,7 @@ static SV *f_FacetList_to_SV(Z_FacetList *facet_list)
 		AV *av;
 		int i;
 		sv = newObject("Net::Z3950::FacetList", (SV *) (av = newAV()));
-	
+
 		for (i = 0; i < facet_list->num; i++) {
 		       SV *sv = f_FacetField_to_SV(facet_list->elements[i]);
 		       av_push(av, sv);
@@ -852,7 +839,7 @@ static void f_SV_to_FacetField(HV *facet_field_hv, Z_FacetField **fl, ODR odr)
 	    STRLEN s_len;
             char *s_buf;
             HV *hv_elem = (HV*) SvRV(sv_2mortal(av_shift(sv_terms)));
-	    
+
 	    Z_FacetTerm *facet_term =
 	     (Z_FacetTerm *) odr_malloc(odr, sizeof(*facet_term));
 	    (*fl)->terms[i] = facet_term;
@@ -872,7 +859,7 @@ static void f_SV_to_FacetList(SV *sv, Z_OtherInformation **oip, ODR odr)
 {
 	AV *entries = (AV *) SvRV(sv);
 	int num_facets;
-	if (entries && SvTYPE(entries) == SVt_PVAV && 
+	if (entries && SvTYPE(entries) == SVt_PVAV &&
        		(num_facets = av_len(entries) + 1) > 0)
  	{
             Z_OtherInformation *oi;
@@ -931,9 +918,9 @@ int bend_search(void *handle, bend_search_rr *rr)
 		zhandle->stop_flag = 1;
 	}
 #endif
-	href = newHV();		
+	href = newHV();
 	hv_store(href, "SETNAME", 7, newSVpv(rr->setname, 0), 0);
-	if (rr->srw_sortKeys && *rr->srw_sortKeys) 
+	if (rr->srw_sortKeys && *rr->srw_sortKeys)
 	    hv_store(href, "SRW_SORTKEYS", 12, newSVpv(rr->srw_sortKeys, 0), 0);
 	hv_store(href, "REPL_SET", 8, newSViv(rr->replace_set), 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
@@ -962,14 +949,14 @@ int bend_search(void *handle, bend_search_rr *rr)
 		     newSVpv(rr->query->u.type_104->u.cql, 0), 0);
 	}
 	else
-	{	
+	{
 		rr->errcode = 108;
 		return 0;
 	}
 	PUSHMARK(sp);
-	
+
 	XPUSHs(sv_2mortal(newRV( (SV*) href)));
-	
+
 	PUTBACK;
 
 	handler_cv = simpleserver_sv2cv( search_ref );
@@ -992,7 +979,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	temp = hv_fetch(href, "OUTPUTFACETS", 12, 1);
         if (SvTYPE(*temp) != SVt_NULL)
 	    f_SV_to_FacetList(*temp, &rr->search_info, rr->stream);
-        
+
 	hv_undef(href);
 	av_undef(aref);
 
@@ -1070,7 +1057,7 @@ int bend_delete(void *handle, bend_delete_rr *rr)
 
 	zhandle->handle = point;
 
-	sv_free( (SV*) href);	
+	sv_free( (SV*) href);
 
 	PUTBACK;
 	FREETMPS;
@@ -1146,7 +1133,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 			if (simple->which == Z_ElementSetNames_generic)
 			{
 				hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
-			} 
+			}
 			else
 			{
 				rr->errcode = 26;
@@ -1189,7 +1176,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	XPUSHs(sv_2mortal(newRV( (SV*) href)));
 
 	PUTBACK;
-	
+
 	handler_cv = simpleserver_sv2cv( fetch_ref );
 	perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
 
@@ -1231,7 +1218,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 
 
 	hv_undef(href);
-	
+
 	ptr = SvPV(basename, length);
 	ODR_basename = (char *)odr_malloc(rr->stream, length + 1);
 	strcpy(ODR_basename, ptr);
@@ -1264,7 +1251,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	zhandle->handle = point;
 	handle = zhandle;
 	rr->last_in_set = SvIV(last);
-	
+
 	if (!(rr->errcode))
 	{
 		rr->errcode = SvIV(err_code);
@@ -1291,7 +1278,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
-	
+
 	return 0;
 }
 
@@ -1338,7 +1325,7 @@ int bend_present(void *handle, bend_present_rr *rr)
 			if (simple->which == Z_ElementSetNames_generic)
 			{
 				hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
-			} 
+			}
 			else
 			{
 				rr->errcode = 26;
@@ -1375,14 +1362,14 @@ int bend_present(void *handle, bend_present_rr *rr)
 	}
 
 	PUSHMARK(sp);
-	
+
 	XPUSHs(sv_2mortal(newRV( (SV*) href)));
-	
+
 	PUTBACK;
-	
+
 	handler_cv = simpleserver_sv2cv( present_ref );
 	perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
-	
+
 	SPAGAIN;
 
 	temp = hv_fetch(href, "ERR_CODE", 8, 1);
@@ -1397,7 +1384,7 @@ int bend_present(void *handle, bend_present_rr *rr)
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
-	
+
 	hv_undef(href);
 	rr->errcode = SvIV(err_code);
 
@@ -1508,7 +1495,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 
 	temp = hv_fetch(href, "STATUS", 6, 1);
 	status = newSVsv(*temp);
-	
+
 	temp = hv_fetch(href, "NUMBER", 6, 1);
 	number = newSVsv(*temp);
 
@@ -1534,9 +1521,9 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 		scan_item = (HV *)SvRV(sv_2mortal(av_shift(entries)));
 		temp = hv_fetch(scan_item, "TERM", 4, 1);
 		ptr = SvPV(*temp, len);
-		buffer->term = (char *) odr_malloc (rr->stream, len + 1); 
+		buffer->term = (char *) odr_malloc (rr->stream, len + 1);
 		strcpy(buffer->term, ptr);
-		temp = hv_fetch(scan_item, "OCCURRENCE", 10, 1); 
+		temp = hv_fetch(scan_item, "OCCURRENCE", 10, 1);
 		buffer->occurrences = SvIV(*temp);
 		buffer++;
 		hv_undef(scan_item);
@@ -1671,7 +1658,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 		q->bend_explain = bend_explain;
 	}
 
-       	href = newHV();	
+       	href = newHV();
 
 	/* ### These should be given initial values from the client */
 	hv_store(href, "IMP_ID", 6, newSVpv("", 0), 0);
@@ -1707,7 +1694,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	        hv_store(href, "PASS", 4, newSVpv(passwd, 0), 0);
 	}
 
-	PUSHMARK(sp);	
+	PUSHMARK(sp);
 
 	XPUSHs(sv_2mortal(newRV((SV*) href)));
 
@@ -1753,8 +1740,8 @@ bend_initresult *bend_init(bend_initrequest *q)
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
-	
-	return r;	
+
+	return r;
 }
 
 void bend_close(void *handle)
@@ -1778,10 +1765,10 @@ void bend_close(void *handle)
 		XPUSHs(sv_2mortal(newRV((SV *)href)));
 
 		PUTBACK;
-	
+
 		handler_cv = simpleserver_sv2cv( close_ref );
 		perl_call_sv( (SV *) handler_cv, G_SCALAR | G_DISCARD);
-	
+
 		SPAGAIN;
 
 		sv_free((SV*) href);
@@ -1846,14 +1833,14 @@ set_ghandle(arg)
 		SV *arg
 	CODE:
 		_global_ghandle = newSVsv(arg);
-		
+
 
 void
 set_init_handler(arg)
 		SV *arg
 	CODE:
 		init_ref = newSVsv(arg);
-		
+
 
 void
 set_close_handler(arg)
@@ -1937,7 +1924,7 @@ start_server(...)
 		{
 			ptr = SvPV(ST(i), len);
 			*argv_buf = (char *)xmalloc(len + 1);
-			strcpy(*argv_buf++, ptr); 
+			strcpy(*argv_buf++, ptr);
 		}
 		*argv_buf = NULL;
 
@@ -1971,7 +1958,7 @@ ScanPartial()
 	OUTPUT:
 		RETVAL
 
- 
+
 void
 yazlog(arg)
 		SV *arg
