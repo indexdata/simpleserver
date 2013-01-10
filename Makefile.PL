@@ -15,13 +15,10 @@ SimpleServer module.
 ];
 }
 
-### Although this release of SimpleServer will work with version 3.0.2
-#   of YAZ, you will not be able to take advantage of the new CCL
-#   support in the YAZ GFS unless you have version 3.0.9 or better.
-
+## present_number in search handler appeared in 4.2.48
 chomp($yazver);
 my ($major, $minor, $trivial) = split(/\./, $yazver);
-my ($needMaj, $needMin, $needTriv) = (3, 0, 2);
+my ($needMaj, $needMin, $needTriv) = (4, 2, 48);
 #print "major=$major, minor=$minor, trivial=$trivial\n";
 die "You have YAZ version $major.$minor.$trivial; " .
     "you need $needMaj.$needMin.$needTriv or better."

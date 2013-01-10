@@ -930,6 +930,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
+	hv_store(href, "PRESENT_NUMBER", 14, newSViv(rr->present_number), 0);
 	if ((rpnSV = zquery2perl(rr->query)) != 0) {
 	    hv_store(href, "RPN", 3, rpnSV, 0);
 	}
