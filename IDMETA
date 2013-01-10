@@ -1,5 +1,6 @@
 NAME=libnet-z3950-simpleserver-perl
-VERSION=1.15
+VERSION=1.16
 OMIT_FROM_DIST="archive"
 DEBIAN_DIST="wheezy squeeze"
 UBUNTU_DIST="quantal precise oneiric natty lucid"
+CENTOS_DIST="centos5 centos6"

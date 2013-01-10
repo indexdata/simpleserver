@@ -1,5 +1,13 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+
+1.16  Thu Jan 10 13:22:01 CET 2013
+        - Create packages for Ubuntu quantal precise oneiric.
+        - Add support for GFS start handler (START) to allow handling
+          of GFS config file (-c).
+        - Handler search now gets PRESENT_NUMBER - a hint for how many
+          records are to be fetched following search (piggyback).
+
 1.15  Fri Oct 14 14:01:18 CEST 2011
         - Fix decoding of OUTPUTFACETS (optinal) ; crashed on some Perl
           versions

@@ -9,11 +9,12 @@ Vendor: Index Data ApS <info@indexdata.com>
 Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: perl
-BuildRequires: libyaz4-devel
+BuildRequires: libyaz4-devel >= 4.2.48
+# On Centos6: BuildRequires: perl-ExtUtils-MakeMaker
 Packager: Jakub Skoczen <jakub@indexdata.dk>
 URL: http://www.indexdata.com/simpleserver/
 
-Requires: libyaz4
+Requires: libyaz4 >= 4.2.48
 
 %description
 The SimpleServer module is a tool for constructing Z39.50 "Information
@@ -47,6 +48,6 @@ make test
 
 %files
 %defattr(-,root,root)
-%{_libdir}/perl5/site_perl/*/*
+%{_libdir}/perl5
 %doc %{_mandir}/man3/*.3*
 %doc %{_datadir}/doc/perl-simpleserver
