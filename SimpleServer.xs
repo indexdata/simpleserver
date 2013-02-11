@@ -92,15 +92,13 @@ PerlInterpreter *root_perl_context;
  */
 char *string_or_undef(SV **svp, ODR stream) {
 	STRLEN len;
-	char *ptr, *buf;
+	char *ptr;
 
 	if (!SvOK(*svp))
 		return 0;
 
 	ptr = SvPV(*svp, len);
-	buf = (char*) odr_malloc(stream, len+1);
-	strcpy(buf, ptr);
-	return buf;
+	return odr_strdupn(stream, ptr, len);
 }
 
 
@@ -1529,16 +1527,14 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 		scan_item = (HV *)SvRV(sv_2mortal(av_shift(entries)));
 		temp = hv_fetch(scan_item, "TERM", 4, 1);
 		ptr = SvPV(*temp, len);
-		buffer->term = (char *) odr_malloc (rr->stream, len + 1);
-		strcpy(buffer->term, ptr);
+		buffer->term = odr_strdupn(rr->stream, ptr, len);
 		temp = hv_fetch(scan_item, "OCCURRENCE", 10, 1);
 		buffer->occurrences = SvIV(*temp);
 		if (hv_exists(scan_item, "DISPLAY_TERM", 12))
 		{
 			temp = hv_fetch(scan_item, "DISPLAY_TERM", 12, 1);
 			ptr = SvPV(*temp, len);
-			buffer->display_term = (char *) odr_malloc (rr->stream, len + 1);
-			strcpy(buffer->display_term, ptr);
+			buffer->display_term = odr_strdupn(rr->stream, ptr,len);
 		}
 		buffer++;
 		hv_undef(scan_item);
