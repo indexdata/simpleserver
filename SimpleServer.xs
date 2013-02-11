@@ -1530,9 +1530,9 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 		buffer->term = odr_strdupn(rr->stream, ptr, len);
 		temp = hv_fetch(scan_item, "OCCURRENCE", 10, 1);
 		buffer->occurrences = SvIV(*temp);
-		if (hv_exists(scan_item, "DISPLAY_TERM", 12))
+		temp = hv_fetch(scan_item, "DISPLAY_TERM", 12, 0);
+		if (temp)
 		{
-			temp = hv_fetch(scan_item, "DISPLAY_TERM", 12, 1);
 			ptr = SvPV(*temp, len);
 			buffer->display_term = odr_strdupn(rr->stream, ptr,len);
 		}
