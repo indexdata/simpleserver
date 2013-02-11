@@ -70,6 +70,7 @@ sub my_scan_handler {
 	my $term = $args->{TERM};
 	my $entries = [
 				{	TERM		=>	'Number 1',
+					DISPLAY_TERM    =>      'Number .1',
 					OCCURRENCE	=>	10 },
 				{	TERM		=>	'Number 2',
 					OCCURRENCE	=>	8 },
