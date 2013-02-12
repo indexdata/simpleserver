@@ -134,6 +134,8 @@ sub my_search_handler {
 	print "Setname          : $set_id\n";
 	print " inputfacets:\n";
 	print Dumper($facets);
+        print " extra args:\n";
+        print Dumper($args->{EXTRA_ARGS});
 	print "------------------------------------------------------------\n";
 
 	$args->{OUTPUTFACETS} = $facets;
