@@ -1,6 +1,14 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-
+1.17  Tue Feb 12 13:30:52 CET 2013
+	- Scan and Search handler gets EXTRA_ARGS . It's represented as
+	  a hash. It holds the extra arguments for SRU (URL).
+	- Scan and Search handler may return extra response data in
+	  EXTRA_RESPONSE_DATA. That's an XML fragment for SRU extra
+	  response data.
+	- Scan Term may include a DISPLAY_TERM (Z39.50 / SRU display term).
+	  Thanks to Simon Jacob for patch.
+	  
 1.16  Thu Jan 10 13:22:01 CET 2013
         - Create packages for Ubuntu quantal precise oneiric.
         - Add support for GFS start handler (START) to allow handling
