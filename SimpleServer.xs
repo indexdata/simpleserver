@@ -885,6 +885,18 @@ static void f_SV_to_FacetList(SV *sv, Z_OtherInformation **oip, ODR odr)
 	}
 }
 
+static HV *parse_extra_args(Z_SRW_extra_arg *args)
+{
+	HV *href = newHV();
+
+	for (; args; args = args->next)
+	{
+		hv_store(href, args->name, strlen(args->name),
+			newSVpv(args->value, 0), 0);
+	}
+	return href;
+}
+
 int bend_search(void *handle, bend_search_rr *rr)
 {
 	HV *href;
@@ -918,6 +930,7 @@ int bend_search(void *handle, bend_search_rr *rr)
 	}
 #endif
 	href = newHV();
+
 	hv_store(href, "SETNAME", 7, newSVpv(rr->setname, 0), 0);
 	if (rr->srw_sortKeys && *rr->srw_sortKeys)
 	    hv_store(href, "SRW_SORTKEYS", 12, newSVpv(rr->srw_sortKeys, 0), 0);
@@ -930,6 +943,8 @@ int bend_search(void *handle, bend_search_rr *rr)
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
 	hv_store(href, "PRESENT_NUMBER", 14, newSViv(rr->present_number), 0);
+	hv_store(href, "EXTRA_ARGS", 10,
+		newRV( (SV*) parse_extra_args(rr->extra_args)), 0);
 	if ((rpnSV = zquery2perl(rr->query)) != 0) {
 	    hv_store(href, "RPN", 3, rpnSV, 0);
 	}
@@ -1459,6 +1474,8 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "STATUS", 6, newSViv(BEND_SCAN_SUCCESS), 0);
 	hv_store(href, "ENTRIES", 7, newRV((SV *) list), 0);
+	hv_store(href, "EXTRA_ARGS", 10,
+		newRV( (SV*) parse_extra_args(rr->extra_args)), 0);
         aref = newAV();
         basenames = rr->basenames;
         for (i = 0; i < rr->num_bases; i++)
