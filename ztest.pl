@@ -95,6 +95,7 @@ sub my_scan_handler {
 	$args->{ENTRIES} = $entries;
 	$args->{STATUS} = Net::Z3950::SimpleServer::ScanPartial;
 	print "Welcome to scan....\n";
+	$args->{EXTRA_RESPONSE_DATA} = '<scanextra>b</scanextra>';
 	print "You scanned for term '$term'\n";
 }
 
@@ -137,6 +138,7 @@ sub my_search_handler {
 
 	$args->{OUTPUTFACETS} = $facets;
 
+	$args->{EXTRA_RESPONSE_DATA} = '<searchextra>b</searchextra>';
 	$args->{HITS} = $hits;
 	$session->{$set_id} = $data;
 	$session->{__HITS} = $hits;
