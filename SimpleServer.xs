@@ -1426,7 +1426,6 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	AV *list;
 	AV *entries;
 	HV *scan_item;
-	struct scan_entry *scan_list;
 	struct scan_entry *buffer;
 	int *step_size = rr->step_size;
 	int scan_list_size = rr->num_entries;
@@ -1529,19 +1528,7 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	rr->errcode = SvIV(err_code);
 	rr->num_entries = SvIV(number);
 	rr->status = SvIV(status);
-	if (yaz_version(NULL, NULL) >= 0x4022c &&
-		rr->num_entries <= scan_list_size)
-	{
-		/* entries has been initialized by yaz and is big enough
-		   to hold all entries */
-		scan_list = rr->entries;
-	}
-	else
-	{
-		scan_list = (struct scan_entry *)
-		  odr_malloc(rr->stream, rr->num_entries * sizeof(*scan_list));
-	}
-	buffer = scan_list;
+	buffer = rr->entries;
 	entries = (AV *)SvRV(entries_ref);
 	if (rr->errcode == 0) for (i = 0; i < rr->num_entries; i++)
 	{
@@ -1560,7 +1547,6 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 		buffer++;
 		hv_undef(scan_item);
 	}
-	rr->entries = scan_list;
 
 	zhandle->handle = point;
 	handle = zhandle;
