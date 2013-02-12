@@ -10,7 +10,7 @@ retrieving the results in the form of structured "records". It is
 widely used in libraries around the world, as well as in the US
 Federal Government. In addition, it is generally useful whenever you
 wish to integrate a number of different database systems around a
-shared, asbtract data model.
+shared, abstract data model.
 
 The model of the module is simple: It implements a "generic" Z39.50
 server, which invokes callback functions supplied by you to search for
@@ -30,10 +30,3 @@ COPYRIGHT AND LICENCE
 
 See file LICENSE
 
-CONVERSION FROM CVS
-
-This module was originally maintained under CVS, and was converted to
-git as follows:
-
-$ cd /usr/local/src/git/git-tools/id-cvs-to-git/
-$ CVSROOT=:ext:mike@bagel.indexdata.com:/home/cvsroot ./id-cvs-to-git.sh CVS simpleserver "Simple Perl API for building Z39.50 servers."
