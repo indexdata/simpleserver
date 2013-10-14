@@ -1,3 +1,9 @@
+libnet-z3950-simpleserver-perl (1.18-1indexdata) unstable; urgency=low
+
+  * Upstream.
+
+ -- Adam Dickmeiss <adam@indexdata.dk>  Mon, 14 Oct 2013 11:24:54 +0200
+
 libnet-z3950-simpleserver-perl (1.17-1indexdata) unstable; urgency=low
 
   * Upstream.
