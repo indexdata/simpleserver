@@ -43,7 +43,7 @@ cp -p README Changes $DOCDIR/
 %clean
 rm -fr ${RPM_BUILD_ROOT}
 
-%check || :
+%check
 make test
 
 %files
