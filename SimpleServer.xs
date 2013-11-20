@@ -1094,7 +1094,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	HV *href;
 	SV **temp;
 	SV *basename;
-	SV *record;
 	SV *last;
 	SV *err_code;
 	SV *err_string;
@@ -1135,7 +1134,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	hv_store(href, "REQ_FORM", 8, newSVpv((char *)oid_dotted->buf, oid_dotted->pos), 0);
 	hv_store(href, "REP_FORM", 8, newSVpv((char *)oid_dotted->buf, oid_dotted->pos), 0);
 	hv_store(href, "BASENAME", 8, newSVpv("", 0), 0);
-	hv_store(href, "RECORD", 6, newSVpv("", 0), 0);
 	hv_store(href, "LAST", 4, newSViv(0), 0);
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
@@ -1204,8 +1202,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	temp = hv_fetch(href, "BASENAME", 8, 1);
 	basename = newSVsv(*temp);
 
-	temp = hv_fetch(href, "RECORD", 6, 1);
-	record = newSVsv(*temp);
 
 	temp = hv_fetch(href, "LAST", 4, 1);
 	last = newSVsv(*temp);
@@ -1234,9 +1230,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	temp = hv_fetch(href, "HANDLE", 6, 1);
 	point = newSVsv(*temp);
 
-
-	hv_undef(href);
-
 	ptr = SvPV(basename, length);
 	rr->basename = odr_strdupn(rr->stream, ptr, length);
 
@@ -1250,18 +1243,26 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 		rr->output_format =
 			odr_oiddup(rr->stream, yaz_oid_recsyn_sutrs);
 	}
-	ptr = SvPV(record, length);
-        /* Treat GRS-1 records separately */
-	if (!oid_oidcmp(rr->output_format, yaz_oid_recsyn_grs_1))
+	temp = hv_fetch(href, "RECORD", 6, 0);
+	if (temp)
 	{
-		rr->record = (char *) read_grs1(ptr, rr->stream);
-		rr->len = -1;
+		SV *record = newSVsv(*temp);
+		ptr = SvPV(record, length);
+        	/* Treat GRS-1 records separately */
+		if (!oid_oidcmp(rr->output_format, yaz_oid_recsyn_grs_1))
+		{
+			rr->record = (char *) read_grs1(ptr, rr->stream);
+			rr->len = -1;
+		}
+		else
+		{
+			rr->record = odr_strdupn(rr->stream, ptr, length);
+			rr->len = length;
+		}
+		sv_free(record);
 	}
-	else
-	{
-		rr->record = odr_strdupn(rr->stream, ptr, length);
-		rr->len = length;
-	}
+	hv_undef(href);
+
 	zhandle->handle = point;
 	handle = zhandle;
 	rr->last_in_set = SvIV(last);
@@ -1277,7 +1278,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	wrbuf_destroy(oid_dotted);
 	sv_free((SV*) href);
 	sv_free(basename);
-	sv_free(record);
 	sv_free(last);
 	sv_free(err_string);
 	sv_free(err_code),
