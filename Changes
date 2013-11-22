@@ -1,7 +1,15 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+1.19  Fri Nov 22 12:31:24 CET 2013
+       -  ESTIMATED_HIT_COUNT = 1 from search_handler signal.
+       -  fetch handler: partial present response for undef RECORD
+          The old behavior was to return empty record (if RECORD was
+          not modified by handler). RECORD is now undefined upon entry
+          to fetch handler and handler must set it to return a record
+	  or just leave it undefined to signal "no record".
+
 1.18  Mon Oct 14 11:23:17 CEST 2013
-       -  Debian/RPM packagesr now built with YAZ 5.
+       -  Debian/RPM packages now built with YAZ 5.
 
 1.17  Tue Feb 12 13:30:52 CET 2013
 	- Scan and Search handler gets EXTRA_ARGS . It's represented as
