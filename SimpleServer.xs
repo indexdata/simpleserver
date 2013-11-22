@@ -1002,6 +1002,11 @@ int bend_search(void *handle, bend_search_rr *rr)
 		rr->extra_response_data = odr_strdupn(rr->stream, ptr, len);
 	}
 
+	temp = hv_fetch(href, "ESTIMATED" "_HIT_" "COUNT", 19, 0);
+	if (temp)
+	{
+		rr->estimated_hit_count = SvIV(*temp);
+	}
 	hv_undef(href);
 	av_undef(aref);
 
