@@ -482,7 +482,7 @@ static SV *rpn2perl(Z_RPNStructure *s)
 	case Z_Operator_and:     type = "Net::Z3950::RPN::And";    break;
 	case Z_Operator_or:      type = "Net::Z3950::RPN::Or";     break;
 	case Z_Operator_and_not: type = "Net::Z3950::RPN::AndNot"; break;
-	case Z_Operator_prox:    fatal("proximity not yet supported");
+	case Z_Operator_prox:    type = "Net::Z3950::RPN::Prox"; break;
 	default: fatal("unknown RPN operator %d", (int) c->roperator->which);
 	}
 	sv = newObject(type, (SV*) (av = newAV()));
@@ -492,6 +492,21 @@ static SV *rpn2perl(Z_RPNStructure *s)
 	if ((tmp = rpn2perl(c->s2)) == 0)
 	    return 0;
 	av_push(av, tmp);
+	if (c->roperator->which == Z_Operator_prox) {
+		Z_ProximityOperator prox = *c->roperator->u.prox;
+		HV *hv;
+		tmp = newObject("Net::Z3950::RPN::Prox::Attributes", (SV*) (hv = newHV()));
+		setMember(hv, "exclusion", newSViv(*prox.exclusion));
+		setMember(hv, "distance", newSViv(*prox.distance));
+		setMember(hv, "ordered", newSViv(*prox.ordered));
+		setMember(hv, "relationType", newSViv(*prox.relationType));
+		if (prox.which == Z_ProximityOperator_known) {
+			setMember(hv, "known", newSViv(*prox.u.known));
+		} else {
+			setMember(hv, "zprivate", newSViv(*prox.u.zprivate));
+		}
+		av_push(av, tmp);
+	}
 	return sv;
     }
 

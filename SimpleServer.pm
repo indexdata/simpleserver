@@ -114,12 +114,15 @@ package Net::Z3950::RPN::Or;
 our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::AndNot;
 our @ISA = qw(Net::Z3950::RPN::Node);
+package Net::Z3950::RPN::Prox;
+our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::Term;
 our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::RSID;
 our @ISA = qw(Net::Z3950::RPN::Node);
 package Net::Z3950::RPN::Attributes;
 package Net::Z3950::RPN::Attribute;
+package Net::Z3950::RPN::Prox::Attributes;
 package Net::Z3950::FacetList;
 package Net::Z3950::FacetField;
 package Net::Z3950::FacetTerms;
@@ -144,6 +147,9 @@ sub toPQF {
 	return '@and ' . $this->[0]->toPQF() . ' ' . $this->[1]->toPQF();
     } elsif ($class eq "Net::Z3950::RPN::AndNot") {
 	return '@not ' . $this->[0]->toPQF() . ' ' . $this->[1]->toPQF();
+    } elsif ($class eq "Net::Z3950::RPN::Prox") {
+    my $pattrs = $this->[3];
+	return '@prox ' . $pattrs->{exclusion} . ' ' . $pattrs->{distance} . ' ' . $pattrs->{ordered} . ' ' . $pattrs->{relationType} . (defined $pattrs->{known} ? ' k ' . $pattrs->{known} : ' p ' . $pattrs->{zprivate}) . ' ' . $this->[0]->toPQF() . ' ' . $this->[1]->toPQF();
     } elsif ($class eq "Net::Z3950::RPN::RSID") {
 	return '@set ' . $this->{id};
     } elsif ($class ne "Net::Z3950::RPN::Term") {
@@ -904,7 +910,7 @@ http://search.cpan.org/~esummers/CQL-Parser/
 
 =head1 AUTHORS
 
-Anders Sønderberg (sondberg@indexdata.dk),
+Anders SÃ¸nderberg (sondberg@indexdata.dk),
 Sebastian Hammer (quinn@indexdata.dk),
 Mike Taylor (indexdata.com).
 
