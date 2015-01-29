@@ -14,10 +14,10 @@ print "ok 1\n";
 
 ######################### End of black magic.
 
-print "not " if Net::Z3950::SimpleServer::yaz_diag_srw_to_bib1(11) != 3;
+print "not " if Net::Z3950::SimpleServer::yaz_diag_srw_to_bib1(11) != 107;
 print "ok 2\n";
 
-print "not " if Net::Z3950::SimpleServer::yaz_diag_bib1_to_srw(3) != 11;
+print "not " if Net::Z3950::SimpleServer::yaz_diag_bib1_to_srw(3) != 48;
 print "ok 3\n";
 
 # Insert your test code below (better if it prints "ok 13"
