@@ -1,6 +1,6 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-1.20  [IN PROGRESS]
+1.20  Thu Jan 29 07:53:46 UTC 2015
 	- Add support for Type-1's proximity operator. Patch from
 	  Simon Jacob of the National Library of Australia.
 
