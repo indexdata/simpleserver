@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+1.20  [IN PROGRESS]
+	- Add support for Type-1's proximity operator. Patch from
+	  Simon Jacob of the National Library of Australia.
+
 1.19  Fri Nov 22 12:31:24 CET 2013
        -  ESTIMATED_HIT_COUNT = 1 from search_handler signal.
        -  fetch handler: partial present response for undef RECORD
