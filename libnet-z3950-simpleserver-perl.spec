@@ -1,4 +1,4 @@
-%define idmetaversion %(. ./IDMETA; echo $VERSION|tr -d '\n')
+%define idmetaversion %(. ./IDMETA; echo $VERSION)
 Summary: Perl API to the YAZ generic front-end server (Z39.50 server)
 Name: libnet-z3950-simpleserver-perl
 Version: %{idmetaversion}
