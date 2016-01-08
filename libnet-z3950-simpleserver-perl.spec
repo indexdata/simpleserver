@@ -38,7 +38,7 @@ find $RPM_BUILD_ROOT/usr/share/man -name '*.gz' -exec rm -f '{}' \;
 # Install additional documentation
 DOCDIR=$RPM_BUILD_ROOT%{_datadir}/doc/perl-simpleserver
 mkdir -p $DOCDIR
-cp -p README Changes $DOCDIR/
+cp -p README.md Changes $DOCDIR/
 
 %clean
 rm -fr ${RPM_BUILD_ROOT}

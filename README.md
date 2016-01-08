@@ -1,4 +1,4 @@
-Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
+## Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
 
 The SimpleServer module is a tool for constructing Z39.50 "Information
 Retrieval" servers in Perl. The module is easy to use, but it does
@@ -21,12 +21,17 @@ The server will take care of managing the network connections for you,
 and it will spawn a new process (or thread, in some environments)
 whenever a new connection is received.
 
-AUTHORS
-	Anders Sønderberg <sondberg@indexdata.dk>
-	Sebastian Hammer <quinn@indexdata.dk>
-	Mike Taylor <mike@indexdata.com>
+### AUTHORS
 
-COPYRIGHT AND LICENCE
+ Anders SÃ¸nderberg <sondberg@indexdata.dk>
+
+ Sebastian Hammer <quinn@indexdata.com>
+
+ Mike Taylor <mike@indexdata.com>
+
+ Adam Dickmeiss <adam@indexdata.com>
+
+### COPYRIGHT AND LICENCE
 
 See file LICENSE
 
