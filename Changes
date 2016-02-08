@@ -40,7 +40,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	- Corrections to manual, kindly supplied by Ben Webb
 	  <bjwebb67@googlemail.com>
 	- Resolve contradictory licence terms: SimpleServer is now
-	  definitely distrbuted under the Revised BSD licence, whereas
+	  definitely distributed under the Revised BSD licence, whereas
 	  earlier versions claimed in the source code to be Revised
 	  BSD but in the README to be under the same terms as Perl.
 
