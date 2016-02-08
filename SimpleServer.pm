@@ -363,7 +363,7 @@ The argument hash passed to the init handler has the form
 	  };
 
 The HANDLE member can be used to store any scalar value which will then
-be provided as input to all subsequent calls (ie. for searching, record
+be provided as input to all subsequent calls (i.e. for searching, record
 retrieval, etc.). A common use of the handle is to store a reference to
 a hash which may then be used to store session-specific parameters.
 If you have any session-specific information (such as a list of
@@ -435,7 +435,7 @@ The following are all examples of valid queries in the PQF.
 You will need to write a recursive function or something similar to
 parse incoming query expressions, and this is usually where a lot of
 the work in writing a database-backend happens. Fortunately, you don't
-need to support anymore functionality than you want to. For instance,
+need to support any more functionality than you want to. For instance,
 it is perfectly legal to not accept boolean operators, but you SHOULD
 try to return good error codes if you run into something you can't or
 won't support.
@@ -622,7 +622,7 @@ The fetch handler is asked to retrieve a SINGLE record from a given
 result set (the front-end server will automatically call the fetch
 handler as many times as required).
 
-The parameters exchanged between the server and the fetch handler are
+The parameters exchanged between the server and the fetch handler are:
 
   $args = {
 				    ## Client/server request:
@@ -647,20 +647,20 @@ The parameters exchanged between the server and the fetch handler are
 	     SCHEMA    =>  "abc"    ## Provided schema, if any
 	  };
 
-The REP_FORM value has by default the REQ_FORM value but can be set to
+The REP_FORM value has by default the REQ_FORM value, but can be set to
 something different if the handler desires. The BASENAME value should
 contain the name of the database from where the returned record originates.
 The ERR_CODE and ERR_STR works the same way they do in the search
 handler. If there is an error condition, the SUR_FLAG is used to
 indicate whether the error condition pertains to the record currently
 being retrieved, or whether it pertains to the operation as a whole
-(eg. the client has specified a result set which does not exist.)
+(e.g. the client has specified a result set which does not exist.)
 
 If you need to return USMARC records, you might want to have a look at
 the MARC module on CPAN, if you don't already have a way of generating
 these.
 
-NOTE: The record offset is 1-indexed - 1 is the offset of the first
+NOTE: The record offset is 1-indexed, so 1 is the offset of the first
 record in the set.
 
 =head2 Scan handler
@@ -671,7 +671,7 @@ should return an ordered list of specified length consisting of terms
 actually occurring in the data base. Each of these terms should be close
 to or equal to the term originally specified. The quality of scan compared
 to simple search is a guarantee of hits. It is simply like browsing through
-an index of a book, you always find something! The parameters exchanged are
+an index of a book, you always find something! The parameters exchanged are:
 
   $args = {
 						## Client request
@@ -856,7 +856,7 @@ and SRW protocols as well as Z39.50.  These ``web-friendly'' protocols
 enable similar functionality to that of Z39.50, but by means of rich
 URLs in the case of SRU, and a SOAP-based web-service in the case of
 SRW.  These protocols are described at
-http://www.loc.gov/sru
+http://www.loc.gov/standards/sru/
 
 In order to serve these protocols from a SimpleServer-based
 application, it is necessary to launch the application with a YAZ
@@ -895,7 +895,7 @@ C<E<lt>=>.  For more information about the format of this file, see
 the I<CQL> section of the YAZ manual at
 http://indexdata.com/yaz/doc/tools.tkl#tools.cql
 
-The YAZ distribution include a sample CQL-to-PQF mapping configuration
+The YAZ distribution includes a sample CQL-to-PQF mapping configuration
 file called C<pqf.properties>; this is sufficient for many
 applications, and a good base to work from for most others.
 
