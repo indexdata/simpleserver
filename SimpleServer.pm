@@ -312,7 +312,7 @@ by means of the method
 Notice, the first argument should be the name of your server
 script (for logging purposes), while the rest of the arguments
 are documented in the YAZ toolkit manual: The section on
-application invocation: <http://indexdata.com/yaz/doc/server.invocation.tkl>
+application invocation: <http://indexdata.com/yaz/doc/server.invocation.html>
 
 In particular, you need to use the -T switch to start your SimpleServer
 in threaded mode.
@@ -875,7 +875,7 @@ translate the CQL queries of SRU and SRW into corresponding Z39.50
 Type-1 queries.  For more information about YAZ GFS configuration,
 including how to specify an Explain record, see the I<Virtual Hosts>
 section of the YAZ manual at
-http://indexdata.com/yaz/doc/server.vhosts.tkl
+http://indexdata.com/yaz/doc/server.vhosts.html
 
 The mapping of CQL queries into Z39.50 Type-1 queries is specified by
 a file that indicates which BIB-1 attributes should be generated for
@@ -893,7 +893,7 @@ Core indexes C<title>, C<subject> and C<creator>, and the BIB-1
 relations (type=2) corresponding to the CQL relations C<E<lt>> and
 C<E<lt>=>.  For more information about the format of this file, see
 the I<CQL> section of the YAZ manual at
-http://indexdata.com/yaz/doc/tools.tkl#tools.cql
+http://indexdata.com/yaz/doc/tools.html#tools.cql
 
 The YAZ distribution includes a sample CQL-to-PQF mapping configuration
 file called C<pqf.properties>; this is sufficient for many
