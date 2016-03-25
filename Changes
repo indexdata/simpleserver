@@ -169,7 +169,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  They are now passed back to the client (thanks to recent
 	  changes to the YAZ generic front-end server) in accordance
 	  with Z39.50 Implementor Agreement 5, found at
-		http://lcweb.loc.gov/z3950/agency/agree/initdiag.html
+		http://www.loc.gov/z3950/agency/agree/initdiag.html
 
 0.07  Fri Jan 03 10:12:15 2003
         - Applied Dave Mitchell's (davem@fdgroup.com) GRS-1 parsing patch.
