@@ -893,7 +893,7 @@ Core indexes C<title>, C<subject> and C<creator>, and the BIB-1
 relations (type=2) corresponding to the CQL relations C<E<lt>> and
 C<E<lt>=>.  For more information about the format of this file, see
 the I<CQL> section of the YAZ manual at
-http://www.indexdata.com/yaz/doc/tools.html#tools.cql
+http://www.indexdata.com/yaz/doc/tools.html#cql
 
 The YAZ distribution includes a sample CQL-to-PQF mapping configuration
 file called C<pqf.properties>; this is sufficient for many
