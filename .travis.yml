@@ -11,11 +11,10 @@ addons:
  apt:
   packages:
    - make
-   - yaz
 
 before_install:
   - ./t/travis/travis-init.sh
-  - sudo apt-get install -yq libyaz5-dev
+  - sudo apt-get install -yq libyaz5-dev yaz
 
 before_script:
  - perl Makefile.PL
