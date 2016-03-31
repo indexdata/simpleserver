@@ -1,0 +1,27 @@
+language: perl 
+sudo: required
+perl:
+  - "5.22"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+
+addons:
+ apt:
+  packages:
+   - make
+   - libmarc-record-perl
+
+before_install:
+  - ./t/travis/travis-init.sh
+  - sudo apt-get install -yq libyaz5-dev
+
+before_script:
+ - perl Makefile.PL
+
+script:
+ - make
+ - make test
+ - make install
+
