@@ -125,7 +125,7 @@ sub my_search_handler {
 	my $rpn = $args->{RPN};
 	my @database_list = @{ $args->{DATABASES} };
 	my $query = $args->{QUERY};
-	my $facets = $args->{INPUTFACETS};
+	my $facets = my_facets_response($args->{INPUTFACETS});
 	my $hits = 3;
 
 	print "------------------------------------------------------------\n";
@@ -150,6 +150,89 @@ sub my_search_handler {
 	}
 }
 
+sub my_facets_response {
+	my $inputfacets = shift;
+	if (!$inputfacets) {
+		# no facets requested: generate default input facets
+		$inputfacets = [
+			{ attributes => [
+				  { attributeType => 1,
+				    attributeValue => 'author'
+				  },
+				  { attributeType => 2,
+				    attributeValue => 0
+				  },
+				  { attributeType => 3,
+				    attributeValue => 5
+				  },
+				  { attributeType => 4,
+				    attributeValue => 0
+				  }
+			      ]
+			},
+			{ attributes => [
+				  { attributeType => 1,
+				    attributeValue => 'title'
+				  },
+				  { attributeType => 2,
+				    attributeValue => 0
+				  },
+				  { attributeType => 3,
+				    attributeValue => 5
+				  },
+				  { attributeType => 4,
+				    attributeValue => 0
+				  }
+			      ]
+			}
+		    ];
+	}
+	# generate facets response. we use inputfacets as basis
+	my $zfacetlist = [];
+	bless $zfacetlist, 'Net::Z3950::FacetList';
+	my $i = 0;
+	foreach my $x (@$inputfacets) {
+		my $facetname = "unknown";
+		my $sortorder = 0;
+		my $count = 5;
+		my $offset = 0;
+		foreach my $attr (@{$x->{'attributes'}}) {
+			my $type = $attr->{'attributeType'};
+			my $value = $attr->{'attributeValue'};
+			print "attr " . $type . "=" . $value . "\n";
+			if ($type == 1) { $facetname = $value; }
+			if ($type == 2) { $sortorder = $value; }
+			if ($type == 3) { $count = $value; }
+			if ($type == 4) { $offset = $value; }		}
+		my $zfacetfield = {};
+		bless $zfacetfield, 'Net::Z3950::FacetField';
+		$zfacetlist->[$i++] = $zfacetfield;
+		my $zattributes = [];
+		bless $zattributes, 'Net::Z3950::RPN::Attributes';
+		$zfacetfield->{'attributes'} = $zattributes;
+		my $zattribute = {};
+		bless $zattribute, 'Net::Z3950::RPN::Attribute';
+		$zattribute->{'attributeType'} = 1;
+		$zattribute->{'attributeValue'} = $facetname;
+		$zattributes->[0] = $zattribute;
+		my $zfacetterms = [];
+		bless $zfacetterms, 'Net::Z3950::FacetTerms';
+		$zfacetfield->{'terms'} = $zfacetterms;
+
+		my $j = 0;
+		while ($j < $count) {
+			my $zfacetterm = {};
+			bless $zfacetterm, 'Net::Z3950::FacetTerm';
+			# just a fake term ..
+			$zfacetterm->{'term'} = "t" . $j;
+			# most frequent first (fake count)
+			my $freq = $count - $j;
+			$zfacetterm->{'count'} = $freq;
+			$zfacetterms->[$j++] = $zfacetterm;
+		}
+	}
+	return $zfacetlist;
+}
 
 sub my_fetch_handler {
 	my $args = shift;
