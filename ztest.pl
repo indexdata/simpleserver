@@ -203,10 +203,13 @@ sub my_facets_response {
 			if ($type == 1) { $facetname = $value; }
 			if ($type == 2) { $sortorder = $value; }
 			if ($type == 3) { $count = $value; }
-			if ($type == 4) { $offset = $value; }		}
+			if ($type == 4) { $offset = $value; }
+		}
 		my $zfacetfield = {};
 		bless $zfacetfield, 'Net::Z3950::FacetField';
-		$zfacetlist->[$i++] = $zfacetfield;
+		if ($count > 0) {
+			$zfacetlist->[$i++] = $zfacetfield;
+		}
 		my $zattributes = [];
 		bless $zattributes, 'Net::Z3950::RPN::Attributes';
 		$zfacetfield->{'attributes'} = $zattributes;
