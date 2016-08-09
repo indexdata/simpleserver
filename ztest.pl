@@ -166,7 +166,7 @@ sub my_facets_response {
 				    attributeValue => 5
 				  },
 				  { attributeType => 4,
-				    attributeValue => 0
+				    attributeValue => 1
 				  }
 			      ]
 			},
@@ -181,7 +181,7 @@ sub my_facets_response {
 				    attributeValue => 5
 				  },
 				  { attributeType => 4,
-				    attributeValue => 0
+				    attributeValue => 1
 				  }
 			      ]
 			}
@@ -195,7 +195,7 @@ sub my_facets_response {
 		my $facetname = "unknown";
 		my $sortorder = 0;
 		my $count = 5;
-		my $offset = 0;
+		my $offset = 1;
 		foreach my $attr (@{$x->{'attributes'}}) {
 			my $type = $attr->{'attributeType'};
 			my $value = $attr->{'attributeValue'};
