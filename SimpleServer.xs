@@ -838,13 +838,16 @@ static void f_SV_to_FacetField(HV *facet_field_hv, Z_FacetField **fl, ODR odr)
 	    hv_undef(hv_elem);
         }
 
-	temp = hv_fetch(facet_field_hv, "terms", 5, 1);
-
-	sv_terms = (AV *) SvRV(*temp);
-	if (SvTYPE(sv_terms) == SVt_PVAV) {
+	temp = hv_fetch(facet_field_hv, "terms", 5, 0);
+	if (!temp) {
+	  num_terms = 0;
+	} else {
+	  sv_terms = (AV *) SvRV(*temp);
+	  if (SvTYPE(sv_terms) == SVt_PVAV) {
   	    num_terms = av_len(sv_terms) + 1;
-        } else {
+	  } else {
             num_terms = 0;
+	  }
 	}
 	*fl = facet_field_create(odr, attributes, num_terms);
 	for (i = 0; i < num_terms; i++) {
