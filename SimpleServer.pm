@@ -400,7 +400,7 @@ anonymous hash. The structure is the following:
     PID                 =>  $x,      # XXX to be described
     PRESENT_NUMBER      =>  $x,      # XXX to be described
     EXTRA_ARGS          =>  $x,      # XXX to be described
-    INPUTFACETS         =>  $x,      # XXX to be described
+    INPUTFACETS         =>  $x,      # Specification of facets required: see below.
 
                                      ## Response parameters:
 
@@ -409,7 +409,7 @@ anonymous hash. The structure is the following:
     HITS                =>  0,       # Number of matches
     ESTIMATED_HIT_COUNT =>  $x,      # XXX to be described
     EXTRA_RESPONSE_DATA =>  $x,      # XXX to be described
-    OUTPUTFACETS        =>  $x       # XXX to be described
+    OUTPUTFACETS        =>  $x       # Facets returned: see below.
   };
 
 Note that a search which finds 0 hits is considered successful in
@@ -591,6 +591,163 @@ Z39.50 if the unusual type-104 query is used), the query that is
 _passed is expressed in CQL, the Contextual Query Language. In this
 case, the query string is made available in the CQL argument.
 
+=head3 Facets
+
+Servers may support the provision of facets -- counted lists of field
+values which may subsequently be be used as query terms to narrow the
+search.
+
+In SRU, facets may be requested by the C<facetLimit> parameter,
+L<as documented in the OASIS standard that formalises the SRU specification|http://docs.oasis-open.org/search-ws/searchRetrieve/v1.0/os/part3-sru2.0/searchRetrieve-v1.0-os-part3-sru2.0.html#_Toc324162453>.
+Its value is a string consisting of a comma-separated list of facet
+specifications. Each facet specification consists of of a count, a
+colon and a fieldname. For example, C<facetLimit=10:title,5:author>
+asks for ten title facets and five author facets.
+
+=head4 Request format
+
+The facet request is passed to the search-handler function in the
+INPUTFACETS parameter. Its value is rather complex, due to backwards
+compatibility with Z39.50:
+
+=over 4
+
+=item *
+
+The top-level value is a C<Net::Z3950::FacetList> array.
+
+=item *
+
+This is an array of C<Net::Z3950::FacetField> objects.
+
+=item *
+
+Each of these is an object with two members, C<attributes> and
+C<terms>.
+
+=item *
+
+C<attributes> has type C<Net::Z3950::RPN::Attributes> and is a list of
+objects of type C<Net::Z3950::RPN::Attribute>.
+
+=item *
+
+Each attribute has two elements, C<attributeType> and
+C<attributeValue>. Each value is interpreted according to its
+type. The meanings of the types are as follows:
+
+=over 4
+
+=item 1
+
+The name of the field to provide values of the facets.
+
+=item 2
+
+The order in which to sort the values. (But it's not clear how this is
+to be interpreted: it may be implementation dependent.)
+
+=item 3
+
+The number of facets to include for the specified field.
+
+=item 4
+
+The first facet to include in the response: for example, if this is
+11, then the first ten facts should be skipped.
+
+=back
+
+=back
+
+So for example, the SRU facet specification
+C<facetLimit=10:title,5:author> would be translated as a
+C<Net::Z3950::FacetList> list of two C<Net::Z3950::FacetField>s. The
+C<attributes> of the first would be [1="title", 3=10], and those of
+the second would be [1="author", 3=5].
+
+It is not clear what the purpose of C<terms> is, but for the record,
+this is how it is represented:
+
+=over 4
+
+=item *
+
+C<terms> is a C<Net::Z3950::FacetTerms> array.
+
+=item *
+
+This is an array of C<Net::Z3950::FacetTerm> objects.
+
+=item *
+
+Each of these is an object with two members, C<term> and C<count>. The
+first of these is an integer, the second a string.
+
+=back
+
+=head4 Response format
+
+Having generated facets corresponding to the request, the search
+handler should return them in the C<OUTPUTFACETS> argument. The
+structure of this response is similar to that of the request:
+
+=over 4
+
+=item *
+
+The top-level value is a C<Net::Z3950::FacetList> array.
+
+=item *
+
+This is an array of C<Net::Z3950::FacetField> objects.
+
+=item *
+
+Each of these is an object with two members, C<attributes> and
+C<terms>.
+
+=item *
+
+C<attributes> has type C<Net::Z3950::RPN::Attributes> and is a list of
+objects of type C<Net::Z3950::RPN::Attribute>.
+
+=item *
+
+Each attribute has two elements, C<attributeType> and
+C<attributeValue>. Each value is interpreted according to its
+type. The meanings of the types are as follows:
+
+=over 4
+
+=item 1
+
+The name of the field for which terms are provided.
+
+=back
+
+(That is the only type used.)
+
+=item *
+
+C<terms> is a C<Net::Z3950::FacetTerms> array.
+
+=item *
+
+This is an array of C<Net::Z3950::FacetTerm> objects.
+
+=item *
+
+Each of these is an object with two members, C<term> and C<count>. The
+first of these is a string containing one of the facet terms, and the
+second is an integer indicating how many times it occurs in the
+records that were found by the search.
+
+=back
+
+The example SimpleServer applicaation server C<ztest.pl> includes code
+that shows how to examine the INPUTFACETS data structure and create
+the OUTPUTFACETS structure.
 
 =head2 Present handler
 
