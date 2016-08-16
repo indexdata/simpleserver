@@ -393,9 +393,9 @@ anonymous hash. The structure is the following:
     SETNAME             =>  "id",    # ID of the result set
     REPL_SET            =>  0,       # Replace set if already existing?
     DATABASES           =>  ["xxx"], # Reference to a list of databases to search
-    QUERY               =>  "query", # The query expression
+    QUERY               =>  "query", # The query expression as a PQF string
     RPN                 =>  $obj,    # Reference to a Net::Z3950::APDU::Query
-    CQL                 =>  $x,      # XXX to be described
+    CQL                 =>  $x,      # A CQL query, if this is provided instead of Type-1
     SRW_SORTKEYS        =>  $x,      # XXX to be described
     PID                 =>  $x,      # XXX to be described
     PRESENT_NUMBER      =>  $x,      # XXX to be described
@@ -420,11 +420,13 @@ should use these whenever possible.
 
 =head3 Query structures
 
-In Z39.50, the query is a tree-structure of terms combined by operators, the
-terms being qualified by lists of attributes. The QUERY parameter is presented
-to the search function in the Prefix Query Format (PQF) which is
-used in many applications based on the YAZ toolkit. The full grammar
-is described in the YAZ manual.
+In Z39.50, the most comment kind of query is the so-called Type-1
+_query, a tree-structure of terms combined by operators, the terms
+being qualified by lists of attributes.
+
+The QUERY parameter presented this tree to the search function in the
+Prefix Query Format (PQF) which is used in many applications based on
+the YAZ toolkit. The full grammar is described in the YAZ manual.
 
 The following are all examples of valid queries in the PQF. 
 
@@ -583,6 +585,11 @@ By adding your own methods to these classes (building what I call
 ``augmented classes''), you can easily build code that walks the tree
 of the incoming RPN.  Take a look at C<samples/render-search.pl> for a
 sample implementation of such an augmented classes technique.
+
+Finally, when SimpleServer is invoked using SRU/SRW (and indeed using
+Z39.50 if the unusual type-104 query is used), the query that is
+_passed is expressed in CQL, the Contextual Query Language. In this
+case, the query string is made available in the CQL argument.
 
 
 =head2 Present handler
