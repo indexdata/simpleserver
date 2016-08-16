@@ -410,8 +410,10 @@ if there was a problem processing the request. The Z39.50 standard
 provides a comprehensive list of standard diagnostic codes, and you
 should use these whenever possible.
 
-The QUERY is a tree-structure of terms combined by operators, the
-terms being qualified by lists of attributes. The query is presented
+=head3 Query structures
+
+In Z39.50, the query is a tree-structure of terms combined by operators, the
+terms being qualified by lists of attributes. The QUERY parameter is presented
 to the search function in the Prefix Query Format (PQF) which is
 used in many applications based on the YAZ toolkit. The full grammar
 is described in the YAZ manual.
@@ -436,11 +438,11 @@ You will need to write a recursive function or something similar to
 parse incoming query expressions, and this is usually where a lot of
 the work in writing a database-backend happens. Fortunately, you don't
 need to support any more functionality than you want to. For instance,
-it is perfectly legal to not accept boolean operators, but you SHOULD
+it is perfectly legal to not accept boolean operators, but you should
 try to return good error codes if you run into something you can't or
 won't support.
 
-A more convenient alternative to the QUERY member may be the RPN
+A more convenient alternative to the QUERY member is the RPN
 member, which is a reference to a Net::Z3950::APDU::Query object
 representing the RPN query tree.  The structure of that object is
 supposed to be self-documenting, but here's a brief summary of what
@@ -483,11 +485,11 @@ Z<>
 =item C<Net::Z3950::RPN::AndNot>
 
 These three classes are all arrays of two elements, each of which is a
-node of one of the above types.
+node.
 
 =item C<Net::Z3950::RPN::Term>
 
-See below for details.
+A query term. See below for details.
 
 =item C<Net::Z3950::RPN::RSID>
 
