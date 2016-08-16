@@ -386,23 +386,31 @@ Similarly, the search handler is called with a reference to an
 anonymous hash. The structure is the following:
 
   $args = {
-	  			    ## Request parameters:
+                                     ## Request parameters:
 
-	     GHANDLE   =>  $obj     ## Global handle specified at creation
-	     HANDLE    =>  ref,     ## Your session reference.
-	     SETNAME   =>  "id",    ## ID of the result set
-	     REPL_SET  =>  0,       ## Replace set if already existing?
-	     DATABASES =>  ["xxx"], ## Reference to a list of data-
-				    ## bases to search
-	     QUERY     =>  "query", ## The query expression
-	     RPN       =>  $obj,    ## Reference to a Net::Z3950::APDU::Query
+    GHANDLE             =>  $obj     # Global handle specified at creation
+    HANDLE              =>  ref,     # Your session reference.
+    SETNAME             =>  "id",    # ID of the result set
+    REPL_SET            =>  0,       # Replace set if already existing?
+    DATABASES           =>  ["xxx"], # Reference to a list of databases to search
+    QUERY               =>  "query", # The query expression
+    RPN                 =>  $obj,    # Reference to a Net::Z3950::APDU::Query
+    CQL                 =>  $x,      # XXX to be described
+    SRW_SORTKEYS        =>  $x,      # XXX to be described
+    PID                 =>  $x,      # XXX to be described
+    PRESENT_NUMBER      =>  $x,      # XXX to be described
+    EXTRA_ARGS          =>  $x,      # XXX to be described
+    INPUTFACETS         =>  $x,      # XXX to be described
 
-				    ## Response parameters:
+                                     ## Response parameters:
 
-	     ERR_CODE  =>  0,       ## Error code (0=Successful search)
-	     ERR_STR   =>  "",      ## Error string
-	     HITS      =>  0        ## Number of matches
-	  };
+    ERR_CODE            =>  0,       # Error code (0=Successful search)
+    ERR_STR             =>  "",      # Error string
+    HITS                =>  0,       # Number of matches
+    ESTIMATED_HIT_COUNT =>  $x,      # XXX to be described
+    EXTRA_RESPONSE_DATA =>  $x,      # XXX to be described
+    OUTPUTFACETS        =>  $x       # XXX to be described
+  };
 
 Note that a search which finds 0 hits is considered successful in
 Z39.50 terms - you should only set the ERR_CODE to a non-zero value
