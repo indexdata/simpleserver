@@ -382,8 +382,8 @@ associated additional information, ERR_STR returned.
 
 =head2 Search handler
 
-Similarly, the search handler is called with a reference to an anony-
-mous hash. The structure is the following:
+Similarly, the search handler is called with a reference to an
+anonymous hash. The structure is the following:
 
   $args = {
 	  			    ## Request parameters:
