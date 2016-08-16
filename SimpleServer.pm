@@ -358,7 +358,7 @@ The argument hash passed to the init handler has the form
 	     			    ## this member contains user name
 	     PASS      =>  "yyy"    ## Under same conditions, this member
 	     			    ## contains the password in clear text
-	     GHANDLE   =>  $obj     ## Global handler specified at creation
+	     GHANDLE   =>  $obj     ## Global handle specified at creation
 	     HANDLE    =>  undef    ## Handler of Perl data structure
 	  };
 
@@ -388,7 +388,7 @@ anonymous hash. The structure is the following:
   $args = {
 	  			    ## Request parameters:
 
-	     GHANDLE   =>  $obj     ## Global handler specified at creation
+	     GHANDLE   =>  $obj     ## Global handle specified at creation
 	     HANDLE    =>  ref,     ## Your session reference.
 	     SETNAME   =>  "id",    ## ID of the result set
 	     REPL_SET  =>  0,       ## Replace set if already existing?
@@ -600,7 +600,7 @@ The information exchanged between client and present handle is:
   $args = {
 				    ## Client/server request:
 
-	     GHANDLE   =>  $obj     ## Global handler specified at creation
+	     GHANDLE   =>  $obj     ## Global handle specified at creation
 	     HANDLE    =>  ref,     ## Reference to datastructure
 	     SETNAME   =>  "id",    ## Result set ID
 	     START     =>  xxx,     ## Start position
@@ -627,7 +627,7 @@ The parameters exchanged between the server and the fetch handler are:
   $args = {
 				    ## Client/server request:
 
-	     GHANDLE   =>  $obj     ## Global handler specified at creation
+	     GHANDLE   =>  $obj     ## Global handle specified at creation
 	     HANDLE    =>  ref	    ## Reference to data structure
 	     SETNAME   =>  "id"     ## ID of the requested result set
 	     OFFSET    =>  nnn      ## Record offset number
@@ -676,7 +676,7 @@ an index of a book, you always find something! The parameters exchanged are:
   $args = {
 						## Client request
 
-		GHANDLE		=> $obj,	## Global handler specified at creation
+		GHANDLE		=> $obj,	## Global handle specified at creation
 		HANDLE		=> $ref,	## Reference to data structure
 		DATABASES	=> ["xxx"],	## Reference to a list of data-
 						## bases to search
@@ -739,7 +739,7 @@ The argument hash received by the close handler has two elements only:
   $args = {
 				    ## Server provides:
 
-	     GHANDLE   =>  $obj     ## Global handler specified at creation
+	     GHANDLE   =>  $obj     ## Global handle specified at creation
 	     HANDLE    =>  ref      ## Reference to data structure
 	  };
 
@@ -753,7 +753,7 @@ The argument hash received by the delete handler has the following elements:
 
   $args = {
 				    ## Client request:
-	     GHANDLE   =>  $obj,    ## Global handler specified at creation
+	     GHANDLE   =>  $obj,    ## Global handle specified at creation
 	     HANDLE    =>  ref,     ## Reference to data structure
 	     SETNAME   =>  "id",    ## Result set ID
 
@@ -777,7 +777,7 @@ The argument hash received by the sort handler has the following elements:
 
 	$args = {
 					## Client request:
-		GHANDLE => $obj,	## Global handler specified at creation
+		GHANDLE => $obj,	## Global handle specified at creation
 		HANDLE => ref,		## Reference to data structure
 		INPUT => [ a, b ... ],	## Names of result-sets to sort
 		OUTPUT => "name",	## Name of result-set to sort into
