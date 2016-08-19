@@ -51,8 +51,11 @@ sub my_init_handler {
 	$args->{IMP_VER} = "3.14159";
 	$args->{ERR_CODE} = 0;
 	$args->{HANDLE} = $session;
-	if (defined($args->{PASS}) && defined($args->{USER})) {
-	    printf("Received USER/PASS=%s/%s\n", $args->{USER},$args->{PASS});
+	if (defined($args->{USER})) {
+	    printf("Received USER=%s\n", $args->{USER});
+	}
+	if (defined($args->{PASS})) {
+	    printf("Received PASS=%s\n", $args->{PASS});
 	}
 
 }
