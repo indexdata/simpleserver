@@ -1682,7 +1682,10 @@ bend_initresult *bend_init(bend_initrequest *q)
 	{
 		q->bend_present = bend_present;
 	}
-	/*q->bend_esrequest = bend_esrequest;*/
+	if (esrequest_ref)
+	{
+		q->bend_esrequest = bend_esrequest;
+	}
 	if (delete_ref)
 	{
 		q->bend_delete = bend_delete;
