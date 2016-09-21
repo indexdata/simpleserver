@@ -46,11 +46,6 @@ sub my_init_handler {
 	my $args = shift;
 	my $session = {};
 
-	$args->{IMP_NAME} = "DemoServer";
-	$args->{IMP_ID} = "81";
-	$args->{IMP_VER} = "3.14159";
-	$args->{ERR_CODE} = 0;
-	$args->{HANDLE} = $session;
 	if (defined($args->{USER})) {
 	    printf("Received USER=%s\n", $args->{USER});
 	}
@@ -58,6 +53,11 @@ sub my_init_handler {
 	    printf("Received PASS=%s\n", $args->{PASS});
 	}
 
+	$args->{IMP_NAME} = "DemoServer";
+	$args->{IMP_ID} = "81";
+	$args->{IMP_VER} = "3.14159";
+	$args->{ERR_CODE} = 0;
+	$args->{HANDLE} = $session;
 }
 
 
