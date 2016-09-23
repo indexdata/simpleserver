@@ -1435,9 +1435,161 @@ int bend_present(void *handle, bend_present_rr *rr)
 }
 
 
+static Z_IOOriginPartToKeep *decodeItemOrderRequest(HV *href, Z_ItemOrder *it)
+{
+	if (it->which == Z_IOItemOrder_esRequest) {
+		Z_IORequest *ir = it->u.esRequest;
+		Z_IOOriginPartToKeep *k = ir->toKeep;
+		Z_IOOriginPartNotToKeep *n = ir->notToKeep;
+
+		if (n->itemRequest) {
+			Z_External *r = n->itemRequest;
+			if (r->direct_reference
+			    && !oid_oidcmp(r->direct_reference, yaz_oid_recsyn_xml)
+			    && r->which == Z_External_octet)
+				hv_store(href, "XML_ILL", 7,
+					 newSVpvn(r->u.octet_aligned->buf,
+						  r->u.octet_aligned->len), 0);
+		}
+		return k;
+	} else {
+		return 0;
+	}
+}
+
+static Z_TaskPackage *createItemOrderTaskPackage(HV *href,
+						 Z_IOOriginPartToKeep *k,
+						 bend_esrequest_rr *rr)
+{
+	SV **temp;
+	ODR stream = rr->stream;
+	Z_TaskPackage *tp = (Z_TaskPackage *) odr_malloc(stream, sizeof(*tp));
+	Z_External *ext = (Z_External *)
+		odr_malloc(stream, sizeof(*ext));
+	Z_IUOriginPartToKeep *keep = (Z_IUOriginPartToKeep *)
+		odr_malloc(stream, sizeof(*keep));
+	Z_IOTargetPart *targetPart = (Z_IOTargetPart *)
+		odr_malloc(stream, sizeof(*targetPart));
+
+	tp->packageType =
+		odr_oiddup(stream, rr->esr->packageType);
+	tp->packageName = 0;
+	tp->userId = 0;
+	tp->retentionTime = 0;
+	tp->permissions = 0;
+	tp->description = 0;
+	tp->targetReference =
+		odr_create_Odr_oct(stream, "911", 3);
+	tp->creationDateTime = 0;
+	tp->taskStatus = odr_intdup(stream, 0);
+	tp->packageDiagnostics = 0;
+	tp->taskSpecificParameters = ext;
+	ext->direct_reference =
+		odr_oiddup(stream, rr->esr->packageType);
+	ext->indirect_reference = 0;
+	ext->descriptor = 0;
+	ext->which = Z_External_itemOrder;
+	ext->u.itemOrder = (Z_ItemOrder *)
+		odr_malloc(stream, sizeof(*ext->u.update));
+	ext->u.itemOrder->which = Z_IOItemOrder_taskPackage;
+	ext->u.itemOrder->u.taskPackage =  (Z_IOTaskPackage *)
+		odr_malloc(stream, sizeof(Z_IOTaskPackage));
+	ext->u.itemOrder->u.taskPackage->originPart = k;
+	ext->u.itemOrder->u.taskPackage->targetPart = targetPart;
+
+	temp = hv_fetch(href, "XML_ILL", 7, 1);
+	if (temp) {
+		SV *err_str = newSVsv(*temp);
+		STRLEN len;
+		char *ptr;
+		ptr = SvPV(err_str, len);
+		targetPart->itemRequest = z_ext_record_xml(stream, ptr, len);
+	} else {
+		targetPart->itemRequest = 0;
+	}
+	targetPart->statusOrErrorReport = 0;
+	targetPart->auxiliaryStatus = 0;
+	return tp;
+}
+
 int bend_esrequest(void *handle, bend_esrequest_rr *rr)
 {
-	perl_call_sv(esrequest_ref, G_VOID | G_DISCARD | G_NOARGS);
+	Z_IOOriginPartToKeep *k = 0;
+	HV *href;
+	Zfront_handle *zhandle = (Zfront_handle *)handle;
+	SV **temp;
+	Z_ExtendedServicesRequest *esr = rr->esr;
+	Z_External *ext = esr->taskSpecificParameters;
+
+	dSP;
+	ENTER;
+	SAVETMPS;
+
+	href = newHV();
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
+        hv_store(href, "HANDLE", 6, zhandle->handle, 0);
+        hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
+        hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
+	if (esr->function) {
+		hv_store(href, "FUNCTION", 8,
+			 newSViv(*esr->function), 0);
+	}
+	if (esr->packageType) {
+		hv_store(href, "PACKAGE_TYPE", 12,
+			 translateOID(esr->packageType), 0);
+	}
+	if (esr->packageName) {
+		hv_store(href, "PACKAGE_NAME", 12,
+			 newSVpv(esr->packageName, 0), 0);
+	}
+	if (esr->userId) {
+		hv_store(href, "USER_ID", 7,
+			 newSVpv(esr->userId, 0), 0);
+	}
+	if (esr->waitAction) {
+		hv_store(href, "WAIT_ACTION", 11,
+			 newSViv(*esr->waitAction), 0);
+	}
+	if (esr->elements) {
+		hv_store(href, "ELEMENTS", 8,
+			 newSVpv(esr->elements, 0), 0);
+	}
+
+	if (ext && ext->which == Z_External_itemOrder) {
+		k = decodeItemOrderRequest(href, ext->u.itemOrder);
+	}
+
+	PUSHMARK(SP);
+
+	XPUSHs(sv_2mortal(newRV( (SV*) href)));
+
+	PUTBACK;
+
+	perl_call_sv(esrequest_ref, G_SCALAR | G_DISCARD);
+
+	SPAGAIN;
+
+	temp = hv_fetch(href, "ERR_CODE", 8, 1);
+	if (temp) {
+		SV *err_code = newSVsv(*temp);
+		rr->errcode = SvIV(err_code);
+	}
+
+	temp = hv_fetch(href, "ERR_STR", 7, 1);
+	if (temp) {
+		SV *err_str = newSVsv(*temp);
+		STRLEN len;
+		char *ptr;
+		ptr = SvPV(err_str, len);
+		rr->errstring = odr_strdupn(rr->stream, ptr, len);
+	}
+	if (rr->errcode == 0 && k) {
+		rr->taskPackage = createItemOrderTaskPackage(href, k, rr);
+	}
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
 	return 0;
 }
 

@@ -99,6 +99,9 @@ sub launch_server {
 	if (defined($self->{START})) {
 		set_start_handler($self->{START});
 	}
+	if (defined($self->{ESREQUEST})) {
+		set_esrequest_handler($self->{ESREQUEST});
+	}
 	start_server(@args);
 }
 

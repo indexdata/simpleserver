@@ -275,6 +275,14 @@ sub my_fetch_handler {
 	}
 }
 
+sub my_esrequest_handler {
+	my $args = shift;
+	print Dumper($args);
+	if (defined($args->{XML_ILL})) {
+		$args->{XML_ILL} = "<response>1234</response>\n";
+	}
+}
+
 sub my_start_handler {
     my $args = shift;
     my $config = $args->{CONFIG};
@@ -288,7 +296,9 @@ my $handler = new Net::Z3950::SimpleServer(
 		SEARCH	=>	"main::my_search_handler",
 		SCAN	=>	"main::my_scan_handler",
                 SORT    =>      "main::my_sort_handler",
-		FETCH	=>	"main::my_fetch_handler" );
+		FETCH	=>	"main::my_fetch_handler",
+		ESREQUEST =>	"main::my_esrequest_handler"
+);
 
 if (@ARGV >= 2 && $ARGV[0] eq "-n") {
     $_fail_frequency = $ARGV[1];
