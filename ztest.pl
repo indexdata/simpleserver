@@ -46,6 +46,16 @@ sub my_init_handler {
 	my $args = shift;
 	my $session = {};
 
+	print("IMP_ID = '", $args->{IMP_ID}, "'\n");
+	print("IMP_NAME = '", $args->{IMP_NAME}, "'\n");
+	print("IMP_VER = '", $args->{IMP_VER}, "'\n");
+	print("ERR_CODE = '", $args->{ERR_CODE}, "'\n");
+	print("ERR_STR = '", $args->{ERR_STR}, "'\n");
+	print("PEER_NAME = '", $args->{PEER_NAME}, "'\n");
+	print("GHANDLE = '", $args->{GHANDLE}, "'\n");
+	print("HANDLE = '", $args->{HANDLE}, "'\n");
+	print("PID = '", $args->{PID}, "'\n");
+
 	if (defined($args->{USER})) {
 	    printf("Received USER=%s\n", $args->{USER});
 	}
