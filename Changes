@@ -14,7 +14,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  many parameters including facet requests. Part of SUP-946.
 	* Document CQL queries.
 	* Document the Explain Handler.
-	* Fix obsolete Libraey-of-Congress URL in documentation.
+	* Fix obsolete Library-of-Congress URL in documentation.
 	* Fix links into Index Data's own documentation to use .html
 	  extensions rather than the old .tkl.
 	* Fix some typos in documentation and change-log.
