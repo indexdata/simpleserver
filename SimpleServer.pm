@@ -921,6 +921,23 @@ What ever data structure the HANDLE value points at goes out of scope
 after this call. If you need to close down a connection to your server
 or something similar, this is the place to do it.
 
+=head2 Explain handler
+
+The argument hash received by the explain handler has the following elements:
+
+  $args = {
+                            ## Request parameters:
+     GHANDLE   =>  $obj,    # Global handle specified at creation
+     HANDLE    =>  ref,     # Reference to data structure
+     DATABASE  =>  $dbname, # Name of database to be explained
+
+                            ## Response parameters:
+     EXPLAIN   =>  $zeerex  # ZeeRex record for specified database
+  };
+
+The handler should return a string containing the ZeeRex XML that
+describes that nominated database.
+
 =head2 Delete handler
 
 The argument hash received by the delete handler has the following elements:
