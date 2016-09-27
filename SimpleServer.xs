@@ -1,5 +1,5 @@
 /* This file is part of simpleserver.
- * Copyright (C) 2000-2015 Index Data.
+ * Copyright (C) 2000-2016 Index Data.
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

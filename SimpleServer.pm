@@ -1,5 +1,5 @@
 ## This file is part of simpleserver
-## Copyright (C) 2000-2015 Index Data.
+## Copyright (C) 2000-2016 Index Data.
 ## All rights reserved.
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions are met:
@@ -1107,7 +1107,7 @@ Mike Taylor (indexdata.com).
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2000-2015 by Index Data.
+Copyright (C) 2000-2016 by Index Data.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
