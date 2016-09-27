@@ -1,6 +1,6 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-1.21  Tue Sep 27 09:06:15 UTC 2016
+1.21  Tue Sep 27 09:40:12 UTC 2016
 	* Better support for facets. Cope with absent terms.
 	* Sample server ztest.pl demonstrates facets implemention.
 	* The ztest.pl sample server now emits all INIT parameter when
