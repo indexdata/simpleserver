@@ -1702,11 +1702,10 @@ bend_initresult *bend_init(bend_initrequest *q)
 
        	href = newHV();
 
-	/* ### Next bit doesn't work as GFS doesn't pass values sent be the client */
-	printf("id=%ld, name=%ld, ver=%ld\n", (long) q->implementation_id, (long) q->implementation_name, (long) q->implementation_version);
-	hv_store(href, "IMP_ID", 6, newSVpv(q->implementation_id, 0), 0);
-	hv_store(href, "IMP_NAME", 8, newSVpv(q->implementation_name, 0), 0);
-	hv_store(href, "IMP_VER", 7, newSVpv(q->implementation_version, 0), 0);
+	/* ### These should be given initial values from the client */
+	hv_store(href, "IMP_ID", 6, newSVpv("", 0), 0);
+	hv_store(href, "IMP_NAME", 8, newSVpv("", 0), 0);
+	hv_store(href, "IMP_VER", 7, newSVpv("", 0), 0);
 
 	hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
 	hv_store(href, "ERR_STR", 7, newSViv(0), 0);
