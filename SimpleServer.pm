@@ -782,6 +782,7 @@ The information exchanged between client and present handle is:
 	     SETNAME   =>  "id",    ## Result set ID
 	     START     =>  xxx,     ## Start position
 	     COMP      =>  "",	    ## Desired record composition
+	     SCHEMA_OID => "",      ## Z39.50 schema (OID), if any
 	     NUMBER    =>  yyy,	    ## Number of requested records
 
 
@@ -810,7 +811,8 @@ The parameters exchanged between the server and the fetch handler are:
 	     OFFSET    =>  nnn      ## Record offset number
 	     REQ_FORM  =>  "n.m.k.l"## Client requested format OID
 	     COMP      =>  "xyz"    ## Formatting instructions
-	     SCHEMA    =>  "abc"    ## Requested schema, if any
+	     SCHEMA_OID => "",      ## Z39.50 schema (OID), if any
+	     SCHEMA    =>  "abc"    ## Requested schema (string), if any
 
 				    ## Handler response:
 

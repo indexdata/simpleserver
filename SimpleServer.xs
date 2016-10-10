@@ -1111,6 +1111,36 @@ int bend_delete(void *handle, bend_delete_rr *rr)
 	return 0;
 }
 
+static int comp(HV *href, Z_RecordComposition *composition)
+{
+	if (composition->which == Z_RecordComp_simple) {
+		Z_ElementSetNames *simple = composition->u.simple;
+		if (simple->which == Z_ElementSetNames_generic) {
+			hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
+		} else {
+			return 26;
+		}
+	} else if (composition->which == Z_RecordComp_complex) {
+		Z_CompSpec *c = composition->u.complex;
+		if (c && c->generic && c->generic->elementSpec &&
+		    c->generic->elementSpec->which ==
+		    Z_ElementSpec_elementSetName) {
+			hv_store(href, "COMP", 4,
+				 newSVpv(c->generic->elementSpec->u.elementSetName, 0), 0);
+		}
+		if (c->generic->which ==  Z_Schema_oid &&
+		    c->generic->schema.oid) {
+			WRBUF w = oid2dotted(c->generic->schema.oid);
+			hv_store(href,
+				 "SCHEMA_OID", 10,
+				 newSVpv(wrbuf_buf(w), wrbuf_len(w)), 0);
+			wrbuf_destroy(w);
+		}
+	} else {
+		return 26;
+	}
+	return 0;
+}
 
 int bend_fetch(void *handle, bend_fetch_rr *rr)
 {
@@ -1129,9 +1159,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
 
-	Z_RecordComposition *composition;
-	Z_ElementSetNames *simple;
-	Z_CompSpec *complex;
 	STRLEN length;
 
 	dSP;
@@ -1164,49 +1191,11 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
-	if (rr->comp)
-	{
-		composition = rr->comp;
-		if (composition->which == Z_RecordComp_simple)
-		{
-			simple = composition->u.simple;
-			if (simple->which == Z_ElementSetNames_generic)
-			{
-				hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
-			}
-			else
-			{
-				rr->errcode = 26;
-				rr->errstring = odr_strdup(rr->stream, "non-generic 'simple' composition");
-				return 0;
-			}
-		}
-		else if (composition->which == Z_RecordComp_complex)
-		{
-		        if (composition->u.complex->generic &&
 
-					composition->u.complex->generic &&
-					composition->u.complex->generic->elementSpec &&
-					composition->u.complex->generic->elementSpec->which ==
-					Z_ElementSpec_elementSetName)
-			{
-				complex = composition->u.complex;
-				hv_store(href, "COMP", 4,
-					newSVpv(complex->generic->elementSpec->u.elementSetName, 0), 0);
-			}
-			else
-			{
-#if 0	/* For now ignore this error, which is ubiquitous in SRU */
-				rr->errcode = 26;
-				rr->errstring = odr_strdup(rr->stream, "'complex' composition is not generic ESN");
-				return 0;
-#endif /*0*/
-			}
-		}
-		else
-		{
-			rr->errcode = 26;
-			rr->errstring = odr_strdup(rr->stream, "composition neither simple nor complex");
+	if (rr->comp) {
+		rr->errcode = comp(href, rr->comp);
+		if (rr->errcode) {
+			rr->errstring = "unhandled compspec";
 			return 0;
 		}
 	}
@@ -1318,6 +1307,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 }
 
 
+
 int bend_present(void *handle, bend_present_rr *rr)
 {
 	HV *href;
@@ -1326,14 +1316,9 @@ int bend_present(void *handle, bend_present_rr *rr)
 	SV *err_string;
 	SV *point;
 	STRLEN len;
-	Z_RecordComposition *composition;
-	Z_ElementSetNames *simple;
-	Z_CompSpec *complex;
 	char *ptr;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
-
-/*	WRBUF oid_dotted; */
 
 	dSP;
 	ENTER;
@@ -1347,50 +1332,11 @@ int bend_present(void *handle, bend_present_rr *rr)
 	hv_store(href, "START", 5, newSViv(rr->start), 0);
 	hv_store(href, "SETNAME", 7, newSVpv(rr->setname, 0), 0);
 	hv_store(href, "NUMBER", 6, newSViv(rr->number), 0);
-	/*oid_dotted = oid2dotted(rr->request_format_raw);
-        hv_store(href, "REQ_FORM", 8, newSVpv((char *)oid_dotted->buf, oid_dotted->pos), 0);*/
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
-	if (rr->comp)
-	{
-		composition = rr->comp;
-		if (composition->which == Z_RecordComp_simple)
-		{
-			simple = composition->u.simple;
-			if (simple->which == Z_ElementSetNames_generic)
-			{
-				hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
-			}
-			else
-			{
-				rr->errcode = 26;
-				rr->errstring = odr_strdup(rr->stream, "non-generic 'simple' composition");
-				return 0;
-			}
-		}
-		else if (composition->which == Z_RecordComp_complex)
-		{
-		        if (composition->u.complex->generic &&
-
-					composition->u.complex->generic &&
-					composition->u.complex->generic->elementSpec &&
-					composition->u.complex->generic->elementSpec->which ==
-					Z_ElementSpec_elementSetName)
-			{
-				complex = composition->u.complex;
-				hv_store(href, "COMP", 4,
-					newSVpv(complex->generic->elementSpec->u.elementSetName, 0), 0);
-			}
-			else
-			{
-				rr->errcode = 26;
-				rr->errstring = odr_strdup(rr->stream, "'complex' composition is not generic ESN");
-				return 0;
-			}
-		}
-		else
-		{
-			rr->errcode = 26;
-			rr->errstring = odr_strdup(rr->stream, "composition neither simple nor complex");
+	if (rr->comp) {
+		rr->errcode = comp(href, rr->comp);
+		if (rr->errcode) {
+			rr->errstring = "unhandled compspec";
 			return 0;
 		}
 	}
