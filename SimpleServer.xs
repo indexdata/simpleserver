@@ -749,7 +749,7 @@ static SV *f_FacetField_to_SV(Z_FacetField *facet_field)
 	    Z_Term *z_term = facet_field->terms[i]->term;
             HV *hv;
 	    SV *sv_count = newSViv(*facet_field->terms[i]->count);
-            SV *sv_term;
+	    SV *sv_term = 0;
 	    SV *tmp;
 	    if (z_term->which == Z_Term_general) {
 	        sv_term = newSVpv((char*) z_term->u.general->buf,
@@ -761,8 +761,9 @@ static SV *f_FacetField_to_SV(Z_FacetField *facet_field)
 	    tmp = newObject("Net::Z3950::FacetTerm", (SV *) (hv = newHV()));
 
 	    setMember(hv, "count", sv_count);
-	    setMember(hv, "term", sv_term);
-
+	    if (sv_term) {
+	        setMember(hv, "term", sv_term);
+	    }
 	    av_push(av, tmp);
 	}
 	setMember(hv, "terms", terms);
@@ -1549,7 +1550,6 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	HV *scan_item;
 	struct scan_entry *buffer;
 	int *step_size = rr->step_size;
-	int scan_list_size = rr->num_entries;
 	int i;
 	char **basenames;
 	SV **temp;
