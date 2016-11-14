@@ -358,6 +358,8 @@ The argument hash passed to the init handler has the form
 	     			    ## this member contains user name
 	     PASS      =>  "yyy"    ## Under same conditions, this member
 	     			    ## contains the password in clear text
+	     GROUP     =>  "zzz"    ## Under same conditions, this member
+				    ## contains the group in clear text
 	     GHANDLE   =>  $obj     ## Global handle specified at creation
 	     HANDLE    =>  undef    ## Handler of Perl data structure
 	  };

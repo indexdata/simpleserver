@@ -1716,6 +1716,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	if (q->auth) {
 	    char *user = NULL;
 	    char *passwd = NULL;
+	    char *group = NULL;
 	    if (q->auth->which == Z_IdAuthentication_open) {
                 char *cp;
 		user = nmem_strdup (odr_getmem (q->stream), q->auth->u.open);
@@ -1725,15 +1726,25 @@ bend_initresult *bend_init(bend_initrequest *q)
 		    *cp = '\0';
 		    passwd = cp+1;
 		}
+		cp = strchr(passwd, '/');
+		if (cp) {
+		    /* user/group/passwd */
+		    *cp = '\0';
+		    group = passwd;
+		    passwd = cp+1;
+                }
 	    } else if (q->auth->which == Z_IdAuthentication_idPass) {
 		user = q->auth->u.idPass->userId;
 		passwd = q->auth->u.idPass->password;
+		group = q->auth->u.idPass->groupId;
 	    }
 	    /* ### some code paths have user/password unassigned here */
             if (user)
 	        hv_store(href, "USER", 4, newSVpv(user, 0), 0);
             if (passwd)
 	        hv_store(href, "PASS", 4, newSVpv(passwd, 0), 0);
+            if (group)
+	        hv_store(href, "GROUP", 5, newSVpv(group, 0), 0);
 	}
 
 	PUSHMARK(sp);
