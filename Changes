@@ -1,5 +1,34 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+1.22  Tue Nov  1 11:23:56 UTC 2016
+	* Extended service Item Order with XML body
+	* SCHEMA_OID to fetch+present handler
+	* Include Travis files in MANIFEST.
+	* Fix a couple of compiler warnings
+
+1.21  Tue Sep 27 09:40:12 UTC 2016
+	* Better support for facets. Cope with absent terms.
+	* Sample server ztest.pl demonstrates facets implemention.
+	* The ztest.pl sample server now emits all INIT parameter when
+	  a connection is made.
+	* Add Travis continuous integration configuration (modified
+	  from that of ZOOM-Perl).
+	* Fix a bizarre RPM package-building bug whereby the
+	  lower-case letter 'n' was stripped from the name of the
+	  person building the package. Fixes SA-743
+	* Major overhaul of search documentation, which was missing
+	  many parameters including facet requests. Part of SUP-946.
+	* Document CQL queries.
+	* Document the Explain Handler.
+	* Fix obsolete Library-of-Congress URL in documentation.
+	* Fix links into Index Data's own documentation to use .html
+	  extensions rather than the old .tkl.
+	* Fix some typos in documentation and change-log.
+	* README file converted to README.md (Markdown).
+	* Many other improvements and clarifications to
+	  documentation.
+	* Update which distributions we build for.
+	  
 1.20  Thu Jan 29 07:53:46 UTC 2015
 	- Add support for Type-1's proximity operator. Patch from
 	  Simon Jacob of the National Library of Australia.

@@ -10,7 +10,10 @@ Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: perl
 BuildRequires: libyaz5-devel >= 5.0.0
-# On Centos6: BuildRequires: perl-ExtUtils-MakeMaker
+BuildRequires: yaz
+%if 0%{?rhel} >= 6
+BuildRequires: perl-ExtUtils-MakeMaker
+%endif
 Packager: Jakub Skoczen <jakub@indexdata.dk>
 URL: http://www.indexdata.com/simpleserver/
 

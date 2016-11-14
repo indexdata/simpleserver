@@ -11,7 +11,7 @@ perl:
   - "5.8"
 
 before_install:
-  - ./t/travis/travis-init.sh
+  - ./travis-init.sh
   - sudo apt-get install -yq libyaz5-dev yaz
 
 before_script:

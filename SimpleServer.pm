@@ -1,5 +1,5 @@
 ## This file is part of simpleserver
-## Copyright (C) 2000-2015 Index Data.
+## Copyright (C) 2000-2016 Index Data.
 ## All rights reserved.
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
 @EXPORT = qw( );
-$VERSION = '1.20';
+$VERSION = '1.22';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
@@ -98,6 +98,9 @@ sub launch_server {
 	}
 	if (defined($self->{START})) {
 		set_start_handler($self->{START});
+	}
+	if (defined($self->{ESREQUEST})) {
+		set_esrequest_handler($self->{ESREQUEST});
 	}
 	start_server(@args);
 }
@@ -781,6 +784,7 @@ The information exchanged between client and present handle is:
 	     SETNAME   =>  "id",    ## Result set ID
 	     START     =>  xxx,     ## Start position
 	     COMP      =>  "",	    ## Desired record composition
+	     SCHEMA_OID => "",      ## Z39.50 schema (OID), if any
 	     NUMBER    =>  yyy,	    ## Number of requested records
 
 
@@ -809,7 +813,8 @@ The parameters exchanged between the server and the fetch handler are:
 	     OFFSET    =>  nnn      ## Record offset number
 	     REQ_FORM  =>  "n.m.k.l"## Client requested format OID
 	     COMP      =>  "xyz"    ## Formatting instructions
-	     SCHEMA    =>  "abc"    ## Requested schema, if any
+	     SCHEMA_OID => "",      ## Z39.50 schema (OID), if any
+	     SCHEMA    =>  "abc"    ## Requested schema (string), if any
 
 				    ## Handler response:
 
@@ -922,6 +927,23 @@ The argument hash received by the close handler has two elements only:
 What ever data structure the HANDLE value points at goes out of scope
 after this call. If you need to close down a connection to your server
 or something similar, this is the place to do it.
+
+=head2 Explain handler
+
+The argument hash received by the explain handler has the following elements:
+
+  $args = {
+                            ## Request parameters:
+     GHANDLE   =>  $obj,    # Global handle specified at creation
+     HANDLE    =>  ref,     # Reference to data structure
+     DATABASE  =>  $dbname, # Name of database to be explained
+
+                            ## Response parameters:
+     EXPLAIN   =>  $zeerex  # ZeeRex record for specified database
+  };
+
+The handler should return a string containing the ZeeRex XML that
+describes that nominated database.
 
 =head2 Delete handler
 
@@ -1092,7 +1114,7 @@ Mike Taylor (indexdata.com).
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2000-2015 by Index Data.
+Copyright (C) 2000-2016 by Index Data.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

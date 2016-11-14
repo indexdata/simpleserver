@@ -1,7 +1,9 @@
 #!/usr/bin/perl -w
 
+#use Carp qw(cluck); $SIG{__WARN__} = sub { cluck @_ };
+
 ## This file is part of simpleserver
-## Copyright (C) 2000-2015 Index Data.
+## Copyright (C) 2000-2016 Index Data.
 ## All rights reserved.
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions are met:
@@ -46,11 +48,16 @@ sub my_init_handler {
 	my $args = shift;
 	my $session = {};
 
-	$args->{IMP_NAME} = "DemoServer";
-	$args->{IMP_ID} = "81";
-	$args->{IMP_VER} = "3.14159";
-	$args->{ERR_CODE} = 0;
-	$args->{HANDLE} = $session;
+	print("IMP_ID = '", $args->{IMP_ID}, "'\n");
+	print("IMP_NAME = '", $args->{IMP_NAME}, "'\n");
+	print("IMP_VER = '", $args->{IMP_VER}, "'\n");
+	print("ERR_CODE = '", $args->{ERR_CODE}, "'\n");
+	print("ERR_STR = '", $args->{ERR_STR}, "'\n");
+	print("PEER_NAME = '", $args->{PEER_NAME}, "'\n");
+	print("GHANDLE = '", $args->{GHANDLE}, "'\n");
+	print("HANDLE = '", $args->{HANDLE}, "'\n");
+	print("PID = '", $args->{PID}, "'\n");
+
 	if (defined($args->{USER})) {
 	    printf("Received USER=%s\n", $args->{USER});
 	}
@@ -58,6 +65,11 @@ sub my_init_handler {
 	    printf("Received PASS=%s\n", $args->{PASS});
 	}
 
+	$args->{IMP_NAME} = "DemoServer";
+	$args->{IMP_ID} = "81";
+	$args->{IMP_VER} = "3.14159";
+	$args->{ERR_CODE} = 0;
+	$args->{HANDLE} = $session;
 }
 
 
@@ -263,6 +275,14 @@ sub my_fetch_handler {
 	}
 }
 
+sub my_esrequest_handler {
+	my $args = shift;
+	print Dumper($args);
+	if (defined($args->{XML_ILL})) {
+		$args->{XML_ILL} = "<response>1234</response>\n";
+	}
+}
+
 sub my_start_handler {
     my $args = shift;
     my $config = $args->{CONFIG};
@@ -276,7 +296,9 @@ my $handler = new Net::Z3950::SimpleServer(
 		SEARCH	=>	"main::my_search_handler",
 		SCAN	=>	"main::my_scan_handler",
                 SORT    =>      "main::my_sort_handler",
-		FETCH	=>	"main::my_fetch_handler" );
+		FETCH	=>	"main::my_fetch_handler",
+		ESREQUEST =>	"main::my_esrequest_handler"
+);
 
 if (@ARGV >= 2 && $ARGV[0] eq "-n") {
     $_fail_frequency = $ARGV[1];
