@@ -54,12 +54,13 @@ sub my_init_handler {
 	print("ERR_CODE = '", $args->{ERR_CODE}, "'\n");
 	print("ERR_STR = '", $args->{ERR_STR}, "'\n");
 	print("PEER_NAME = '", $args->{PEER_NAME}, "'\n");
-	print("GHANDLE = '", $args->{GHANDLE}, "'\n");
-	print("HANDLE = '", $args->{HANDLE}, "'\n");
 	print("PID = '", $args->{PID}, "'\n");
 
 	if (defined($args->{USER})) {
 	    printf("Received USER=%s\n", $args->{USER});
+	}
+	if (defined($args->{GROUP})) {
+	    printf("Received GROUP=%s\n", $args->{GROUP});
 	}
 	if (defined($args->{PASS})) {
 	    printf("Received PASS=%s\n", $args->{PASS});
@@ -287,8 +288,6 @@ sub my_start_handler {
     my $args = shift;
     my $config = $args->{CONFIG};
 }
-
-Net::Z3950::SimpleServer::yazlog("hello");
 
 my $handler = new Net::Z3950::SimpleServer(
                 START   =>      "main::my_start_handler",
