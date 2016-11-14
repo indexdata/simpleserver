@@ -1826,14 +1826,14 @@ bend_initresult *bend_init(bend_initrequest *q)
                     /* password after / given */
 		    *cp = '\0';
 		    passwd = cp+1;
+		    cp = strchr(passwd, '/');
+		    if (cp) {
+			/* user/group/passwd */
+			*cp = '\0';
+			group = passwd;
+			passwd = cp+1;
+		    }
 		}
-		cp = strchr(passwd, '/');
-		if (cp) {
-		    /* user/group/passwd */
-		    *cp = '\0';
-		    group = passwd;
-		    passwd = cp+1;
-                }
 	    } else if (q->auth->which == Z_IdAuthentication_idPass) {
 		user = q->auth->u.idPass->userId;
 		passwd = q->auth->u.idPass->password;
