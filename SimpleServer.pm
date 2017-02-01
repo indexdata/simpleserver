@@ -1,5 +1,5 @@
 ## This file is part of simpleserver
-## Copyright (C) 2000-2016 Index Data.
+## Copyright (C) 2000-2017 Index Data.
 ## All rights reserved.
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions are met:
@@ -183,7 +183,7 @@ __END__
 
 =head1 NAME
 
-Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers. 
+Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
 
 =head1 SYNOPSIS
 
@@ -258,7 +258,7 @@ of events:
   - Search request
   - Present request
   - Fetching of records
-  - Scan request (browsing) 
+  - Scan request (browsing)
   - Closing down connection
 
 Note that only the Search and Fetch handler functions are required.
@@ -419,7 +419,7 @@ The QUERY parameter presented this tree to the search function in the
 Prefix Query Format (PQF) which is used in many applications based on
 the YAZ toolkit. The full grammar is described in the YAZ manual.
 
-The following are all examples of valid queries in the PQF. 
+The following are all examples of valid queries in the PQF.
 
 	dylan
 
@@ -952,7 +952,7 @@ be deleted.  In either case, the callback function should report on
 success or failure by setting the STATUS element either to zero, on
 success, or to an integer from 1 to 10, to indicate one of the ten
 possible failure codes described in section 3.2.4.1.4 of the Z39.50
-standard -- see 
+standard -- see
 http://www.loc.gov/z3950/agency/markup/05.html#Delete-list-statuses1
 
 =head2 Sort handler
@@ -1095,12 +1095,12 @@ http://search.cpan.org/~esummers/CQL-Parser/
 =head1 AUTHORS
 
 Anders Sønderberg (sondberg@indexdata.dk),
-Sebastian Hammer (quinn@indexdata.dk),
+Sebastian Hammer (quinn@indexdata.com),
 Mike Taylor (indexdata.com).
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2000-2016 by Index Data.
+Copyright (C) 2000-2017 by Index Data.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
