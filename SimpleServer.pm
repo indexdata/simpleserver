@@ -219,10 +219,10 @@ Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
 
   ## Register custom event handlers:
   my $z = new Net::Z3950::SimpleServer(GHANDLE = $someObject,
-				       INIT   =>  \&my_init_handler,
-				       CLOSE  =>  \&my_close_handler,
-				       SEARCH =>  \&my_search_handler,
-				       FETCH  =>  \&my_fetch_handler);
+				       INIT   =>  "main::my_init_handler",
+				       CLOSE  =>  "main::my_close_handler",
+				       SEARCH =>  "main::my_search_handler",
+				       FETCH  =>  "main::my_fetch_handler");
 
   ## Launch server:
   $z->launch_server("ztest.pl", @ARGV);
@@ -276,36 +276,22 @@ The Perl programmer specifies the event handlers for the server by
 means of the SimpleServer object constructor
 
   my $z = new Net::Z3950::SimpleServer(
-                        START   =>      \&my_start_handler,
-			INIT	=>	\&my_init_handler,
-			CLOSE	=>	\&my_close_handler,
-			SEARCH	=>	\&my_search_handler,
-			PRESENT	=>	\&my_present_handler,
-			SCAN	=>	\&my_scan_handler,
-			FETCH	=>	\&my_fetch_handler,
-  			EXPLAIN =>	\&my_explain_handler,
-  			DELETE  =>	\&my_delete_handler,
-  			SORT    =>	\&my_sort_handler);
+                        START   =>      "main::my_start_handler",
+			INIT	=>	"main::my_init_handler",
+			CLOSE	=>	"main::my_close_handler",
+			SEARCH	=>	"main::my_search_handler",
+			PRESENT	=>	"main::my_present_handler",
+			SCAN	=>	"main::my_scan_handler",
+			FETCH	=>	"main::my_fetch_handler",
+			EXPLAIN =>	"main::my_explain_handler",
+			DELETE  =>	"main::my_delete_handler",
+			ESREQUEST =>    "main::my_esrequest_handler",
+			SORT    =>	"main::my_sort_handler");
 
 In addition, the arguments to the constructor may include GHANDLE, a
 global handle which is made available to each invocation of every
 callback function.  This is typically a reference to either a hash or
-an object.
-
-If you want your SimpleServer to start a thread (threaded mode) to
-handle each incoming Z39.50 request instead of forking a process
-(forking mode), you need to register the handlers by symbol rather
-than by code reference. Thus, in threaded mode, you will need to
-register your handlers this way:
-
-  my $z = new Net::Z3950::SimpleServer(
-  			INIT	=>	"my_package::my_init_handler",
-			CLOSE	=>	"my_package::my_close_handler",
-			....
-			....          );
-
-where my_package is the Perl package in which your handler is
-located.
+an object. (replace main with your package, if not main).
 
 After the custom event handlers are declared, the server is launched
 by means of the method
