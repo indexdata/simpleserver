@@ -1425,8 +1425,7 @@ static Z_TaskPackage *createItemOrderTaskPackage(HV *href,
 	tp->retentionTime = 0;
 	tp->permissions = 0;
 	tp->description = 0;
-	tp->targetReference =
-		odr_create_Odr_oct(stream, "911", 3);
+	tp->targetReference = 0;
 	tp->creationDateTime = 0;
 	tp->taskStatus = odr_intdup(stream, 0);
 	tp->packageDiagnostics = 0;
