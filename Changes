@@ -1,5 +1,10 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+1.24  Tue Mar  7 11:05:56 CET 2017
+	* Extended Service: no fake targetReference in Task Package
+	* Few doc updates; bump copyright year
+	* Use thread-safe notation for callbacks
+
 1.23  Mon Nov 14 15:54:36 UTC 2016
 	* GROUP passed to init handler
 
