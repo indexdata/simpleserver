@@ -3,4 +3,4 @@ VERSION=1.24
 OMIT_FROM_DIST="archive"
 DEBIAN_DIST="jessie wheezy"
 UBUNTU_DIST="yakkety xenial trusty precise"
-CENTOS_DIST="centos5 centos6 centos7"
+CENTOS_DIST="centos6 centos7"
