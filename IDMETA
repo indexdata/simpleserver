@@ -1,6 +1,6 @@
 NAME=libnet-z3950-simpleserver-perl
 VERSION=1.24
 OMIT_FROM_DIST="archive"
-DEBIAN_DIST="jessie wheezy"
+DEBIAN_DIST="stretch jessie wheezy"
 UBUNTU_DIST="bionic xenial trusty"
 CENTOS_DIST="centos6 centos7"
