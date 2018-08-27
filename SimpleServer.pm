@@ -849,6 +849,7 @@ an index of a book, you always find something! The parameters exchanged are:
 						## bases to search
 		TERM		=> 'start',	## The start term
 		RPN		=>  $obj,       ## Reference to a Net::Z3950::RPN::Term
+		attributeSet	=> OID,		## OID String (optional)
 
 		NUMBER		=> xx,		## Number of requested terms
 		POS		=> yy,		## Position of starting point
