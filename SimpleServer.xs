@@ -1584,6 +1584,10 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 		rr->errcode = 229;	/* Unsupported term type */
 		return 0;
 	}
+	if (rr->attributeset)
+		setMember(href, "attributeSet",
+			  translateOID(rr->attributeset));
+
 	hv_store(href, "STEP", 4, newSViv(*step_size), 0);
 	hv_store(href, "NUMBER", 6, newSViv(rr->num_entries), 0);
 	hv_store(href, "POS", 3, newSViv(rr->term_position), 0);
