@@ -1504,7 +1504,12 @@ int bend_esrequest(void *handle, bend_esrequest_rr *rr)
 	if (ext && ext->which == Z_External_itemOrder) {
 		k = decodeItemOrderRequest(href, ext->u.itemOrder);
 	}
-
+	if (ext && !oid_oidcmp(yaz_oid_extserv_xml_es, esr->packageType)
+	    && ext->which ==  Z_External_octet) {
+	  hv_store(href, "XML_ILL", 7,
+		   newSVpvn(ext->u.octet_aligned->buf,
+			    ext->u.octet_aligned->len), 0);
+	}
 	PUSHMARK(SP);
 
 	XPUSHs(sv_2mortal(newRV( (SV*) href)));
