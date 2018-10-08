@@ -9,7 +9,7 @@ Vendor: Index Data ApS <info@indexdata.com>
 Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: perl
-BuildRequires: libyaz5-devel >= 5.0.0
+BuildRequires: libyaz5-devel >= 5.27.0
 BuildRequires: yaz
 %if 0%{?rhel} >= 6
 BuildRequires: perl-ExtUtils-MakeMaker
@@ -17,7 +17,7 @@ BuildRequires: perl-ExtUtils-MakeMaker
 Packager: Jakub Skoczen <jakub@indexdata.dk>
 URL: http://www.indexdata.com/simpleserver/
 
-Requires: libyaz5 >= 5.0.0
+Requires: libyaz5 >= 5.27.0
 
 %description
 The SimpleServer module is a tool for constructing Z39.50 "Information

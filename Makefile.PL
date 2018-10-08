@@ -15,10 +15,9 @@ SimpleServer module.
 ];
 }
 
-## extra_args + extra_response_data for scan appeared in 4.2.51
 chomp($yazver);
 my ($major, $minor, $trivial) = split(/\./, $yazver);
-my ($needMaj, $needMin, $needTriv) = (4, 2, 51);
+my ($needMaj, $needMin, $needTriv) = (5, 27, 0);
 #print "major=$major, minor=$minor, trivial=$trivial\n";
 die "You have YAZ version $major.$minor.$trivial; " .
     "you need $needMaj.$needMin.$needTriv or better."
