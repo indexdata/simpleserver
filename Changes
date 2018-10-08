@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+1.26  Mon Oct  8 13:47:43 CEST 2018
+        * SIM-29: Handle extended service XML-ES response
+
 1.25  Wed Sep 26 15:19:30 CEST 2018
         * SIM-28: Handle extended service XML-ES (pass XML_ILL document)
 
