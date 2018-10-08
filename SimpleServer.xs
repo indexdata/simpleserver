@@ -1537,7 +1537,23 @@ int bend_esrequest(void *handle, bend_esrequest_rr *rr)
 	if (rr->errcode == 0 && k) {
 		rr->taskPackage = createItemOrderTaskPackage(href, k, rr);
 	}
-
+        temp = hv_fetch(href, "XML_ILL", 7, 1);
+	if (rr->errcode == 0 &&
+	    ext && !oid_oidcmp(yaz_oid_extserv_xml_es, esr->packageType)
+	    && temp) {
+	    SV *err_str = newSVsv(*temp);
+	    STRLEN len;
+	    char *ptr;
+	    Z_External *ext = (Z_External *)
+	      odr_malloc(rr->stream, sizeof(*ext));
+	    rr->taskPackageExt = ext;
+	    ext->direct_reference = esr->packageType;
+	    ext->descriptor = 0;
+	    ext->indirect_reference = 0;
+	    ext->which = Z_External_octet;
+	    ptr = SvPV(err_str, len);
+	    ext->u.octet_aligned = odr_create_Odr_oct(rr->stream, ptr, len);
+	}
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
