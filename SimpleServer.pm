@@ -181,6 +181,8 @@ package Net::Z3950::SimpleServer;
 __END__
 # Below is the stub of documentation for your module. You better edit it!
 
+=encoding utf8
+
 =head1 NAME
 
 Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
