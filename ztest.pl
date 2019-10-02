@@ -259,20 +259,25 @@ sub my_fetch_handler {
 	my $set_id = $args->{SETNAME};
 	my $data = $session->{$set_id};
 	my $offset = $args->{OFFSET};
-	my $record = "<xml>";
+	my $comp = $args->{COMP};
 	my $field;
 	my $hits = $session->{__HITS};
 	my $href = $data->[$offset - 1];
 
 	$args->{REP_FORM} = Net::Z3950::OID::xml;
-	foreach $field (keys %$href) {
-		$record .= "<" . $field . ">" . $href->{$field} . "</" . $field . ">";
-	}
-
-	$record .= "</xml>";
-	$args->{RECORD} = $record;
 	if ($offset == $session->{__HITS}) {
 		$args->{LAST} = 1;
+	} elsif ($comp eq "OP") {
+	    $args->{RECORD} = return_opacxml();
+	} elsif ($comp eq "marcxml") {
+	    $args->{RECORD} = return_marcxml();
+	} else {
+	    my $record = "<xml>";
+	    foreach $field (keys %$href) {
+		$record .= "<" . $field . ">" . $href->{$field} . "</" . $field . ">";
+	    }
+	    $record .= "</xml>";
+	    $args->{RECORD} = $record;
 	}
 }
 
@@ -288,6 +293,135 @@ sub my_start_handler {
     my $args = shift;
     my $config = $args->{CONFIG};
 }
+
+# Return fake MARC record
+sub return_marcxml {
+	my $record = q@
+<record xmlns="http://www.loc.gov/MARC21/slim">
+  <leader>01212nam a2200157 i 4500</leader>
+  <controlfield tag="001">9910367181303811</controlfield>
+  <controlfield tag="005">20180618101041.0</controlfield>
+  <controlfield tag="008">170620s        xx            000 0 eng d</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">bw90000408-01tuli_inst</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Host bibliographic record for boundwith item barcode 39074015913874</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">How fiscal (mis)-management may impede trade reform : lessons from an intertemporal, multi-sector general equilibrium model for Turkey / Xinshen Diao, Terry L. Roe and A. Erin&#xE7; Yeldan.</subfield>
+    <subfield code="w">991011711849703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Educational achievement and sectoral transition in the Indonesian labor force / Anna Maria Siti Kawuryan.</subfield>
+    <subfield code="w">991011711799703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Growth economics and development economics : what should development economists learn (if anything) from the new growth theory? / Vernon W. Ruttan.</subfield>
+    <subfield code="w">991011711709703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">The effect of sequencing trade and water market reform on interest groups in irrigated agriculture : an intertemporal economy-wide analysis of the Moroccan case / Xinshen Diao and Terry Roe.</subfield>
+    <subfield code="w">991011712049703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Monetary instability and economic growth / Willis Peterson.</subfield>
+    <subfield code="w">991011711759703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="852" ind1="0" ind2=" ">
+    <subfield code="b">KARDON</subfield>
+    <subfield code="c">p_remote</subfield>
+    <subfield code="h">HD1401</subfield>
+    <subfield code="i">.B95x no.98-6</subfield>
+  </datafield>
+</record>
+@;
+	return $record;
+}
+
+# Return fake OPACXML record
+sub return_opacxml {
+	my $record = q@
+<opacRecord>
+  <bibliographicRecord>
+<record xmlns="http://www.loc.gov/MARC21/slim">
+  <leader>01212nam a2200157 i 4500</leader>
+  <controlfield tag="001">9910367181303811</controlfield>
+  <controlfield tag="005">20180618101041.0</controlfield>
+  <controlfield tag="008">170620s        xx            000 0 eng d</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">bw90000408-01tuli_inst</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Host bibliographic record for boundwith item barcode 39074015913874</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">How fiscal (mis)-management may impede trade reform : lessons from an intertemporal, multi-sector general equilibrium model for Turkey / Xinshen Diao, Terry L. Roe and A. Erin&#xE7; Yeldan.</subfield>
+    <subfield code="w">991011711849703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Educational achievement and sectoral transition in the Indonesian labor force / Anna Maria Siti Kawuryan.</subfield>
+    <subfield code="w">991011711799703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Growth economics and development economics : what should development economists learn (if anything) from the new growth theory? / Vernon W. Ruttan.</subfield>
+    <subfield code="w">991011711709703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">The effect of sequencing trade and water market reform on interest groups in irrigated agriculture : an intertemporal economy-wide analysis of the Moroccan case / Xinshen Diao and Terry Roe.</subfield>
+    <subfield code="w">991011712049703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Monetary instability and economic growth / Willis Peterson.</subfield>
+    <subfield code="w">991011711759703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="852" ind1="0" ind2=" ">
+    <subfield code="b">KARDON</subfield>
+    <subfield code="c">p_remote</subfield>
+    <subfield code="h">HD1401</subfield>
+    <subfield code="i">.B95x no.98-6</subfield>
+  </datafield>
+</record>
+  </bibliographicRecord>
+<holdings>
+ <holding>
+  <encodingLevel>3</encodingLevel>
+  <localLocation>Remote Storage</localLocation>
+  <shelvingLocation>Main Remote Stacks</shelvingLocation>
+  <callNumber>HD1401 .B95x no.98-6</callNumber>
+  <volumes>
+   <volume>
+    <enumeration>       </enumeration>
+    <chronology>     </chronology>
+   </volume>
+  </volumes>
+  <circulations>
+   <circulation>
+    <availableNow value="1"/>
+    <availableThru>0</availableThru>
+    <itemId>39074015913874</itemId>
+    <renewable value="0"/>
+    <onHold value="0"/>
+   </circulation>
+  </circulations>
+ </holding>
+</holdings>
+</opacRecord>
+@;
+	print $record;
+	return $record;
+}
+
 
 my $handler = new Net::Z3950::SimpleServer(
                 START   =>      "main::my_start_handler",

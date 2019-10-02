@@ -16,3 +16,4 @@ samples/render-search.pl
 test.pl
 travis-init.sh
 ztest.pl
+gfs.xml
