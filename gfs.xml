@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<!-- generic frontend server configuration 
+<!-- generic frontend server configuration
   https://software.indexdata.com/yaz/doc/server.vhosts.html
 
   this configuration is passed to simpleserver with option -f, eg
- 
+
   ./ztest.pl -f gfs.xml
 
   The retrievalInfo sections makes YAZ responsible for converting
@@ -22,6 +22,11 @@
           <marc inputformat="xml" outputformat="marc" outputcharset="utf-8"/>
         </backend>
       </retrieval>
+      <!--
+       Provide conversion from OPACXML to plain opac in Z39.50
+       Make sure the server script can return xml/OP, then this
+       entry triggers the conversion to "opac" if requested
+      -->
       <retrieval syntax="opac">
         <backend syntax="xml" name="OP">
         </backend>
