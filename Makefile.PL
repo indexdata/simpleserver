@@ -2,17 +2,26 @@ use ExtUtils::MakeMaker;
 
 # Use: perl Makefile.PL OPTIMIZE="-O0 -g -Wdeclaration-after-statement"
 
-my $yazconf = "yaz-config";
-my $yazver = `$yazconf --version`;
-my $yazinc = `$yazconf --cflags servers`;
-my $yazlibs = `$yazconf --libs server`;
-if (!$yazver || (!$yazinc && !$yazlibs)) {
-   die qq[
+my $yazver;
+my $yazinc;
+my $yazlibs;
+system("pkg-config --exists yaz-server");
+if ($? == 0) {
+    $yazver = `pkg-config --modversion yaz-server` or die;
+    $yazinc = `pkg-config --cflags yaz-server` or die;
+    $yazlibs = `pkg-config --libs yaz-server` or die;
+} else {
+    $yazver = `yaz-config --version`;
+    $yazinc = `yaz-config --cflags servers`;
+    $yazlibs = `yaz-config --libs server`;
+    if (!$yazver || (!$yazinc && !$yazlibs)) {
+       die qq[
 ERROR: Unable to call script: yaz-config
 If you are using a YAZ installation from the Debian package "yaz", you
 will also need to install "libyaz-dev" in order to build the
 SimpleServer module.
 ];
+   }
 }
 
 chomp($yazver);
