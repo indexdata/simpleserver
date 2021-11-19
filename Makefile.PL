@@ -7,15 +7,13 @@ my $yazinc;
 my $yazlibs;
 system("pkg-config --exists yaz-server");
 if ($? == 0) {
-    $yazconf = "pkg-config";
     $yazver = `pkg-config --modversion yaz-server` or die;
     $yazinc = `pkg-config --cflags yaz-server` or die;
     $yazlibs = `pkg-config --libs yaz-server` or die;
 } else {
-    my $yazconf = "yaz-config";
-    $yazver = `$yazconf --version`;
-    $yazinc = `$yazconf --cflags servers`;
-    $yazlibs = `$yazconf --libs server`;
+    $yazver = `yaz-config --version`;
+    $yazinc = `yaz-config --cflags servers`;
+    $yazlibs = `yaz-config --libs server`;
     if (!$yazver || (!$yazinc && !$yazlibs)) {
        die qq[
 ERROR: Unable to call script: yaz-config
