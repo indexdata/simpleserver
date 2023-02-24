@@ -11,7 +11,7 @@ jobs:
      run: sudo apt update
    - name: Install required and optional dependencies
      run: >
-      sudo apt install perl gcc make libyaz-dev pkg-config
+      sudo apt install perl gcc make yaz libyaz-dev pkg-config
    - name: Generate Makefile
      run: perl Makefile.PL
    - name: Run make test
