@@ -1,15 +1,18 @@
-use ExtUtils::MakeMaker;
-
 # Use: perl Makefile.PL OPTIMIZE="-O0 -g -Wdeclaration-after-statement"
+#  or: perl Makefile.PL PREFIX=/home/mike/universe
+
+use 5.008;
+use ExtUtils::MakeMaker;
+use strict;
 
 my $yazver;
 my $yazinc;
 my $yazlibs;
 system("pkg-config --exists yaz-server");
 if ($? == 0) {
-    $yazver = `pkg-config --modversion yaz-server` or die;
-    $yazinc = `pkg-config --cflags yaz-server` or die;
-    $yazlibs = `pkg-config --libs yaz-server` or die;
+    $yazver = `pkg-config --modversion yaz-server` or die $!;
+    $yazinc = `pkg-config --cflags yaz-server` or die $!;
+    $yazlibs = `pkg-config --libs yaz-server` or die $!;
 } else {
     $yazver = `yaz-config --version`;
     $yazinc = `yaz-config --cflags servers`;
@@ -25,18 +28,11 @@ SimpleServer module.
 }
 
 chomp($yazver);
-my ($major, $minor, $trivial) = split(/\./, $yazver);
-my ($needMaj, $needMin, $needTriv) = (5, 27, 0);
-#print "major=$major, minor=$minor, trivial=$trivial\n";
-die "You have YAZ version $major.$minor.$trivial; " .
-    "you need $needMaj.$needMin.$needTriv or better."
-    if ($major < $needMaj || 
-	$major == $needMaj && $minor < $needMin ||
-	$major == $needMaj && $minor == $needMin && $trivial < $needTriv);
+check_version($yazver, "5.27.0");
 
 # For Windows use
-# $yazinc = '-Ic:\yaz\include'
-# $yazlibs = 'c:\yaz\lib\yaz3.lib'
+# $yazinc = '-Ic:\yaz\include';
+# $yazlibs = 'c:\yaz\lib\yaz3.lib';
 
 WriteMakefile(
     'NAME'	=> 'Net::Z3950::SimpleServer',
@@ -46,3 +42,21 @@ WriteMakefile(
     'INC'	=> $yazinc,     # e.g., '-I/usr/include/other' 
 #    OPTIMIZE   => "-Wdeclaration-after-statement -g -O0",
 );
+
+
+sub check_version {
+    my($got, $want) = @_;
+
+    my($gmajor, $gminor, $gtrivial) = ($got =~ /(\d+)\.(\d+)\.(\d+)/);
+    my($wmajor, $wminor, $wtrivial) = ($want =~ /(\d+)\.(\d+)\.(\d+)/);
+    if (($gmajor < $wmajor) ||
+	($gmajor == $wmajor && $gminor < $wminor) ||
+	($gmajor == $wmajor && $gminor == $wminor && $gtrivial < $wtrivial)) {
+	print <<__EOT__;
+*** ERROR!
+Net::Z3950::SimpleServer requires at least version $want of YAZ,
+but you only have version $got.
+__EOT__
+	exit 1;
+    }
+}
