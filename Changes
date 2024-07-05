@@ -5,7 +5,7 @@ Revision history for Perl extension Net::Z3950::SimpleServer
 	  pkg-config is absent. Fixes ZOOM-30.
 	* Tests now work on platforms (such as MacOS 12.7.5) where the
 	  program is hardened and will not accept dynamic libraries
-	  from relative paths.
+	  from relative paths. Fixes ZOOM-31.
 
 1.26  Mon Oct  8 13:47:43 CEST 2018
         * SIM-29: Handle extended service XML-ES response
