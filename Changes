@@ -1,6 +1,6 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-1.27  IN PROGRESS
+1.27  Fri  5 Jul 2024 18:55:44 BST
 	* Rework configuration to use Debian's yaz-config when
 	  pkg-config is absent. Fixes ZOOM-30.
 
