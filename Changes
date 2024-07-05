@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+1.27  IN PROGRESS
+	* Rework configuration to use Debian's yaz-config when
+	  pkg-config is absent. Fixes ZOOM-30.
+
 1.26  Mon Oct  8 13:47:43 CEST 2018
         * SIM-29: Handle extended service XML-ES response
 
