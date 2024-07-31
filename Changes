@@ -1,6 +1,6 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
-IN PROGRESS
+1.28  Wed 31 Jul 2024 18:28:11 BST
 	* Revert ZOOM-31, which prevented installation from
 	  working. See https://folio-org.atlassian.net/browse/ZF-103
 
